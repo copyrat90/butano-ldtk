@@ -1,0 +1,14 @@
+
+# vscode
+.vscode/
+
+# python
+.venv/
+
+# build output 
+build*/
+*.elf
+*.gba
+
+# save file for testing
+*.sav
