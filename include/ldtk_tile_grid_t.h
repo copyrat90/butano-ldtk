@@ -59,6 +59,18 @@ public:
     }
 
 public:
+    // @brief Get the cell tile info with the grid coordinate
+    [[nodiscard]] constexpr auto cell_tile_info(int grid_x, int grid_y) const -> tile_info override
+    {
+        tile t = get_tile(grid_x, grid_y);
+
+        return tile_info{
+            .index = t.fields.index,
+            .x_flip = t.fields.x_flip,
+            .y_flip = t.fields.y_flip,
+        };
+    }
+
     // @brief Get the cell tile index with the grid coordinate
     [[nodiscard]] constexpr auto cell_tile_index(int grid_x, int grid_y) const -> int override
     {

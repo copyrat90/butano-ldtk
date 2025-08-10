@@ -1,10 +1,20 @@
 #pragma once
 
+#include <cstdint>
+
 namespace ldtk
 {
 
 class tile_grid_base
 {
+public:
+    struct tile_info
+    {
+        std::uint16_t index;
+        bool x_flip;
+        bool y_flip;
+    };
+
 public:
     constexpr virtual ~tile_grid_base() = default;
 
@@ -13,6 +23,9 @@ public:
     }
 
 public:
+    // @brief Get the cell tile info with the grid coordinate
+    [[nodiscard]] constexpr virtual auto cell_tile_info(int grid_x, int grid_y) const -> tile_info = 0;
+
     // @brief Get the cell tile index with the grid coordinate
     [[nodiscard]] constexpr virtual auto cell_tile_index(int grid_x, int grid_y) const -> int = 0;
 
