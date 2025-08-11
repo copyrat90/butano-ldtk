@@ -14,6 +14,12 @@
 #include <bn_string_view.h>
 
 #include <memory>
+#include <type_traits>
+
+#define LDTK_FIELD_GETTER_TYPE_ASSERT(expected) \
+    BN_ASSERT(_type == expected, "Field type is not ", #expected, " - it was (field_type)", (int)_type)
+
+#define LDTK_FIELD_GETTER_NULL_CHECK BN_ASSERT(has_value(), "Field was null")
 
 namespace ldtk
 {
@@ -362,189 +368,147 @@ public:
     }
 
 public:
-    [[nodiscard]] constexpr auto get_int() const -> int
+    template <typename T>
+    [[nodiscard]] constexpr auto get() const -> const T&
     {
-        BN_ASSERT(_type == field_type::INT, "Invalid field type, was ", (int)_type);
-        BN_ASSERT(has_value(), "Field was null");
-
-        return _value.integral;
-    }
-
-    [[nodiscard]] constexpr auto get_fixed() const -> bn::fixed
-    {
-        BN_ASSERT(_type == field_type::FIXED, "Invalid field type, was ", (int)_type);
-        BN_ASSERT(has_value(), "Field was null");
-
-        return _value.fixed;
-    }
-
-    [[nodiscard]] constexpr auto get_bool() const -> bool
-    {
-        BN_ASSERT(_type == field_type::BOOL, "Invalid field type, was ", (int)_type);
-        BN_ASSERT(has_value(), "Field was null");
-
-        return _value.flag;
-    }
-
-    [[nodiscard]] constexpr auto get_string() const -> const bn::string_view&
-    {
-        BN_ASSERT(_type == field_type::STRING, "Invalid field type, was ", (int)_type);
-        BN_ASSERT(has_value(), "Field was null");
-
-        return _value.str;
-    }
-
-    [[nodiscard]] constexpr auto get_color() const -> bn::color
-    {
-        BN_ASSERT(_type == field_type::COLOR, "Invalid field type, was ", (int)_type);
-        BN_ASSERT(has_value(), "Field was null");
-
-        return _value.color;
-    }
-
-    [[nodiscard]] constexpr auto get_typed_enum() const -> const typed_enum&
-    {
-        BN_ASSERT(_type == field_type::TYPED_ENUM, "Invalid field type, was ", (int)_type);
-        BN_ASSERT(has_value(), "Field was null");
-
-        return _value.t_enum;
-    }
-
-    // [[nodiscard]] constexpr auto get_tile() const -> const tile&
-    // {
-    //     BN_ASSERT(_type == field_type::TILE, "Invalid field type, was ", (int)_type);
-    //     BN_ASSERT(has_value(), "Field was null");
-
-    //     return _value.tile;
-    // }
-
-    [[nodiscard]] constexpr auto get_entity_ref() const -> const entity_ref&
-    {
-        BN_ASSERT(_type == field_type::ENTITY_REF, "Invalid field type, was ", (int)_type);
-        BN_ASSERT(has_value(), "Field was null");
-
-        return _value.ent_ref;
-    }
-
-    [[nodiscard]] constexpr auto get_point() const -> const bn::point&
-    {
-        BN_ASSERT(_type == field_type::POINT, "Invalid field type, was ", (int)_type);
-        BN_ASSERT(has_value(), "Field was null");
-
-        return _value.point;
-    }
-
-    [[nodiscard]] constexpr auto get_int_span() const -> const bn::span<const int>&
-    {
-        BN_ASSERT(_type == field_type::INT_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.int_span;
-    }
-
-    [[nodiscard]] constexpr auto get_fixed_span() const -> const bn::span<const bn::fixed>&
-    {
-        BN_ASSERT(_type == field_type::FIXED_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.fixed_span;
-    }
-
-    [[nodiscard]] constexpr auto get_bool_span() const -> const bn::span<const bool>&
-    {
-        BN_ASSERT(_type == field_type::BOOL_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.flag_span;
-    }
-
-    [[nodiscard]] constexpr auto get_string_span() const -> const bn::span<const bn::string_view>&
-    {
-        BN_ASSERT(_type == field_type::STRING_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.str_span;
-    }
-
-    [[nodiscard]] constexpr auto get_color_span() const -> const bn::span<const bn::color>&
-    {
-        BN_ASSERT(_type == field_type::COLOR_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.color_span;
-    }
-
-    [[nodiscard]] constexpr auto get_typed_enum_span() const -> const bn::span<const typed_enum>&
-    {
-        BN_ASSERT(_type == field_type::TYPED_ENUM_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.t_enum_span;
-    }
-
-    // [[nodiscard]] constexpr auto get_tile_span() const -> const bn::span<const tile>&
-    // {
-    //     BN_ASSERT(_type == field_type::TILE_SPAN, "Invalid field type, was ", (int)_type);
-
-    //     return _value.tile_span;
-    // }
-
-    [[nodiscard]] constexpr auto get_entity_ref_span() const -> const bn::span<const entity_ref>&
-    {
-        BN_ASSERT(_type == field_type::ENTITY_REF_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.ent_ref_span;
-    }
-
-    [[nodiscard]] constexpr auto get_point_span() const -> const bn::span<const bn::point>&
-    {
-        BN_ASSERT(_type == field_type::POINT_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.point_span;
-    }
-
-    [[nodiscard]] constexpr auto get_optional_int_span() const -> const bn::span<const bn::optional<int>>&
-    {
-        BN_ASSERT(_type == field_type::OPTIONAL_INT_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.opt_int_span;
-    }
-
-    [[nodiscard]] constexpr auto get_optional_fixed_span() const -> const bn::span<const bn::optional<bn::fixed>>&
-    {
-        BN_ASSERT(_type == field_type::OPTIONAL_FIXED_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.opt_fixed_span;
-    }
-
-    [[nodiscard]] constexpr auto get_optional_string_span() const
-        -> const bn::span<const bn::optional<bn::string_view>>&
-    {
-        BN_ASSERT(_type == field_type::OPTIONAL_STRING_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.opt_str_span;
-    }
-
-    [[nodiscard]] constexpr auto get_optional_typed_enum_span() const -> const bn::span<const bn::optional<typed_enum>>&
-    {
-        BN_ASSERT(_type == field_type::OPTIONAL_TYPED_ENUM_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.opt_t_enum_span;
-    }
-
-    // [[nodiscard]] constexpr auto get_optional_tile_span() const -> const bn::span<const bn::optional<tile>>&
-    // {
-    //     BN_ASSERT(_type == field_type::OPTIONAL_TILE_SPAN, "Invalid field type, was ", (int)_type);
-
-    //     return _value.opt_tile_span;
-    // }
-
-    [[nodiscard]] constexpr auto get_optional_entity_ref_span() const -> const bn::span<const bn::optional<entity_ref>>&
-    {
-        BN_ASSERT(_type == field_type::OPTIONAL_ENTITY_REF_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.opt_ent_ref_span;
-    }
-
-    [[nodiscard]] constexpr auto get_optional_point_span() const -> const bn::span<const bn::optional<bn::point>>&
-    {
-        BN_ASSERT(_type == field_type::OPTIONAL_POINT_SPAN, "Invalid field type, was ", (int)_type);
-
-        return _value.opt_point_span;
+        if constexpr (std::is_same_v<T, int>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::INT);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.integral;
+        }
+        else if constexpr (std::is_same_v<T, bn::fixed>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::FIXED);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.fixed;
+        }
+        else if constexpr (std::is_same_v<T, bool>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::BOOL);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.flag;
+        }
+        else if constexpr (std::is_same_v<T, bn::string_view>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::STRING);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.str;
+        }
+        else if constexpr (std::is_same_v<T, bn::color>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::COLOR);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.color;
+        }
+        else if constexpr (std::is_same_v<T, typed_enum>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::TYPED_ENUM);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.t_enum;
+        }
+        // else if constexpr (std::is_same_v<T, tile>)
+        // {
+        //     LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::TILE);
+        //     LDTK_FIELD_GETTER_NULL_CHECK;
+        //     return _value.tile;
+        // }
+        else if constexpr (std::is_same_v<T, entity_ref>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::ENTITY_REF);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.ent_ref;
+        }
+        else if constexpr (std::is_same_v<T, bn::point>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::POINT);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.point;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const int>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::INT_SPAN);
+            return _value.int_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::fixed>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::FIXED_SPAN);
+            return _value.fixed_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bool>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::BOOL_SPAN);
+            return _value.flag_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::string_view>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::STRING_SPAN);
+            return _value.str_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::color>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::COLOR_SPAN);
+            return _value.color_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const typed_enum>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::TYPED_ENUM_SPAN);
+            return _value.t_enum_span;
+        }
+        // else if constexpr (std::is_same_v<T, bn::span<const tile>>)
+        // {
+        //     LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::TILE_SPAN);
+        //     return _value.tile_span;
+        // }
+        else if constexpr (std::is_same_v<T, bn::span<const entity_ref>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::ENTITY_REF_SPAN);
+            return _value.ent_ref_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::point>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::POINT_SPAN);
+            return _value.point_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<int>>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::OPTIONAL_INT_SPAN);
+            return _value.opt_int_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<bn::fixed>>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::OPTIONAL_FIXED_SPAN);
+            return _value.opt_fixed_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<bn::string_view>>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::OPTIONAL_STRING_SPAN);
+            return _value.opt_str_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<typed_enum>>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::OPTIONAL_TYPED_ENUM_SPAN);
+            return _value.opt_t_enum_span;
+        }
+        // else if constexpr (std::is_same_v<T, bn::span<const bn::optional<tile>>>)
+        // {
+        //     LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::OPTIONAL_TILE_SPAN);
+        //     return _value.opt_tile_span;
+        // }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<entity_ref>>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::OPTIONAL_ENTITY_REF_SPAN);
+            return _value.opt_ent_ref_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<bn::point>>>)
+        {
+            LDTK_FIELD_GETTER_TYPE_ASSERT(field_type::OPTIONAL_POINT_SPAN);
+            return _value.opt_point_span;
+        }
+        else
+        {
+            static_assert(false, "Invalid type parameter T provided");
+        }
     }
 
 private:
