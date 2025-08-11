@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ldtk_definitions.h"
 #include "ldtk_gen_ident_fwd.h"
 #include "ldtk_gen_iid_fwd.h"
 #include "ldtk_level.h"
@@ -14,7 +15,8 @@ namespace ldtk
 class project
 {
 public:
-    constexpr project(gen::iid iid, const bn::span<const level>& levels) : _iid(iid), _levels(levels)
+    constexpr project(const definitions& def, gen::iid iid, const bn::span<const level>& levels)
+        : _def(def), _iid(iid), _levels(levels)
     {
     }
 
@@ -47,6 +49,12 @@ public:
     }
 
 public:
+    /// @brief A structure containing all the definitions of this project
+    [[nodiscard]] constexpr auto def() const -> const definitions&
+    {
+        return _def;
+    }
+
     /// @brief Unique project identifier
     [[nodiscard]] constexpr auto iid() const -> gen::iid
     {
@@ -63,6 +71,8 @@ public:
     }
 
 private:
+    const definitions& _def;
+
     gen::iid _iid;
     bn::span<const level> _levels;
 };

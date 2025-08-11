@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ldtk_entity_definition.h"
+
 #include "ldtk_field.h"
 #include "ldtk_gen_ident_fwd.h"
 #include "ldtk_gen_iid_fwd.h"
@@ -9,17 +11,17 @@
 #include <bn_point.h>
 #include <bn_span.h>
 
+#include <algorithm>
+
 namespace ldtk
 {
 
 class entity
 {
 public:
-    constexpr entity(const bn::point& grid, gen::ident identifier, const bn::fixed_point& pivot,
-                     const bn::span<const gen::tag>& tags, const bn::span<const field>& field_instances, int height,
-                     gen::iid iid, const bn::point& px, int width)
-        : _grid(grid), _identifier(identifier), _pivot(pivot), _tags(tags), _field_instances(field_instances),
-          _height(height), _iid(iid), _px(px), _width(width)
+    constexpr entity(const entity_definition& def, const bn::point& grid, const bn::span<const field>& field_instances,
+                     int height, gen::iid iid, const bn::point& px, int width)
+        : _def(def), _grid(grid), _field_instances(field_instances), _height(height), _iid(iid), _px(px), _width(width)
     {
     }
 
@@ -39,6 +41,12 @@ public:
     }
 
 public:
+    /// @brief Reference to the Entity definition
+    [[nodiscard]] constexpr auto def() const -> const entity_definition&
+    {
+        return _def;
+    }
+
     /// @brief Grid-based coordinates (`[x,y]` format)
     [[nodiscard]] constexpr auto grid() const -> const bn::point&
     {
@@ -48,19 +56,19 @@ public:
     /// @brief Entity definition identifier
     [[nodiscard]] constexpr auto identifier() const -> gen::ident
     {
-        return _identifier;
+        return def().identifier();
     }
 
     /// @brief Pivot coordinates (`[x,y]` format, values are from 0 to 1) of the Entity
     [[nodiscard]] constexpr auto pivot() const -> const bn::fixed_point&
     {
-        return _pivot;
+        return def().pivot();
     }
 
     /// @brief Array of tags defined in this Entity definition
     [[nodiscard]] constexpr auto tags() const -> const bn::span<const gen::tag>&
     {
-        return _tags;
+        return def().tags();
     }
 
     /// @brief An array of all custom fields and their values.
@@ -97,10 +105,9 @@ public:
     }
 
 private:
+    const entity_definition& _def;
+
     bn::point _grid;
-    gen::ident _identifier;
-    bn::fixed_point _pivot;
-    bn::span<const gen::tag> _tags;
 
     bn::span<const field> _field_instances;
     int _height;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ldtk_field_definition.h"
+
 #include "ldtk_entity_ref.h"
 #include "ldtk_field_type.h"
 #include "ldtk_gen_ident_fwd.h"
@@ -16,9 +18,11 @@
 #include <memory>
 #include <type_traits>
 
-#define LDTK_FIELD_GETTER_TYPE_ASSERT(expected) \
-    BN_ASSERT(_type == expected, "Field type is not ", #expected, " - it was (field_type)", (int)_type)
+#define LDTK_FIELD_INIT_TYPE_ASSERT(expected) \
+    BN_ASSERT(type() == expected, "Field definition type is not ", #expected, " - it was (field_type)", (int)type())
 
+#define LDTK_FIELD_GETTER_TYPE_ASSERT(expected) \
+    BN_ASSERT(type() == expected, "Field type is not ", #expected, " - it was (field_type)", (int)type())
 #define LDTK_FIELD_GETTER_NULL_CHECK BN_ASSERT(has_value(), "Field was null")
 
 namespace ldtk
@@ -27,234 +31,287 @@ namespace ldtk
 class field
 {
 public:
-    constexpr field(gen::ident identifier, int value)
-        : _identifier(identifier), _type(field_type::INT), _has_value(true)
+    constexpr field(const field_definition& def, int value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::INT);
+
         std::construct_at(&_value.integral, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::optional<int>& value)
-        : _identifier(identifier), _type(field_type::INT), _has_value(value.has_value())
+    constexpr field(const field_definition& def, const bn::optional<int>& value)
+        : _def(def), _has_value(value.has_value())
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::INT);
+
         if (value.has_value())
             std::construct_at(&_value.integral, value.value());
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(gen::ident identifier, bn::fixed value)
-        : _identifier(identifier), _type(field_type::FIXED), _has_value(true)
+    constexpr field(const field_definition& def, bn::fixed value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::FIXED);
+
         std::construct_at(&_value.fixed, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::optional<bn::fixed>& value)
-        : _identifier(identifier), _type(field_type::FIXED), _has_value(value.has_value())
+    constexpr field(const field_definition& def, const bn::optional<bn::fixed>& value)
+        : _def(def), _has_value(value.has_value())
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::FIXED);
+
         if (value.has_value())
             std::construct_at(&_value.fixed, value.value());
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(gen::ident identifier, bool value)
-        : _identifier(identifier), _type(field_type::BOOL), _has_value(true)
+    constexpr field(const field_definition& def, bool value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::BOOL);
+
         std::construct_at(&_value.flag, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::optional<bool>& value)
-        : _identifier(identifier), _type(field_type::BOOL), _has_value(value.has_value())
+    constexpr field(const field_definition& def, const bn::optional<bool>& value)
+        : _def(def), _has_value(value.has_value())
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::BOOL);
+
         if (value.has_value())
             std::construct_at(&_value.flag, value.value());
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(gen::ident identifier, const bn::string_view& value)
-        : _identifier(identifier), _type(field_type::STRING), _has_value(true)
+    constexpr field(const field_definition& def, const bn::string_view& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::STRING);
+
         std::construct_at(&_value.str, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::optional<bn::string_view>& value)
-        : _identifier(identifier), _type(field_type::STRING), _has_value(value.has_value())
+    constexpr field(const field_definition& def, const bn::optional<bn::string_view>& value)
+        : _def(def), _has_value(value.has_value())
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::STRING);
+
         if (value.has_value())
             std::construct_at(&_value.str, value.value());
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(gen::ident identifier, bn::color value)
-        : _identifier(identifier), _type(field_type::COLOR), _has_value(true)
+    constexpr field(const field_definition& def, bn::color value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::COLOR);
+
         std::construct_at(&_value.color, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::optional<bn::color>& value)
-        : _identifier(identifier), _type(field_type::COLOR), _has_value(value.has_value())
+    constexpr field(const field_definition& def, const bn::optional<bn::color>& value)
+        : _def(def), _has_value(value.has_value())
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::COLOR);
+
         if (value.has_value())
             std::construct_at(&_value.color, value.value());
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(gen::ident identifier, const typed_enum& value)
-        : _identifier(identifier), _type(field_type::TYPED_ENUM), _has_value(true)
+    constexpr field(const field_definition& def, const typed_enum& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::TYPED_ENUM);
+
         std::construct_at(&_value.t_enum, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::optional<typed_enum>& value)
-        : _identifier(identifier), _type(field_type::TYPED_ENUM), _has_value(value.has_value())
+    constexpr field(const field_definition& def, const bn::optional<typed_enum>& value)
+        : _def(def), _has_value(value.has_value())
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::TYPED_ENUM);
+
         if (value.has_value())
             std::construct_at(&_value.t_enum, value.value());
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    // constexpr field(gen::ident identifier, const tile& value)
-    //     : _identifier(identifier), _type(field_type::TILE), _has_value(true)
+    // constexpr field(const field_definition& def, const tile& value)
+    //     : _def(def), _has_value(true)
     // {
+    //     LDTK_FIELD_INIT_TYPE_ASSERT(field_type::TILE);
+    //
     //     std::construct_at(&_value.tile, value);
     // }
 
-    // constexpr field(gen::ident identifier, const bn::optional<tile>& value)
-    //     : _identifier(identifier), _type(field_type::TILE), _has_value(value.has_value())
+    // constexpr field(const field_definition& def, const bn::optional<tile>& value)
+    //     : _def(def), _has_value(value.has_value())
     // {
+    //     LDTK_FIELD_INIT_TYPE_ASSERT(field_type::TILE);
+    //
     //     if (value.has_value())
     //         std::construct_at(&_value.tile , value.value());
     //     else
     //         std::construct_at(&_value.empty, 0);
     // }
 
-    constexpr field(gen::ident identifier, const entity_ref& value)
-        : _identifier(identifier), _type(field_type::ENTITY_REF), _has_value(true)
+    constexpr field(const field_definition& def, const entity_ref& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::ENTITY_REF);
+
         std::construct_at(&_value.ent_ref, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::optional<entity_ref>& value)
-        : _identifier(identifier), _type(field_type::ENTITY_REF), _has_value(value.has_value())
+    constexpr field(const field_definition& def, const bn::optional<entity_ref>& value)
+        : _def(def), _has_value(value.has_value())
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::ENTITY_REF);
+
         if (value.has_value())
             std::construct_at(&_value.ent_ref, value.value());
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(gen::ident identifier, const bn::point& value)
-        : _identifier(identifier), _type(field_type::POINT), _has_value(true)
+    constexpr field(const field_definition& def, const bn::point& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::POINT);
+
         std::construct_at(&_value.point, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::optional<bn::point>& value)
-        : _identifier(identifier), _type(field_type::POINT), _has_value(value.has_value())
+    constexpr field(const field_definition& def, const bn::optional<bn::point>& value)
+        : _def(def), _has_value(value.has_value())
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::POINT);
+
         if (value.has_value())
             std::construct_at(&_value.point, value.value());
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const int>& value)
-        : _identifier(identifier), _type(field_type::INT_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const int>& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::INT_SPAN);
+
         std::construct_at(&_value.int_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const bn::fixed>& value)
-        : _identifier(identifier), _type(field_type::FIXED_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bn::fixed>& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::FIXED_SPAN);
+
         std::construct_at(&_value.fixed_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const bool>& value)
-        : _identifier(identifier), _type(field_type::BOOL_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bool>& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::BOOL_SPAN);
+
         std::construct_at(&_value.flag_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const bn::string_view>& value)
-        : _identifier(identifier), _type(field_type::STRING_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bn::string_view>& value)
+        : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::STRING_SPAN);
+
         std::construct_at(&_value.str_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const bn::color>& value)
-        : _identifier(identifier), _type(field_type::COLOR_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bn::color>& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::COLOR_SPAN);
+
         std::construct_at(&_value.color_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const typed_enum>& value)
-        : _identifier(identifier), _type(field_type::TYPED_ENUM_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const typed_enum>& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::TYPED_ENUM_SPAN);
+
         std::construct_at(&_value.t_enum_span, value);
     }
 
-    // constexpr field(gen::ident identifier, const bn::span<const tile>& value)
-    //     : _identifier(identifier), _type(field_type::TILE_SPAN), _has_value(true)
+    // constexpr field(const field_definition& def, const bn::span<const tile>& value)
+    //     : _def(def), _has_value(true)
     // {
-    //     std::construct_at(&_value.tile_span , value);
+    //     LDTK_FIELD_INIT_TYPE_ASSERT(field_type::TILE_SPAN);
+    //
+    //     std::construct_at(&_value.tile_span, value);
     // }
 
-    constexpr field(gen::ident identifier, const bn::span<const entity_ref>& value)
-        : _identifier(identifier), _type(field_type::ENTITY_REF_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const entity_ref>& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::ENTITY_REF_SPAN);
+
         std::construct_at(&_value.ent_ref_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const bn::point>& value)
-        : _identifier(identifier), _type(field_type::POINT_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bn::point>& value) : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::POINT_SPAN);
+
         std::construct_at(&_value.point_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const bn::optional<int>>& value)
-        : _identifier(identifier), _type(field_type::OPTIONAL_INT_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<int>>& value)
+        : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::OPTIONAL_INT_SPAN);
+
         std::construct_at(&_value.opt_int_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const bn::optional<bn::fixed>>& value)
-        : _identifier(identifier), _type(field_type::OPTIONAL_FIXED_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<bn::fixed>>& value)
+        : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::OPTIONAL_FIXED_SPAN);
+
         std::construct_at(&_value.opt_fixed_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const bn::optional<bn::string_view>>& value)
-        : _identifier(identifier), _type(field_type::OPTIONAL_STRING_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<bn::string_view>>& value)
+        : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::OPTIONAL_STRING_SPAN);
+
         std::construct_at(&_value.opt_str_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const bn::optional<typed_enum>>& value)
-        : _identifier(identifier), _type(field_type::OPTIONAL_TYPED_ENUM_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<typed_enum>>& value)
+        : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::OPTIONAL_TYPED_ENUM_SPAN);
+
         std::construct_at(&_value.opt_t_enum_span, value);
     }
 
-    // constexpr field(gen::ident identifier, const bn::span<const bn::optional<tile>>& value)
-    //     : _identifier(identifier), _type(field_type::OPTIONAL_TILE_SPAN), _has_value(true)
+    // constexpr field(const field_definition& def, const bn::span<const bn::optional<tile>>& value)
+    //     : _def(def), _has_value(true)
     // {
+    //     LDTK_FIELD_INIT_TYPE_ASSERT(field_type::OPTIONAL_TILE_SPAN);
+    //
     //     std::construct_at(&_value.opt_tile_span, value);
     // }
 
-    constexpr field(gen::ident identifier, const bn::span<const bn::optional<entity_ref>>& value)
-        : _identifier(identifier), _type(field_type::OPTIONAL_ENTITY_REF_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<entity_ref>>& value)
+        : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::OPTIONAL_ENTITY_REF_SPAN);
+
         std::construct_at(&_value.opt_ent_ref_span, value);
     }
 
-    constexpr field(gen::ident identifier, const bn::span<const bn::optional<bn::point>>& value)
-        : _identifier(identifier), _type(field_type::OPTIONAL_POINT_SPAN), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<bn::point>>& value)
+        : _def(def), _has_value(true)
     {
+        LDTK_FIELD_INIT_TYPE_ASSERT(field_type::OPTIONAL_POINT_SPAN);
+
         std::construct_at(&_value.opt_point_span, value);
     }
 
@@ -262,7 +319,7 @@ public:
     {
         if (_has_value)
         {
-            switch (_type)
+            switch (type())
             {
             case field_type::INT:
                 std::destroy_at(&_value.integral);
@@ -352,14 +409,19 @@ public:
     }
 
 public:
+    [[nodiscard]] constexpr auto def() const -> const field_definition&
+    {
+        return _def;
+    }
+
     [[nodiscard]] constexpr auto identifier() const -> gen::ident
     {
-        return _identifier;
+        return def().identifier();
     }
 
     [[nodiscard]] constexpr auto type() const -> field_type
     {
-        return _type;
+        return def().type();
     }
 
     [[nodiscard]] constexpr auto has_value() const -> bool
@@ -512,9 +574,7 @@ public:
     }
 
 private:
-    gen::ident _identifier;
-
-    field_type _type;
+    const field_definition& _def;
 
     // `false` is possible only for non-spans;
     // spans are always initialized, thus always `true`.

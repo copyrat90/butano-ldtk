@@ -72,7 +72,7 @@ public:
     }
 
     // @brief Get the cell tile index with the grid coordinate
-    [[nodiscard]] constexpr auto cell_tile_index(int grid_x, int grid_y) const -> std::uint16_t override
+    [[nodiscard]] constexpr auto cell_tile_index(int grid_x, int grid_y) const -> tile_index override
     {
         return get_tile(grid_x, grid_y).fields.index;
     }

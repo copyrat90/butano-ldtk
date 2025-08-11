@@ -5,6 +5,7 @@
 #include "ldtk_gen_iid_fwd.h"
 #include "ldtk_layer.h"
 
+#include <bn_color.h>
 #include <bn_span.h>
 
 #include <algorithm>
@@ -15,12 +16,12 @@ namespace ldtk
 class level
 {
 public:
-    constexpr level(const bn::span<const field>& field_instances, gen::ident identifier, gen::iid iid,
-                    const bn::span<const layer>& layer_instances, int px_height, int px_width, int uid, int world_depth,
-                    int world_x, int world_y)
-        : _field_instances(field_instances), _identifier(identifier), _iid(iid), _layer_instances(layer_instances),
-          _px_height(px_height), _px_width(px_width), _uid(uid), _world_depth(world_depth), _world_x(world_x),
-          _world_y(world_y)
+    constexpr level(bn::color bg_color, const bn::span<const field>& field_instances, gen::ident identifier,
+                    gen::iid iid, const bn::span<const layer>& layer_instances, int px_height, int px_width, int uid,
+                    int world_depth, int world_x, int world_y)
+        : _bg_color(bg_color), _field_instances(field_instances), _identifier(identifier), _iid(iid),
+          _layer_instances(layer_instances), _px_height(px_height), _px_width(px_width), _uid(uid),
+          _world_depth(world_depth), _world_x(world_x), _world_y(world_y)
     {
     }
 
@@ -67,6 +68,12 @@ public:
     }
 
 public:
+    /// @brief Background color of the level
+    [[nodiscard]] constexpr auto bg_color() const -> bn::color
+    {
+        return _bg_color;
+    }
+
     /// @brief An array containing this level custom field values.
     [[nodiscard]] constexpr auto field_instances() const -> const bn::span<const field>&
     {
@@ -135,6 +142,7 @@ public:
     }
 
 private:
+    bn::color _bg_color;
     bn::span<const field> _field_instances;
     gen::ident _identifier;
     gen::iid _iid;
