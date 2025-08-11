@@ -34,7 +34,7 @@ struct bloated_tile_traits
         cell data;
         struct
         {
-            cell index : 10;
+            cell index : 14;
             bool x_flip : 1;
             bool y_flip : 1;
         } fields;
@@ -72,7 +72,7 @@ public:
     }
 
     // @brief Get the cell tile index with the grid coordinate
-    [[nodiscard]] constexpr auto cell_tile_index(int grid_x, int grid_y) const -> int override
+    [[nodiscard]] constexpr auto cell_tile_index(int grid_x, int grid_y) const -> std::uint16_t override
     {
         return get_tile(grid_x, grid_y).fields.index;
     }

@@ -27,7 +27,7 @@ public:
     [[nodiscard]] constexpr virtual auto cell_tile_info(int grid_x, int grid_y) const -> tile_info = 0;
 
     // @brief Get the cell tile index with the grid coordinate
-    [[nodiscard]] constexpr virtual auto cell_tile_index(int grid_x, int grid_y) const -> int = 0;
+    [[nodiscard]] constexpr virtual auto cell_tile_index(int grid_x, int grid_y) const -> std::uint16_t = 0;
 
     // @brief Get the cell tile X flip with the grid coordinate
     [[nodiscard]] constexpr virtual auto cell_tile_x_flip(int grid_x, int grid_y) const -> bool = 0;
