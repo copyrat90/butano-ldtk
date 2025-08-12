@@ -7,11 +7,10 @@
 #include "ldtk_gen_iid_fwd.h"
 #include "ldtk_gen_tag_fwd.h"
 
+#include <bn_assert.h>
 #include <bn_fixed_point.h>
 #include <bn_point.h>
 #include <bn_span.h>
-
-#include <algorithm>
 
 namespace ldtk
 {
@@ -26,18 +25,19 @@ public:
     }
 
 public:
-    /// @brief Linear searches a field.
-    /// @param identifier Unique identifier of the field to search for.
-    /// @return Pointer to the found field, or `nullptr` if it doesn't exist.
-    [[nodiscard]] constexpr auto find_field(gen::ident identifier) const -> const field*
+    /// @brief Looks up a field with its identifier.
+    /// @note Look-up is done via indexing, thus it's O(1). \n
+    /// @b Never use non-field identifier nor unrelated one in current context,
+    /// that would result in an error, or getting the wrong field.
+    /// @param identifier Unique identifier of the field to look up.
+    /// @return Reference to the field.
+    [[nodiscard]] constexpr auto get_field(gen::ident identifier) const -> const field&
     {
-        auto iter = std::ranges::find_if(_field_instances,
-                                         [identifier](const field& fd) { return fd.identifier() == identifier; });
+        BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::ident)", (int)identifier);
+        BN_ASSERT((int)identifier < _field_instances.size(), "Out of bound identifier (get::ident)", identifier,
+                  " - it's a non-field or unrelated identifier");
 
-        if (iter == _field_instances.end())
-            return nullptr;
-
-        return &*iter;
+        return _field_instances.data()[(int)identifier];
     }
 
 public:

@@ -5,6 +5,7 @@
 #include "ldtk_gen_iid_fwd.h"
 #include "ldtk_level.h"
 
+#include <bn_assert.h>
 #include <bn_span.h>
 
 #include <algorithm>
@@ -21,31 +22,33 @@ public:
     }
 
 public:
-    /// @brief Linear searches a level.
-    /// @param iid Instance id of the level to search for.
-    /// @return Pointer to the found level, or `nullptr` if it doesn't exist.
-    [[nodiscard]] constexpr auto find_level(gen::iid iid) const -> const level*
+    /// @brief Looks up a level with its identifier.
+    /// @note Look-up is done via indexing, thus it's O(1). \n
+    /// @b Never use non-level identifier,
+    /// that would result in an error, or getting the wrong level.
+    /// @param identifier Unique identifier of the level to look up.
+    /// @return Reference to the level.
+    [[nodiscard]] constexpr auto get_level(gen::ident identifier) const -> const level&
     {
-        auto iter = std::ranges::find_if(_levels, [iid](const level& lv) { return lv.iid() == iid; });
+        BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::ident)", (int)identifier);
+        BN_ASSERT((int)identifier < _levels.size(), "Out of bound identifier (get::ident)", identifier,
+                  " - it's a non-level identifier");
 
-        if (iter == _levels.end())
-            return nullptr;
-
-        return &*iter;
+        return _levels.data()[(int)identifier];
     }
 
-    /// @brief Linear searches a level.
-    /// @param identifier Unique identifier of the level to search for.
-    /// @return Pointer to the found level, or `nullptr` if it doesn't exist.
-    [[nodiscard]] constexpr auto find_level(gen::ident identifier) const -> const level*
+    /// @brief Linear searches a level with its Instance id.
+    /// @note If you know the identifier, prefer `get_level()` instead, as that's O(1). \n
+    /// Not finding the level errors out;
+    /// You should @b never use non-level IID, then you'll always find the level.
+    /// @param iid Instance id of the level to search for.
+    /// @return Reference to the found level.
+    [[nodiscard]] constexpr auto find_level(gen::iid iid) const -> const level&
     {
-        auto iter =
-            std::ranges::find_if(_levels, [identifier](const level& lv) { return lv.identifier() == identifier; });
+        auto iter = std::ranges::find_if(_levels, [iid](const level& lv) { return lv.iid() == iid; });
+        BN_ASSERT(iter != _levels.end(), "Level not found with (gen::iid)", (int)iid, " - it's a non-level IID");
 
-        if (iter == _levels.end())
-            return nullptr;
-
-        return &*iter;
+        return *iter;
     }
 
 public:

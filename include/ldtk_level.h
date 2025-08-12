@@ -5,6 +5,7 @@
 #include "ldtk_gen_iid_fwd.h"
 #include "ldtk_layer.h"
 
+#include <bn_assert.h>
 #include <bn_color.h>
 #include <bn_span.h>
 
@@ -26,45 +27,49 @@ public:
     }
 
 public:
-    /// @brief Linear searches a layer.
+    /// @brief Looks up a layer with its identifier.
+    /// @note Look-up is done via indexing, thus it's O(1). \n
+    /// @b Never use non-layer identifier,
+    /// that would result in an error, or getting the wrong layer.
+    /// @param identifier Unique identifier of the layer to search for.
+    /// @return Reference to the layer.
+    [[nodiscard]] constexpr auto get_layer(gen::ident identifier) const -> const layer&
+    {
+        BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::ident)", (int)identifier);
+        BN_ASSERT((int)identifier < _layer_instances.size(), "Out of bound identifier (get::ident)", identifier,
+                  " - it's a non-layer identifier");
+
+        return _layer_instances.data()[(int)identifier];
+    }
+
+    /// @brief Linear searches a layer with its Instance id.
+    /// @note If you know the identifier, prefer `get_layer()` instead, as that's O(1). \n
+    /// Not finding the layer errors out;
+    /// You should @b never use non-layer IID, then you'll always find the layer.
     /// @param iid Instance id of the layer to search for.
-    /// @return Pointer to the found layer, or `nullptr` if it doesn't exist.
-    [[nodiscard]] constexpr auto find_layer(gen::iid iid) const -> const layer*
+    /// @return Reference to the found layer.
+    [[nodiscard]] constexpr auto find_layer(gen::iid iid) const -> const layer&
     {
         auto iter = std::ranges::find_if(_layer_instances, [iid](const layer& ly) { return ly.iid() == iid; });
+        BN_ASSERT(iter != _layer_instances.end(), "Layer not found with (gen::iid)", (int)iid,
+                  " - it's a non-layer IID");
 
-        if (iter == _layer_instances.end())
-            return nullptr;
-
-        return &*iter;
+        return *iter;
     }
 
-    /// @brief Linear searches a layer.
-    /// @param identifier Unique identifier of the layer to search for.
-    /// @return Pointer to the found layer, or `nullptr` if it doesn't exist.
-    [[nodiscard]] constexpr auto find_layer(gen::ident identifier) const -> const layer*
+    /// @brief Looks up a field with its identifier.
+    /// @note Look-up is done via indexing, thus it's O(1). \n
+    /// @b Never use non-field identifier nor unrelated one in current context,
+    /// that would result in an error, or getting the wrong field.
+    /// @param identifier Unique identifier of the field to look up.
+    /// @return Reference to the field.
+    [[nodiscard]] constexpr auto get_field(gen::ident identifier) const -> const field&
     {
-        auto iter = std::ranges::find_if(_layer_instances,
-                                         [identifier](const layer& ly) { return ly.identifier() == identifier; });
+        BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::ident)", (int)identifier);
+        BN_ASSERT((int)identifier < _field_instances.size(), "Out of bound identifier (get::ident)", identifier,
+                  " - it's a non-field or unrelated identifier");
 
-        if (iter == _layer_instances.end())
-            return nullptr;
-
-        return &*iter;
-    }
-
-    /// @brief Linear searches a field.
-    /// @param identifier Unique identifier of the field to search for.
-    /// @return Pointer to the found field, or `nullptr` if it doesn't exist.
-    [[nodiscard]] constexpr auto find_field(gen::ident identifier) const -> const field*
-    {
-        auto iter = std::ranges::find_if(_field_instances,
-                                         [identifier](const field& fd) { return fd.identifier() == identifier; });
-
-        if (iter == _field_instances.end())
-            return nullptr;
-
-        return &*iter;
+        return _field_instances.data()[(int)identifier];
     }
 
 public:

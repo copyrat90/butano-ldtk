@@ -10,6 +10,7 @@
 #include "ldtk_layer_type.h"
 #include "ldtk_tile_grid_base.h"
 
+#include <bn_assert.h>
 #include <bn_span.h>
 
 #include <algorithm>
@@ -32,17 +33,17 @@ public:
     }
 
 public:
-    /// @brief Linear searches an entity.
+    /// @brief Linear searches an entity with its Instance id.
+    /// @note Not finding the entity errors out;
+    /// You should @b never use non-entity IID nor unrelated one in current context.
     /// @param iid Instance id of the entity to search for.
-    /// @return Pointer to the found entity, or `nullptr` if it doesn't exist.
-    [[nodiscard]] constexpr auto find_entity(gen::iid iid) const -> const entity*
+    /// @return Reference to the found entity.
+    [[nodiscard]] constexpr auto find_entity(gen::iid iid) const -> const entity&
     {
         auto iter = std::ranges::find_if(_entity_instances, [iid](const entity& et) { return et.iid() == iid; });
+        BN_ASSERT(iter != _entity_instances.end(), "Entity not found with (gen::iid)", (int)iid, " - it's a non-entity or unrelated IID");
 
-        if (iter == _entity_instances.end())
-            return nullptr;
-
-        return &*iter;
+        return *iter;
     }
 
 public:
