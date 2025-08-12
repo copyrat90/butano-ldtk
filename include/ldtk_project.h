@@ -6,6 +6,7 @@
 #include "ldtk_level.h"
 
 #include <bn_assert.h>
+#include <bn_color.h>
 #include <bn_span.h>
 
 #include <algorithm>
@@ -16,8 +17,8 @@ namespace ldtk
 class project
 {
 public:
-    constexpr project(const definitions& def, gen::iid iid, const bn::span<const level>& levels)
-        : _def(def), _iid(iid), _levels(levels)
+    constexpr project(const definitions& defs, gen::iid iid, const bn::span<const level>& levels, bn::color bg_color)
+        : _defs(defs), _iid(iid), _levels(levels), _bg_color(bg_color)
     {
     }
 
@@ -53,9 +54,9 @@ public:
 
 public:
     /// @brief A structure containing all the definitions of this project
-    [[nodiscard]] constexpr auto def() const -> const definitions&
+    [[nodiscard]] constexpr auto defs() const -> const definitions&
     {
-        return _def;
+        return _defs;
     }
 
     /// @brief Unique project identifier
@@ -73,11 +74,18 @@ public:
         return _levels;
     }
 
+    /// @brief Project background color
+    [[nodiscard]] constexpr auto bg_color() const -> bn::color
+    {
+        return _bg_color;
+    }
+
 private:
-    const definitions& _def;
+    const definitions& _defs;
 
     gen::iid _iid;
     bn::span<const level> _levels;
+    bn::color _bg_color;
 };
 
 } // namespace ldtk

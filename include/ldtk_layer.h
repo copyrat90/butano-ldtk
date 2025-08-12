@@ -11,6 +11,7 @@
 #include "ldtk_tile_grid_base.h"
 
 #include <bn_assert.h>
+#include <bn_fixed.h>
 #include <bn_span.h>
 
 #include <algorithm>
@@ -41,7 +42,8 @@ public:
     [[nodiscard]] constexpr auto find_entity(gen::iid iid) const -> const entity&
     {
         auto iter = std::ranges::find_if(_entity_instances, [iid](const entity& et) { return et.iid() == iid; });
-        BN_ASSERT(iter != _entity_instances.end(), "Entity not found with (gen::iid)", (int)iid, " - it's a non-entity or unrelated IID");
+        BN_ASSERT(iter != _entity_instances.end(), "Entity not found with (gen::iid)", (int)iid,
+                  " - it's a non-entity or unrelated IID");
 
         return *iter;
     }
@@ -81,6 +83,12 @@ public:
     [[nodiscard]] constexpr auto identifier() const -> gen::ident
     {
         return def().identifier();
+    }
+
+    /// @brief Layer opacity as Fixed [0-1]
+    [[nodiscard]] constexpr auto opacity() const -> bn::fixed
+    {
+        return def().display_opacity();
     }
 
     /// @brief Total layer X pixel offset, including both instance and definition offsets.

@@ -14,13 +14,13 @@ namespace ldtk
 class layer_definition
 {
 public:
-    constexpr layer_definition(layer_type type, int grid_size, gen::ident identifier,
+    constexpr layer_definition(layer_type type, bn::fixed display_opacity, int grid_size, gen::ident identifier,
                                const bn::span<const int_grid_value_info>& int_grid_values,
                                const bn::span<const int_grid_value_group_info>& int_grid_value_groups,
                                bn::fixed parallax_factor_x, bn::fixed parallax_factor_y, int uid)
-        : _type(type), _grid_size(grid_size), _identifier(identifier), _int_grid_values(int_grid_values),
-          _int_grid_value_groups(int_grid_value_groups), _parallax_factor_x(parallax_factor_x),
-          _parallax_factor_y(parallax_factor_y), _uid(uid)
+        : _type(type), _display_opacity(display_opacity), _grid_size(grid_size), _identifier(identifier),
+          _int_grid_values(int_grid_values), _int_grid_value_groups(int_grid_value_groups),
+          _parallax_factor_x(parallax_factor_x), _parallax_factor_y(parallax_factor_y), _uid(uid)
     {
     }
 
@@ -52,6 +52,12 @@ public:
     [[nodiscard]] constexpr auto type() const -> layer_type
     {
         return _type;
+    }
+
+    /// @brief Opacity of the layer (0 to 1.0)
+    [[nodiscard]] constexpr auto display_opacity() const -> bn::fixed
+    {
+        return _display_opacity;
     }
 
     /// @brief Width and height of the grid in pixels
@@ -102,6 +108,7 @@ public:
 
 private:
     layer_type _type;
+    bn::fixed _display_opacity;
     int _grid_size;
     gen::ident _identifier;
     bn::span<const int_grid_value_info> _int_grid_values;
