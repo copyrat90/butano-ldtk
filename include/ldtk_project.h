@@ -32,7 +32,7 @@ public:
     [[nodiscard]] constexpr auto get_level(gen::ident identifier) const -> const level&
     {
         BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::ident)", (int)identifier);
-        BN_ASSERT((int)identifier < _levels.size(), "Out of bound identifier (get::ident)", identifier,
+        BN_ASSERT((int)identifier < _levels.size(), "Out of bound identifier (get::ident)", (int)identifier,
                   " - it's a non-level identifier");
 
         return _levels.data()[(int)identifier];

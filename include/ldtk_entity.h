@@ -34,7 +34,7 @@ public:
     [[nodiscard]] constexpr auto get_field(gen::ident identifier) const -> const field&
     {
         BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::ident)", (int)identifier);
-        BN_ASSERT((int)identifier < _field_instances.size(), "Out of bound identifier (get::ident)", identifier,
+        BN_ASSERT((int)identifier < _field_instances.size(), "Out of bound identifier (get::ident)", (int)identifier,
                   " - it's a non-field or unrelated identifier");
 
         return _field_instances.data()[(int)identifier];

@@ -35,7 +35,7 @@ public:
     }
 
     /// @brief Pivot coordinate (from 0 to 1.0)
-    [[nodiscard]] constexpr auto pivot() const -> bn::fixed_point
+    [[nodiscard]] constexpr auto pivot() const -> const bn::fixed_point&
     {
         return _pivot;
     }
