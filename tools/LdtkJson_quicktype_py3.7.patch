@@ -1,0 +1,13 @@
+diff --git a/tools/LdtkJson.py b/tools/LdtkJson.py
+index e0aab03..afca2ed 100644
+--- a/tools/LdtkJson.py
++++ b/tools/LdtkJson.py
+@@ -233,7 +233,7 @@ class FieldDefinition:
+     array_min_length: Optional[int] = None
+     """Array min length"""
+ 
+-    default_override: Any
++    default_override: Any = None
+     """Default value if selected value is null or invalid."""
+ 
+     doc: Optional[str] = None

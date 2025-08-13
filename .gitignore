@@ -4,8 +4,9 @@
 
 # python
 .venv/
+__pycache__/
 
-# build output 
+# build output
 build*/
 *.elf
 *.gba
