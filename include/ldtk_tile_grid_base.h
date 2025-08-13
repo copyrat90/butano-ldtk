@@ -2,6 +2,8 @@
 
 #include "ldtk_tile_index.h"
 
+#include <bn_size.h>
+
 namespace ldtk
 {
 
@@ -18,7 +20,7 @@ public:
 public:
     constexpr virtual ~tile_grid_base() = default;
 
-    constexpr tile_grid_base(int c_width, int c_height) : _c_width(c_width), _c_height(c_height)
+    constexpr tile_grid_base(int c_width, int c_height) : _c_size(c_width, c_height)
     {
     }
 
@@ -36,21 +38,25 @@ public:
     [[nodiscard]] constexpr virtual auto cell_tile_y_flip(int grid_x, int grid_y) const -> bool = 0;
 
 public:
+    [[nodiscard]] constexpr auto c_size() const -> const bn::size&
+    {
+        return _c_size;
+    }
+
     /// @brief Grid-based width
     [[nodiscard]] constexpr auto c_width() const -> int
     {
-        return _c_width;
+        return c_size().width();
     }
 
     /// @brief Grid-based height
     [[nodiscard]] constexpr auto c_height() const -> int
     {
-        return _c_height;
+        return c_size().height();
     }
 
 private:
-    int _c_width;
-    int _c_height;
+    bn::size _c_size;
 };
 
 } // namespace ldtk

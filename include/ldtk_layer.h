@@ -12,6 +12,8 @@
 
 #include <bn_assert.h>
 #include <bn_fixed.h>
+#include <bn_point.h>
+#include <bn_size.h>
 #include <bn_span.h>
 
 #include <algorithm>
@@ -22,14 +24,13 @@ namespace ldtk
 class layer
 {
 public:
-    constexpr layer(const layer_definition& def, const tileset_definition* tileset_def, int c_height, int c_width,
-                    int px_total_offset_x, int px_total_offset_y, const tile_grid_base* auto_layer_tiles,
-                    const bn::span<const entity>& entity_instances, const tile_grid_base* grid_tiles, gen::iid iid,
-                    const int_grid_base* int_grid, bool visible)
-        : _def(def), _tileset_def(tileset_def), _c_height(c_height), _c_width(c_width),
-          _px_total_offset_x(px_total_offset_x), _px_total_offset_y(px_total_offset_y),
-          _auto_layer_tiles(auto_layer_tiles), _entity_instances(entity_instances), _grid_tiles(grid_tiles), _iid(iid),
-          _int_grid(int_grid), _visible(visible)
+    constexpr layer(const layer_definition& def, const tileset_definition* tileset_def, const bn::size& c_size,
+                    const bn::point& px_total_offset, const tile_grid_base* auto_layer_tiles,
+                    const tile_grid_base* grid_tiles, const int_grid_base* int_grid,
+                    const bn::span<const entity>& entity_instances, gen::iid iid, bool visible)
+        : _def(def), _tileset_def(tileset_def), _c_size(c_size), _px_total_offset(px_total_offset),
+          _auto_layer_tiles(auto_layer_tiles), _grid_tiles(grid_tiles), _int_grid(int_grid),
+          _entity_instances(entity_instances), _iid(iid), _visible(visible)
     {
     }
 
@@ -61,16 +62,22 @@ public:
         return _tileset_def;
     }
 
-    /// @brief Grid-based height
-    [[nodiscard]] constexpr auto c_height() const -> int
+    /// @brief Grid-based size
+    [[nodiscard]] constexpr auto c_size() const -> const bn::size&
     {
-        return _c_height;
+        return _c_size;
     }
 
     /// @brief Grid-based width
     [[nodiscard]] constexpr auto c_width() const -> int
     {
-        return _c_width;
+        return _c_size.width();
+    }
+
+    /// @brief Grid-based height
+    [[nodiscard]] constexpr auto c_height() const -> int
+    {
+        return _c_size.height();
     }
 
     /// @brief Grid size
@@ -91,16 +98,22 @@ public:
         return def().display_opacity();
     }
 
+    /// @brief Total layer pixel offset, including both instance and definition offsets.
+    [[nodiscard]] constexpr auto px_total_offset() const -> const bn::point&
+    {
+        return _px_total_offset;
+    }
+
     /// @brief Total layer X pixel offset, including both instance and definition offsets.
     [[nodiscard]] constexpr auto px_total_offset_x() const -> int
     {
-        return _px_total_offset_x;
+        return px_total_offset().x();
     }
 
     /// @brief Total layer Y pixel offset, including both instance and definition offsets.
     [[nodiscard]] constexpr auto px_total_offset_y() const -> int
     {
-        return _px_total_offset_y;
+        return px_total_offset().y();
     }
 
     /// @brief Layer type
@@ -118,22 +131,10 @@ public:
         return _auto_layer_tiles;
     }
 
-    /// @brief (Only *Entity layers*)
-    [[nodiscard]] constexpr auto entity_instances() const -> const bn::span<const entity>&
-    {
-        return _entity_instances;
-    }
-
     /// @brief (Only *Tile layers*)
     [[nodiscard]] constexpr auto grid_tiles() const -> const tile_grid_base*
     {
         return _grid_tiles;
-    }
-
-    /// @brief Unique project identifier
-    [[nodiscard]] constexpr auto iid() const -> gen::iid
-    {
-        return _iid;
     }
 
     /// @brief (Only *IntGrid layers*) A list of all values in the IntGrid layer. \n
@@ -142,6 +143,18 @@ public:
     [[nodiscard]] constexpr auto int_grid() const -> const int_grid_base*
     {
         return _int_grid;
+    }
+
+    /// @brief (Only *Entity layers*)
+    [[nodiscard]] constexpr auto entity_instances() const -> const bn::span<const entity>&
+    {
+        return _entity_instances;
+    }
+
+    /// @brief Unique project identifier
+    [[nodiscard]] constexpr auto iid() const -> gen::iid
+    {
+        return _iid;
     }
 
     /// @brief Layer instance visibility
@@ -154,17 +167,15 @@ private:
     const layer_definition& _def;
     const tileset_definition* _tileset_def;
 
-    int _c_height;
-    int _c_width;
-
-    int _px_total_offset_x;
-    int _px_total_offset_y;
+    bn::size _c_size;
+    bn::point _px_total_offset;
 
     const tile_grid_base* _auto_layer_tiles;
-    bn::span<const entity> _entity_instances;
     const tile_grid_base* _grid_tiles;
-    gen::iid _iid;
     const int_grid_base* _int_grid;
+
+    bn::span<const entity> _entity_instances;
+    gen::iid _iid;
 
     bool _visible;
 };

@@ -5,6 +5,7 @@
 #include "ldtk_gen_tag_fwd.h"
 
 #include <bn_fixed_point.h>
+#include <bn_size.h>
 #include <bn_span.h>
 
 namespace ldtk
@@ -13,19 +14,30 @@ namespace ldtk
 class entity_definition
 {
 public:
-    constexpr entity_definition(int height, gen::ident identifier, bn::fixed_point pivot, int uid,
-                                int width, const bn::span<const field_definition>& field_defs,
+    constexpr entity_definition(const bn::size& size, gen::ident identifier, bn::fixed_point pivot, int uid,
+                                const bn::span<const field_definition>& field_defs,
                                 const bn::span<const gen::tag>& tags)
-        : _height(height), _identifier(identifier), _pivot(pivot), _uid(uid), _width(width),
-          _field_defs(field_defs), _tags(tags)
+        : _size(size), _identifier(identifier), _pivot(pivot), _uid(uid), _field_defs(field_defs), _tags(tags)
     {
     }
 
 public:
+    /// @brief Pixel size
+    [[nodiscard]] constexpr auto size() const -> const bn::size&
+    {
+        return _size;
+    }
+
+    /// @brief Pixel width
+    [[nodiscard]] constexpr auto width() const -> int
+    {
+        return size().width();
+    }
+
     /// @brief Pixel height
     [[nodiscard]] constexpr auto height() const -> int
     {
-        return _height;
+        return size().height();
     }
 
     /// @brief User defined unique identifier
@@ -46,12 +58,6 @@ public:
         return _uid;
     }
 
-    /// @brief Pixel width
-    [[nodiscard]] constexpr auto width() const -> int
-    {
-        return _width;
-    }
-
     /// @brief Array of field definitions
     [[nodiscard]] constexpr auto field_defs() const -> const bn::span<const field_definition>&
     {
@@ -65,11 +71,10 @@ public:
     }
 
 private:
-    int _height;
+    bn::size _size;
     gen::ident _identifier;
     bn::fixed_point _pivot;
     int _uid;
-    int _width;
     bn::span<const field_definition> _field_defs;
     bn::span<const gen::tag> _tags;
 };

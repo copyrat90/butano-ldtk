@@ -3,14 +3,18 @@
 #include "ldtk_field_type.h"
 #include "ldtk_gen_ident_fwd.h"
 
+#include <bn_optional.h>
+#include <bn_type_id.h>
+
 namespace ldtk
 {
 
 class field_definition
 {
 public:
-    constexpr field_definition(field_type type, bool can_be_null, gen::ident identifier, int uid)
-        : _type(type), _can_be_null(can_be_null), _identifier(identifier), _uid(uid)
+    constexpr field_definition(field_type type, const bn::optional<bn::type_id_t>& enum_type, bool can_be_null,
+                               gen::ident identifier, int uid)
+        : _type(type), _can_be_null(can_be_null), _enum_type(enum_type), _identifier(identifier), _uid(uid)
     {
     }
 
@@ -19,6 +23,11 @@ public:
     [[nodiscard]] constexpr auto type() const -> field_type
     {
         return _type;
+    }
+
+    [[nodiscard]] constexpr auto enum_type() const -> const bn::optional<bn::type_id_t>&
+    {
+        return _enum_type;
     }
 
     /// @brief TRUE if the value can be null.
@@ -44,6 +53,7 @@ public:
 private:
     field_type _type;
     bool _can_be_null;
+    bn::optional<bn::type_id_t> _enum_type;
     gen::ident _identifier;
     int _uid;
 };

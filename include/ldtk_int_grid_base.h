@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bn_size.h>
+
 namespace ldtk
 {
 
@@ -8,7 +10,7 @@ class int_grid_base
 public:
     constexpr virtual ~int_grid_base() = default;
 
-    constexpr int_grid_base(int c_width, int c_height) : _c_width(c_width), _c_height(c_height)
+    constexpr int_grid_base(int c_width, int c_height) : _c_size(c_width, c_height)
     {
     }
 
@@ -17,21 +19,26 @@ public:
     [[nodiscard]] constexpr virtual auto cell_int(int grid_x, int grid_y) const -> int = 0;
 
 public:
+    /// @brief Grid-based size
+    [[nodiscard]] constexpr auto c_size() const -> const bn::size&
+    {
+        return _c_size;
+    }
+
     /// @brief Grid-based width
     [[nodiscard]] constexpr auto c_width() const -> int
     {
-        return _c_width;
+        return c_size().width();
     }
 
     /// @brief Grid-based height
     [[nodiscard]] constexpr auto c_height() const -> int
     {
-        return _c_height;
+        return c_size().height();
     }
 
 private:
-    int _c_width;
-    int _c_height;
+    bn::size _c_size;
 };
 
 } // namespace ldtk

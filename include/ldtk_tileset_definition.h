@@ -6,10 +6,14 @@
 #include "ldtk_gen_ident_fwd.h"
 #include "ldtk_gen_tag_fwd.h"
 
+#include <bn_assert.h>
 #include <bn_optional.h>
 #include <bn_regular_bg_item.h>
 #include <bn_span.h>
 #include <bn_type_id.h>
+
+#include <algorithm>
+#include <type_traits>
 
 namespace ldtk
 {
@@ -26,6 +30,35 @@ public:
           _identifier(identifier), _tags(tags), _tags_source_enum_id(tags_source_enum_id),
           _tile_grid_size(tile_grid_size), _uid(uid)
     {
+    }
+
+public:
+    /// @brief Looks up the enum tag via the enum value.
+    /// @note Look-up is done via indexing, thus it's O(1).
+    template <typename Enum>
+        requires(std::is_enum_v<Enum> && sizeof(Enum) <= sizeof(int))
+    [[nodiscard]] constexpr auto get_enum_tag(Enum value) -> const tileset_enum_tag&
+    {
+        BN_ASSERT(_tags_source_enum_id.has_value(), "No enum is associated with this tileset");
+        BN_ASSERT(bn::type_id<Enum>() == _tags_source_enum_id, "Enum type mismatch");
+
+        BN_ASSERT(0 <= (int)value && (int)value < _enum_tags.size(), "Enum value ", (int)value, " out of bound [0..",
+                  _enum_tags.size(), ")");
+
+        return _enum_tags.data()[(int)value];
+    }
+
+    /// @brief Linear searches the custom data associated with the tile index.
+    /// @note You should @b never use tile index that's not for this tileset.
+    /// @return Pointer to the custom data, or `nullptr` if no custom data is associated with the tile index.
+    [[nodiscard]] constexpr auto find_custom_data(tile_index tile_id) -> const tileset_custom_data*
+    {
+        auto iter = std::ranges::find_if(
+            _custom_data, [tile_id](const tileset_custom_data& data) { return data.tile_id() == tile_id; });
+        if (iter == _custom_data.end())
+            return nullptr;
+
+        return &*iter;
     }
 
 public:

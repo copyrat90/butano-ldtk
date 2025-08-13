@@ -10,6 +10,7 @@
 #include <bn_assert.h>
 #include <bn_fixed_point.h>
 #include <bn_point.h>
+#include <bn_size.h>
 #include <bn_span.h>
 
 namespace ldtk
@@ -19,8 +20,8 @@ class entity
 {
 public:
     constexpr entity(const entity_definition& def, const bn::point& grid, const bn::span<const field>& field_instances,
-                     int height, gen::iid iid, const bn::point& px, int width)
-        : _def(def), _grid(grid), _field_instances(field_instances), _height(height), _iid(iid), _px(px), _width(width)
+                     const bn::size& size, gen::iid iid, const bn::point& px)
+        : _def(def), _grid(grid), _field_instances(field_instances), _size(size), _iid(iid), _px(px)
     {
     }
 
@@ -77,11 +78,25 @@ public:
         return _field_instances;
     }
 
+    /// @brief Entity size in pixels.
+    /// For non-resizable entities, it will be the same as Entity definition.
+    [[nodiscard]] constexpr auto size() const -> const bn::size&
+    {
+        return _size;
+    }
+
+    /// @brief Entity width in pixels.
+    /// For non-resizable entities, it will be the same as Entity definition.
+    [[nodiscard]] constexpr auto width() const -> int
+    {
+        return size().width();
+    }
+
     /// @brief Entity height in pixels.
     /// For non-resizable entities, it will be the same as Entity definition.
     [[nodiscard]] constexpr auto height() const -> int
     {
-        return _height;
+        return size().height();
     }
 
     /// @brief Unique instance identifier
@@ -97,23 +112,15 @@ public:
         return _px;
     }
 
-    /// @brief Entity width in pixels.
-    /// For non-resizable entities, it will be the same as Entity definition.
-    [[nodiscard]] constexpr auto width() const -> int
-    {
-        return _width;
-    }
-
 private:
     const entity_definition& _def;
 
     bn::point _grid;
 
     bn::span<const field> _field_instances;
-    int _height;
+    bn::size _size;
     gen::iid _iid;
     bn::point _px;
-    int _width;
 };
 
 } // namespace ldtk

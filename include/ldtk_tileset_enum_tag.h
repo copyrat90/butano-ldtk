@@ -12,8 +12,8 @@ namespace ldtk
 class tileset_enum_tag
 {
 public:
-    constexpr tileset_enum_tag(int enum_value_id, const bn::span<const tile_index>& tile_ids)
-        : _enum_value_id(enum_value_id), _tile_ids(tile_ids)
+    constexpr tileset_enum_tag(const bn::span<const tile_index>& tile_ids)
+        : _tile_ids(tile_ids)
     {
     }
 
@@ -24,18 +24,12 @@ public:
     }
 
 public:
-    [[nodiscard]] constexpr auto enum_value_id() const -> int
-    {
-        return _enum_value_id;
-    }
-
     [[nodiscard]] constexpr auto tile_ids() const -> const bn::span<const tile_index>&
     {
         return _tile_ids;
     }
 
 private:
-    int _enum_value_id;
     bn::span<const tile_index> _tile_ids;
 };
 

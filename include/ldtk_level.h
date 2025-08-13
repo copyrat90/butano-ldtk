@@ -7,6 +7,8 @@
 
 #include <bn_assert.h>
 #include <bn_color.h>
+#include <bn_point.h>
+#include <bn_size.h>
 #include <bn_span.h>
 
 #include <algorithm>
@@ -18,11 +20,11 @@ class level
 {
 public:
     constexpr level(bn::color bg_color, const bn::span<const field>& field_instances, gen::ident identifier,
-                    gen::iid iid, const bn::span<const layer>& layer_instances, int px_height, int px_width, int uid,
-                    int world_depth, int world_x, int world_y)
+                    gen::iid iid, const bn::span<const layer>& layer_instances, const bn::size& px_size, int uid,
+                    int world_depth, const bn::point& world_coord)
         : _bg_color(bg_color), _field_instances(field_instances), _identifier(identifier), _iid(iid),
-          _layer_instances(layer_instances), _px_height(px_height), _px_width(px_width), _uid(uid),
-          _world_depth(world_depth), _world_x(world_x), _world_y(world_y)
+          _layer_instances(layer_instances), _px_size(px_size), _uid(uid), _world_depth(world_depth),
+          _world_coord(world_coord)
     {
     }
 
@@ -104,16 +106,22 @@ public:
         return _layer_instances;
     }
 
-    /// @brief Height of the level in pixels
-    [[nodiscard]] constexpr auto px_height() const -> int
+    /// @brief Size of the level in pixels
+    [[nodiscard]] constexpr auto px_size() const -> const bn::size&
     {
-        return _px_height;
+        return _px_size;
     }
 
     /// @brief Width of the level in pixels
     [[nodiscard]] constexpr auto px_width() const -> int
     {
-        return _px_width;
+        return px_size().width();
+    }
+
+    /// @brief Height of the level in pixels
+    [[nodiscard]] constexpr auto px_height() const -> int
+    {
+        return px_size().height();
     }
 
     /// @brief Unique Int identifier
@@ -130,12 +138,20 @@ public:
         return _world_depth;
     }
 
+    /// @brief World coordinate in pixels. \n
+    /// Only relevant for world layouts where level spatial positioning is manual (ie. GridVania, Free).
+    /// For Horizontal and Vertical layouts, the value is always -1 here.
+    [[nodiscard]] constexpr auto world_coord() const -> const bn::point&
+    {
+        return _world_coord;
+    }
+
     /// @brief World X coordinate in pixels. \n
     /// Only relevant for world layouts where level spatial positioning is manual (ie. GridVania, Free).
     /// For Horizontal and Vertical layouts, the value is always -1 here.
     [[nodiscard]] constexpr auto world_x() const -> int
     {
-        return _world_x;
+        return world_coord().x();
     }
 
     /// @brief World Y coordinate in pixels. \n
@@ -143,7 +159,7 @@ public:
     /// For Horizontal and Vertical layouts, the value is always -1 here.
     [[nodiscard]] constexpr auto world_y() const -> int
     {
-        return _world_y;
+        return world_coord().y();
     }
 
 private:
@@ -152,12 +168,10 @@ private:
     gen::ident _identifier;
     gen::iid _iid;
     bn::span<const layer> _layer_instances;
-    int _px_height;
-    int _px_width;
+    bn::size _px_size;
     int _uid;
     int _world_depth;
-    int _world_x;
-    int _world_y;
+    bn::point _world_coord;
 };
 
 } // namespace ldtk
