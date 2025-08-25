@@ -92,8 +92,8 @@ public:
 private:
     [[nodiscard]] constexpr auto get_tile(int grid_x, int grid_y) const -> tile
     {
-        BN_ASSERT(grid_x >= 0 && grid_x < c_width(), "Invalid grid_x: ", grid_x, " [0..", c_width(), ")");
-        BN_ASSERT(grid_x >= 0 && grid_x < c_height(), "Invalid grid_y: ", grid_y, " [0..", c_height(), ")");
+        if (grid_x < 0 || grid_x >= c_width() || grid_y < 0 || grid_y >= c_height())
+            return tile{0};
 
         return tile{_grid[grid_y * c_width() + grid_x]};
     }

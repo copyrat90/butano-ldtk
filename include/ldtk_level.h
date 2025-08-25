@@ -4,9 +4,11 @@
 #include "ldtk_gen_idents_fwd.h"
 #include "ldtk_gen_iids_fwd.h"
 #include "ldtk_layer.h"
+#include "ldtk_level_bgs_ptr.h"
 
 #include <bn_assert.h>
 #include <bn_color.h>
+#include <bn_fixed_point.h>
 #include <bn_point.h>
 #include <bn_size.h>
 #include <bn_span.h>
@@ -70,6 +72,31 @@ public:
                   (int)identifier);
 
         return _field_instances.data()[(int)identifier];
+    }
+
+public:
+    /// @brief Creates a `level_bgs_ptr` using the information contained in this level.
+    /// @return The requested `level_bgs_ptr`.
+    [[nodiscard]] auto create_bgs() const -> level_bgs_ptr
+    {
+        return level_bgs_ptr::create(*this);
+    }
+
+    /// @brief Creates a `level_bgs_ptr` using the information contained in this level.
+    /// @param x Horizontal position of the level backgrounds.
+    /// @param y Vertical position of the level backgrounds.
+    /// @return The requested `level_bgs_ptr`.
+    [[nodiscard]] auto create_bgs(bn::fixed x, bn::fixed y) const -> level_bgs_ptr
+    {
+        return level_bgs_ptr::create(x, y, *this);
+    }
+
+    /// @brief Creates a `level_bgs_ptr` using the information contained in this level.
+    /// @param position Position of the level backgrounds.
+    /// @return The requested `level_bgs_ptr`.
+    [[nodiscard]] auto create_bgs(const bn::fixed_point& position) const -> level_bgs_ptr
+    {
+        return level_bgs_ptr::create(position, *this);
     }
 
 public:
