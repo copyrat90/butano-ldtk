@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ldtk_field.h"
-#include "ldtk_gen_ident_fwd.h"
-#include "ldtk_gen_iid_fwd.h"
+#include "ldtk_gen_idents_fwd.h"
+#include "ldtk_gen_iids_fwd.h"
 #include "ldtk_layer.h"
 
 #include <bn_assert.h>
@@ -19,8 +19,8 @@ namespace ldtk
 class level
 {
 public:
-    constexpr level(bn::color bg_color, const bn::span<const field>& field_instances, gen::ident identifier,
-                    gen::iid iid, const bn::span<const layer>& layer_instances, const bn::size& px_size, int uid,
+    constexpr level(bn::color bg_color, const bn::span<const field>& field_instances, gen::level_ident identifier,
+                    gen::level_iid iid, const bn::span<const layer>& layer_instances, const bn::size& px_size, int uid,
                     int world_depth, const bn::point& world_coord)
         : _bg_color(bg_color), _field_instances(field_instances), _identifier(identifier), _iid(iid),
           _layer_instances(layer_instances), _px_size(px_size), _uid(uid), _world_depth(world_depth),
@@ -30,16 +30,14 @@ public:
 
 public:
     /// @brief Looks up a layer with its identifier.
-    /// @note Look-up is done via indexing, thus it's O(1). \n
-    /// @b Never use non-layer identifier,
-    /// that would result in an error, or getting the wrong layer.
+    /// @note Look-up is done via indexing, thus it's O(1).
     /// @param identifier Unique identifier of the layer to search for.
     /// @return Reference to the layer.
-    [[nodiscard]] constexpr auto get_layer(gen::ident identifier) const -> const layer&
+    [[nodiscard]] constexpr auto get_layer(gen::layer_ident identifier) const -> const layer&
     {
-        BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::ident)", (int)identifier);
-        BN_ASSERT((int)identifier < _layer_instances.size(), "Out of bound identifier (get::ident)", (int)identifier,
-                  " - it's a non-layer identifier");
+        BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::layer_ident)", (int)identifier);
+        BN_ASSERT((int)identifier < _layer_instances.size(), "Out of bound identifier (gen::layer_ident)",
+                  (int)identifier);
 
         return _layer_instances.data()[(int)identifier];
     }
@@ -47,29 +45,27 @@ public:
     /// @brief Linear searches a layer with its Instance id.
     /// @note If you know the identifier, prefer `get_layer()` instead, as that's O(1). \n
     /// Not finding the layer errors out;
-    /// You should @b never use non-layer IID, then you'll always find the layer.
+    /// You should @b never use layer IIDs that's for other level.
     /// @param iid Instance id of the layer to search for.
     /// @return Reference to the found layer.
-    [[nodiscard]] constexpr auto find_layer(gen::iid iid) const -> const layer&
+    [[nodiscard]] constexpr auto find_layer(gen::layer_iid iid) const -> const layer&
     {
         auto iter = std::ranges::find_if(_layer_instances, [iid](const layer& ly) { return ly.iid() == iid; });
-        BN_ASSERT(iter != _layer_instances.end(), "Layer not found with (gen::iid)", (int)iid,
-                  " - it's a non-layer IID");
+        BN_ASSERT(iter != _layer_instances.end(), "Layer not found with (gen::layer_iid)", (int)iid,
+                  " - perhaps it's a layer of different level");
 
         return *iter;
     }
 
     /// @brief Looks up a field with its identifier.
-    /// @note Look-up is done via indexing, thus it's O(1). \n
-    /// @b Never use non-field identifier nor unrelated one in current context,
-    /// that would result in an error, or getting the wrong field.
+    /// @note Look-up is done via indexing, thus it's O(1).
     /// @param identifier Unique identifier of the field to look up.
     /// @return Reference to the field.
-    [[nodiscard]] constexpr auto get_field(gen::ident identifier) const -> const field&
+    [[nodiscard]] constexpr auto get_field(gen::level_field_ident identifier) const -> const field&
     {
-        BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::ident)", (int)identifier);
-        BN_ASSERT((int)identifier < _field_instances.size(), "Out of bound identifier (get::ident)", (int)identifier,
-                  " - it's a non-field or unrelated identifier");
+        BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::level_field_ident)", (int)identifier);
+        BN_ASSERT((int)identifier < _field_instances.size(), "Out of bound identifier (gen::level_field_ident)",
+                  (int)identifier);
 
         return _field_instances.data()[(int)identifier];
     }
@@ -88,13 +84,13 @@ public:
     }
 
     /// @brief User defined unique identifier
-    [[nodiscard]] constexpr auto identifier() const -> gen::ident
+    [[nodiscard]] constexpr auto identifier() const -> gen::level_ident
     {
         return _identifier;
     }
 
-    /// @brief Unique project identifier
-    [[nodiscard]] constexpr auto iid() const -> gen::iid
+    /// @brief Unique level instance id
+    [[nodiscard]] constexpr auto iid() const -> gen::level_iid
     {
         return _iid;
     }
@@ -165,8 +161,8 @@ public:
 private:
     bn::color _bg_color;
     bn::span<const field> _field_instances;
-    gen::ident _identifier;
-    gen::iid _iid;
+    gen::level_ident _identifier;
+    gen::level_iid _iid;
     bn::span<const layer> _layer_instances;
     bn::size _px_size;
     int _uid;

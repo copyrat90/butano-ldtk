@@ -3,9 +3,9 @@
 #include "ldtk_entity_definition.h"
 
 #include "ldtk_field.h"
-#include "ldtk_gen_ident_fwd.h"
-#include "ldtk_gen_iid_fwd.h"
-#include "ldtk_gen_tag_fwd.h"
+#include "ldtk_gen_idents_fwd.h"
+#include "ldtk_gen_iids_fwd.h"
+#include "ldtk_gen_tags_fwd.h"
 
 #include <bn_assert.h>
 #include <bn_fixed_point.h>
@@ -20,7 +20,7 @@ class entity
 {
 public:
     constexpr entity(const entity_definition& def, const bn::point& grid, const bn::span<const field>& field_instances,
-                     const bn::size& size, gen::iid iid, const bn::point& px)
+                     const bn::size& size, gen::entity_iid iid, const bn::point& px)
         : _def(def), _grid(grid), _field_instances(field_instances), _size(size), _iid(iid), _px(px)
     {
     }
@@ -28,15 +28,15 @@ public:
 public:
     /// @brief Looks up a field with its identifier.
     /// @note Look-up is done via indexing, thus it's O(1). \n
-    /// @b Never use non-field identifier nor unrelated one in current context,
+    /// @b Never use unrelated entity's field identifier,
     /// that would result in an error, or getting the wrong field.
     /// @param identifier Unique identifier of the field to look up.
     /// @return Reference to the field.
-    [[nodiscard]] constexpr auto get_field(gen::ident identifier) const -> const field&
+    [[nodiscard]] constexpr auto get_field(gen::entity_field_ident identifier) const -> const field&
     {
-        BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::ident)", (int)identifier);
-        BN_ASSERT((int)identifier < _field_instances.size(), "Out of bound identifier (get::ident)", (int)identifier,
-                  " - it's a non-field or unrelated identifier");
+        BN_ASSERT((int)identifier >= 0, "Invalid identifier (gen::entity_field_ident)", (int)identifier);
+        BN_ASSERT((int)identifier < _field_instances.size(), "Out of bound identifier (gen::entity_field_ident)",
+                  (int)identifier, " - perhaps it's a field of different entity kind");
 
         return _field_instances.data()[(int)identifier];
     }
@@ -55,7 +55,7 @@ public:
     }
 
     /// @brief Entity definition identifier
-    [[nodiscard]] constexpr auto identifier() const -> gen::ident
+    [[nodiscard]] constexpr auto identifier() const -> gen::entity_ident
     {
         return def().identifier();
     }
@@ -67,7 +67,7 @@ public:
     }
 
     /// @brief Array of tags defined in this Entity definition
-    [[nodiscard]] constexpr auto tags() const -> const bn::span<const gen::tag>&
+    [[nodiscard]] constexpr auto tags() const -> const bn::span<const gen::entity_tag>&
     {
         return def().tags();
     }
@@ -100,7 +100,7 @@ public:
     }
 
     /// @brief Unique instance identifier
-    [[nodiscard]] constexpr auto iid() const -> gen::iid
+    [[nodiscard]] constexpr auto iid() const -> gen::entity_iid
     {
         return _iid;
     }
@@ -119,7 +119,7 @@ private:
 
     bn::span<const field> _field_instances;
     bn::size _size;
-    gen::iid _iid;
+    gen::entity_iid _iid;
     bn::point _px;
 };
 

@@ -1,10 +1,12 @@
 #pragma once
 
 #include "ldtk_field_type.h"
-#include "ldtk_gen_ident_fwd.h"
+#include "ldtk_gen_idents_fwd.h"
 
 #include <bn_optional.h>
 #include <bn_type_id.h>
+
+#include <type_traits>
 
 namespace ldtk
 {
@@ -13,8 +15,14 @@ class field_definition
 {
 public:
     constexpr field_definition(field_type type, const bn::optional<bn::type_id_t>& enum_type, bool can_be_null,
-                               gen::ident identifier, int uid)
-        : _type(type), _can_be_null(can_be_null), _enum_type(enum_type), _identifier(identifier), _uid(uid)
+                               gen::level_field_ident identifier, int uid)
+        : _type(type), _can_be_null(can_be_null), _enum_type(enum_type), _identifier((int)identifier), _uid(uid)
+    {
+    }
+
+    constexpr field_definition(field_type type, const bn::optional<bn::type_id_t>& enum_type, bool can_be_null,
+                               gen::entity_field_ident identifier, int uid)
+        : _type(type), _can_be_null(can_be_null), _enum_type(enum_type), _identifier((int)identifier), _uid(uid)
     {
     }
 
@@ -30,8 +38,8 @@ public:
         return _enum_type;
     }
 
-    /// @brief TRUE if the value can be null.
-    /// For arrays, TRUE means it can contain null values
+    /// @brief `true` if the value can be null.
+    /// For arrays, `true` means it can contain null values
     /// (exception: array of Points can't have null values).
     [[nodiscard]] constexpr auto can_be_null() const -> bool
     {
@@ -39,7 +47,9 @@ public:
     }
 
     /// @brief User defined unique identifier
-    [[nodiscard]] constexpr auto identifier() const -> gen::ident
+    template <typename Ident>
+        requires(std::is_same_v<Ident, gen::level_field_ident> || std::is_same_v<Ident, gen::entity_field_ident>)
+    [[nodiscard]] constexpr auto identifier() const -> Ident
     {
         return _identifier;
     }
@@ -54,7 +64,7 @@ private:
     field_type _type;
     bool _can_be_null;
     bn::optional<bn::type_id_t> _enum_type;
-    gen::ident _identifier;
+    int _identifier;
     int _uid;
 };
 

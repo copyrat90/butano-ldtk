@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ldtk_gen_ident_fwd.h"
+#include "ldtk_gen_idents_fwd.h"
 #include "ldtk_int_grid_value_group_info.h"
 #include "ldtk_int_grid_value_info.h"
 #include "ldtk_layer_type.h"
@@ -14,7 +14,7 @@ namespace ldtk
 class layer_definition
 {
 public:
-    constexpr layer_definition(layer_type type, bn::fixed display_opacity, int grid_size, gen::ident identifier,
+    constexpr layer_definition(layer_type type, bn::fixed display_opacity, int grid_size, gen::layer_ident identifier,
                                const bn::span<const int_grid_value_info>& int_grid_values,
                                const bn::span<const int_grid_value_group_info>& int_grid_value_groups,
                                bn::fixed parallax_factor_x, bn::fixed parallax_factor_y, int uid)
@@ -67,7 +67,7 @@ public:
     }
 
     /// @brief User defined unique identifier
-    [[nodiscard]] constexpr auto identifier() const -> gen::ident
+    [[nodiscard]] constexpr auto identifier() const -> gen::layer_ident
     {
         return _identifier;
     }
@@ -110,7 +110,7 @@ private:
     layer_type _type;
     bn::fixed _display_opacity;
     int _grid_size;
-    gen::ident _identifier;
+    gen::layer_ident _identifier;
     bn::span<const int_grid_value_info> _int_grid_values;
     bn::span<const int_grid_value_group_info> _int_grid_value_groups;
     bn::fixed _parallax_factor_x;

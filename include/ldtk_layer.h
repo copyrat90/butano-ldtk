@@ -4,8 +4,8 @@
 #include "ldtk_tileset_definition.h"
 
 #include "ldtk_entity.h"
-#include "ldtk_gen_ident_fwd.h"
-#include "ldtk_gen_iid_fwd.h"
+#include "ldtk_gen_idents_fwd.h"
+#include "ldtk_gen_iids_fwd.h"
 #include "ldtk_int_grid_base.h"
 #include "ldtk_layer_type.h"
 #include "ldtk_tile_grid_base.h"
@@ -27,7 +27,7 @@ public:
     constexpr layer(const layer_definition& def, const tileset_definition* tileset_def, const bn::size& c_size,
                     const bn::point& px_total_offset, const tile_grid_base* auto_layer_tiles,
                     const tile_grid_base* grid_tiles, const int_grid_base* int_grid,
-                    const bn::span<const entity>& entity_instances, gen::iid iid, bool visible)
+                    const bn::span<const entity>& entity_instances, gen::layer_iid iid, bool visible)
         : _def(def), _tileset_def(tileset_def), _c_size(c_size), _px_total_offset(px_total_offset),
           _auto_layer_tiles(auto_layer_tiles), _grid_tiles(grid_tiles), _int_grid(int_grid),
           _entity_instances(entity_instances), _iid(iid), _visible(visible)
@@ -37,14 +37,14 @@ public:
 public:
     /// @brief Linear searches an entity with its Instance id.
     /// @note Not finding the entity errors out;
-    /// You should @b never use non-entity IID nor unrelated one in current context.
+    /// You should @b never use entity IIDs that's for other layer instance.
     /// @param iid Instance id of the entity to search for.
     /// @return Reference to the found entity.
-    [[nodiscard]] constexpr auto find_entity(gen::iid iid) const -> const entity&
+    [[nodiscard]] constexpr auto find_entity(gen::entity_iid iid) const -> const entity&
     {
         auto iter = std::ranges::find_if(_entity_instances, [iid](const entity& et) { return et.iid() == iid; });
-        BN_ASSERT(iter != _entity_instances.end(), "Entity not found with (gen::iid)", (int)iid,
-                  " - it's a non-entity or unrelated IID");
+        BN_ASSERT(iter != _entity_instances.end(), "Entity not found with (gen::entity_iid)", (int)iid,
+                  " - perhaps it's an entity of different layer instance");
 
         return *iter;
     }
@@ -87,7 +87,7 @@ public:
     }
 
     /// @brief Layer definition identifier
-    [[nodiscard]] constexpr auto identifier() const -> gen::ident
+    [[nodiscard]] constexpr auto identifier() const -> gen::layer_ident
     {
         return def().identifier();
     }
@@ -151,8 +151,8 @@ public:
         return _entity_instances;
     }
 
-    /// @brief Unique project identifier
-    [[nodiscard]] constexpr auto iid() const -> gen::iid
+    /// @brief Unique layer instance id
+    [[nodiscard]] constexpr auto iid() const -> gen::layer_iid
     {
         return _iid;
     }
@@ -175,7 +175,7 @@ private:
     const int_grid_base* _int_grid;
 
     bn::span<const entity> _entity_instances;
-    gen::iid _iid;
+    gen::layer_iid _iid;
 
     bool _visible;
 };

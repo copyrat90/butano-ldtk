@@ -4,7 +4,7 @@
 
 #include "ldtk_entity_ref.h"
 #include "ldtk_field_type.h"
-#include "ldtk_gen_ident_fwd.h"
+#include "ldtk_gen_idents_fwd.h"
 #include "ldtk_typed_enum.h"
 
 #include <bn_assert.h>
@@ -414,9 +414,11 @@ public:
         return _def;
     }
 
-    [[nodiscard]] constexpr auto identifier() const -> gen::ident
+    template <typename Ident>
+        requires(std::is_same_v<Ident, gen::level_field_ident> || std::is_same_v<Ident, gen::entity_field_ident>)
+    [[nodiscard]] constexpr auto identifier() const -> Ident
     {
-        return def().identifier();
+        return def().identifier<Ident>();
     }
 
     [[nodiscard]] constexpr auto type() const -> field_type

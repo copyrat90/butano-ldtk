@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ldtk_gen_ident_fwd.h"
+#include "ldtk_gen_idents_fwd.h"
 
 #include <bn_color.h>
 #include <bn_optional.h>
@@ -11,7 +11,8 @@ namespace ldtk
 class int_grid_value_info
 {
 public:
-    constexpr int_grid_value_info(bn::color color, int group_uid, const bn::optional<gen::ident>& identifier, int value)
+    constexpr int_grid_value_info(bn::color color, int group_uid,
+                                  const bn::optional<gen::layer_int_grid_value_ident>& identifier, int value)
         : _color(color), _group_uid(group_uid), _identifier(identifier), _value(value)
     {
     }
@@ -29,7 +30,7 @@ public:
     }
 
     /// @brief User defined unique identifier
-    [[nodiscard]] constexpr auto identifier() const -> const bn::optional<gen::ident>&
+    [[nodiscard]] constexpr auto identifier() const -> const bn::optional<gen::layer_int_grid_value_ident>&
     {
         return _identifier;
     }
@@ -43,7 +44,7 @@ public:
 private:
     bn::color _color;
     int _group_uid;
-    bn::optional<gen::ident> _identifier;
+    bn::optional<gen::layer_int_grid_value_ident> _identifier;
     int _value;
 };
 

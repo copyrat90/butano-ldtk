@@ -3,8 +3,8 @@
 #include "ldtk_tileset_custom_data.h"
 #include "ldtk_tileset_enum_tag.h"
 
-#include "ldtk_gen_ident_fwd.h"
-#include "ldtk_gen_tag_fwd.h"
+#include "ldtk_gen_idents_fwd.h"
+#include "ldtk_gen_tags_fwd.h"
 
 #include <bn_assert.h>
 #include <bn_optional.h>
@@ -23,8 +23,8 @@ class tileset_definition
 public:
     constexpr tileset_definition(const bn::regular_bg_item& bg_item, int tiles_count,
                                  bn::span<const tileset_custom_data> custom_data,
-                                 bn::span<const tileset_enum_tag> enum_tags, gen::ident identifier,
-                                 bn::span<const gen::tag> tags, bn::optional<bn::type_id_t> tags_source_enum_id,
+                                 bn::span<const tileset_enum_tag> enum_tags, gen::tileset_ident identifier,
+                                 bn::span<const gen::tileset_tag> tags, bn::optional<bn::type_id_t> tags_source_enum_id,
                                  int tile_grid_size, int uid)
         : _bg_item(bg_item), _tiles_count(tiles_count), _custom_data(custom_data), _enum_tags(enum_tags),
           _identifier(identifier), _tags(tags), _tags_source_enum_id(tags_source_enum_id),
@@ -88,13 +88,13 @@ public:
     }
 
     /// @brief User defined unique identifier
-    [[nodiscard]] constexpr auto identifier() const -> gen::ident
+    [[nodiscard]] constexpr auto identifier() const -> gen::tileset_ident
     {
         return _identifier;
     }
 
     /// @brief An array of user-defined tags to organize the Tilesets
-    [[nodiscard]] constexpr auto tags() const -> const bn::span<const gen::tag>&
+    [[nodiscard]] constexpr auto tags() const -> const bn::span<const gen::tileset_tag>&
     {
         return _tags;
     }
@@ -122,8 +122,8 @@ private:
     int _tiles_count;
     bn::span<const tileset_custom_data> _custom_data;
     bn::span<const tileset_enum_tag> _enum_tags;
-    gen::ident _identifier;
-    bn::span<const gen::tag> _tags;
+    gen::tileset_ident _identifier;
+    bn::span<const gen::tileset_tag> _tags;
     bn::optional<bn::type_id_t> _tags_source_enum_id;
     int _tile_grid_size;
     int _uid;

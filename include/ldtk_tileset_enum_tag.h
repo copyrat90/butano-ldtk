@@ -12,8 +12,7 @@ namespace ldtk
 class tileset_enum_tag
 {
 public:
-    constexpr tileset_enum_tag(const bn::span<const tile_index>& tile_ids)
-        : _tile_ids(tile_ids)
+    constexpr tileset_enum_tag(const bn::span<const tile_index>& tile_ids) : _tile_ids(tile_ids)
     {
     }
 

@@ -386,53 +386,53 @@ def generate_enum_headers(
     build_folder_path: Path,
 ):
     enums_header = EnumsHeader()
-    ident_header = IdentHeader()
-    iid_header = IidHeader()
-    tag_header = TagHeader()
+    idents_header = IdentsHeader()
+    iids_header = IidsHeader()
+    tags_header = TagsHeader()
 
-    iid_header.add_iid(ldtk_project.iid, "PROJECT")
+    iids_header.add_iid(ldtk_project.iid, "project")
 
     for enum_def in ldtk_project.defs.enums:
         if enum_def.external_rel_path is not None:
             raise ExternalEnumNotSupportedException(f'Enum "{enum_def.identifier}"')
         enums_header.add_enum(enum_def)
 
-    ident_header.add_tileset_idents(ldtk_project.defs.tilesets)
+    idents_header.add_tileset_idents(ldtk_project.defs.tilesets)
     for tileset_def in ldtk_project.defs.tilesets:
         for tag in tileset_def.tags:
-            tag_header.add_tag(tag, "TILESET")
+            tags_header.add_tag(tag, "tileset")
 
-    ident_header.add_level_idents(ldtk_project.levels)
-    ident_header.add_level_field_idents(ldtk_project.defs.level_fields)
+    idents_header.add_level_idents(ldtk_project.levels)
+    idents_header.add_level_field_idents(ldtk_project.defs.level_fields)
     for level in ldtk_project.levels:
-        iid_header.add_iid(level.iid, "LEVEL")
+        iids_header.add_iid(level.iid, "level")
         assert level.layer_instances is not None
         for layer in level.layer_instances:
-            iid_header.add_iid(layer.iid, "LAYER")
+            iids_header.add_iid(layer.iid, "layer")
             for entity in layer.entity_instances:
-                iid_header.add_iid(entity.iid, "ENTITY")
+                iids_header.add_iid(entity.iid, "entity")
 
-    ident_header.add_layer_idents(ldtk_project.defs.layers)
+    idents_header.add_layer_idents(ldtk_project.defs.layers)
     for layer in ldtk_project.defs.layers:
-        ident_header.add_layer_int_grid_value_idents(
+        idents_header.add_layer_int_grid_value_idents(
             layer.identifier, layer.int_grid_values
         )
-        ident_header.add_layer_int_grid_value_group_idents(
+        idents_header.add_layer_int_grid_value_group_idents(
             layer.identifier, layer.int_grid_values_groups
         )
 
-    ident_header.add_entity_idents(ldtk_project.defs.entities)
+    idents_header.add_entity_idents(ldtk_project.defs.entities)
     for entity_def in ldtk_project.defs.entities:
-        ident_header.add_entity_field_idents(
+        idents_header.add_entity_field_idents(
             entity_def.identifier, entity_def.field_defs
         )
         for tag in entity_def.tags:
-            tag_header.add_tag(tag, "ENTITY")
+            tags_header.add_tag(tag, "entity")
 
     enums_header.write(build_folder_path)
-    ident_header.write(build_folder_path)
-    iid_header.write(build_folder_path)
-    tag_header.write(build_folder_path)
+    idents_header.write(build_folder_path)
+    iids_header.write(build_folder_path)
+    tags_header.write(build_folder_path)
 
 
 def generate_definitions_headers(

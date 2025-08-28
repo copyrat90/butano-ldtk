@@ -2,9 +2,9 @@
 
 ## enum
 
-* ldtk_gen_ident.h
-* ldtk_gen_iid.h
-* ldtk_gen_tag.h
+* ldtk_gen_idents.h
+* ldtk_gen_iids.h
+* ldtk_gen_tags.h
 
 * ldtk_gen_enums.h
 

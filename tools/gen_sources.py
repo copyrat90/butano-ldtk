@@ -5,7 +5,7 @@ from io import TextIOWrapper
 from datetime import datetime
 from pathlib import Path
 from enum import Enum
-from typing import Dict, List, NamedTuple, Tuple, Optional, Generator, Any
+from typing import Dict, DefaultDict, List, NamedTuple, Tuple, Optional, Generator
 
 
 class GenSource(metaclass=ABCMeta):
@@ -104,7 +104,7 @@ class GenPrivHeader(GenHeader):
         return "::gen::priv"
 
 
-class IdentHeader(GenHeader):
+class IdentsHeader(GenHeader):
     class TilesetIdent(NamedTuple):
         tileset_ident: str
 
@@ -134,33 +134,44 @@ class IdentHeader(GenHeader):
 
     @staticmethod
     def base_file_path() -> Path:
-        return Path("ldtk_gen_ident.h")
+        return Path("ldtk_gen_idents.h")
 
     def __init__(self):
         super().__init__()
-        self.add_include("ldtk_gen_ident_fwd.h")
+        self.add_include("ldtk_gen_idents_fwd.h")
 
-        self.idents: List[Tuple[Any, int]] = []
+        self.tileset_idents: List[IdentsHeader.TilesetIdent] = []
+        self.level_idents: List[IdentsHeader.LevelIdent] = []
+        self.level_field_idents: List[IdentsHeader.LevelFieldIdent] = []
+        self.layer_idents: List[IdentsHeader.LayerIdent] = []
+        self.layer_int_grid_value_idents: List[
+            Tuple[IdentsHeader.LayerIntGridValueIdent, int]
+        ] = []
+        self.layer_int_grid_value_group_idents: List[
+            Tuple[IdentsHeader.LayerIntGridValueGroupIdent, int]
+        ] = []
+        self.entity_idents: List[IdentsHeader.EntityIdent] = []
+        self.entity_field_idents: List[Tuple[IdentsHeader.EntityFieldIdent, int]] = []
 
     def add_tileset_idents(self, tileset_defs: List[LdtkJson.TilesetDefinition]):
-        for tileset_idx, tileset_def in enumerate(tileset_defs):
-            key = IdentHeader.TilesetIdent(tileset_def.identifier)
-            self.idents.append((key, tileset_idx))
+        for tileset_def in tileset_defs:
+            key = IdentsHeader.TilesetIdent(tileset_def.identifier)
+            self.tileset_idents.append(key)
 
     def add_level_idents(self, levels: List[LdtkJson.Level]):
-        for level_idx, level in enumerate(levels):
-            key = IdentHeader.LevelIdent(level.identifier)
-            self.idents.append((key, level_idx))
+        for level in levels:
+            key = IdentsHeader.LevelIdent(level.identifier)
+            self.level_idents.append(key)
 
     def add_level_field_idents(self, level_field_defs: List[LdtkJson.FieldDefinition]):
-        for field_idx, field_def in enumerate(level_field_defs):
-            key = IdentHeader.LevelFieldIdent(field_def.identifier)
-            self.idents.append((key, field_idx))
+        for field_def in level_field_defs:
+            key = IdentsHeader.LevelFieldIdent(field_def.identifier)
+            self.level_field_idents.append(key)
 
     def add_layer_idents(self, layer_defs: List[LdtkJson.LayerDefinition]):
-        for layer_idx, layer_def in enumerate(layer_defs):
-            key = IdentHeader.LayerIdent(layer_def.identifier)
-            self.idents.append((key, layer_idx))
+        for layer_def in layer_defs:
+            key = IdentsHeader.LayerIdent(layer_def.identifier)
+            self.layer_idents.append(key)
 
     def add_layer_int_grid_value_idents(
         self, layer_ident: str, int_grid_values: List[LdtkJson.IntGridValueDefinition]
@@ -168,10 +179,10 @@ class IdentHeader(GenHeader):
         for idx, int_grid_value_def in enumerate(int_grid_values):
             if int_grid_value_def.identifier is None:
                 continue
-            key = IdentHeader.LayerIntGridValueIdent(
+            key = IdentsHeader.LayerIntGridValueIdent(
                 layer_ident, int_grid_value_def.identifier
             )
-            self.idents.append((key, idx))
+            self.layer_int_grid_value_idents.append((key, idx))
 
     def add_layer_int_grid_value_group_idents(
         self,
@@ -181,98 +192,117 @@ class IdentHeader(GenHeader):
         for idx, int_grid_value_group_def in enumerate(int_grid_value_groups):
             if int_grid_value_group_def.identifier is None:
                 continue
-            key = IdentHeader.LayerIntGridValueGroupIdent(
+            key = IdentsHeader.LayerIntGridValueGroupIdent(
                 layer_ident, int_grid_value_group_def.identifier
             )
-            self.idents.append((key, idx))
+            self.layer_int_grid_value_group_idents.append((key, idx))
 
     def add_entity_idents(self, entity_defs: List[LdtkJson.EntityDefinition]):
-        for entity_idx, entity_def in enumerate(entity_defs):
-            key = IdentHeader.EntityIdent(entity_def.identifier)
-            self.idents.append((key, entity_idx))
+        for entity_def in entity_defs:
+            key = IdentsHeader.EntityIdent(entity_def.identifier)
+            self.entity_idents.append(key)
 
     def add_entity_field_idents(
         self, entity_ident: str, entity_field_defs: List[LdtkJson.FieldDefinition]
     ):
-        for field_idx, field_def in enumerate(entity_field_defs):
-            key = IdentHeader.EntityFieldIdent(entity_ident, field_def.identifier)
-            self.idents.append((key, field_idx))
+        for idx, field_def in enumerate(entity_field_defs):
+            key = IdentsHeader.EntityFieldIdent(entity_ident, field_def.identifier)
+            self.entity_field_idents.append((key, idx))
 
     def _write_contents(self, source: TextIOWrapper):
-        source.write("enum class ident {\n")
-        for ident, idx in self.idents:
-            source.write("    ")
-            match ident:
-                case IdentHeader.TilesetIdent():
-                    source.write(f"TILESET_{ident.tileset_ident}")
-                case IdentHeader.LevelIdent():
-                    source.write(f"LEVEL_{ident.level_ident}")
-                case IdentHeader.LevelFieldIdent():
-                    source.write(f"LEVEL_FIELD_{ident.field_ident}")
-                case IdentHeader.LayerIdent():
-                    source.write(f"LAYER_{ident.layer_ident}")
-                case IdentHeader.LayerIntGridValueIdent():
-                    source.write(
-                        f"LAYER_{ident.layer_ident}_INT_GRID_VALUE_{ident.int_grid_value_ident}"
-                    )
-                case IdentHeader.LayerIntGridValueGroupIdent():
-                    source.write(
-                        f"LAYER_{ident.layer_ident}_INT_GRID_VALUE_GROUP_{ident.int_grid_value_group_ident}"
-                    )
-                case IdentHeader.EntityIdent():
-                    source.write(f"ENTITY_{ident.entity_ident}")
-                case IdentHeader.EntityFieldIdent():
-                    source.write(
-                        f"ENTITY_{ident.entity_ident}_FIELD_{ident.field_ident}"
-                    )
-                case _:
-                    raise AssertionError(
-                        f"{ident=} has an invalid ident type: {type(ident)}"
-                    )
-            source.write(f" = {idx},\n")
+        source.write("enum class tileset_ident {\n")
+        for ident in self.tileset_idents:
+            source.write(f"    {ident.tileset_ident},\n")
+        source.write("};\n\n")
+
+        source.write("enum class level_ident {\n")
+        for ident in self.level_idents:
+            source.write(f"    {ident.level_ident},\n")
+        source.write("};\n\n")
+
+        source.write("enum class level_field_ident {\n")
+        for ident in self.level_field_idents:
+            source.write(f"    {ident.field_ident},\n")
+        source.write("};\n\n")
+
+        source.write("enum class layer_ident {\n")
+        for ident in self.layer_idents:
+            source.write(f"    {ident.layer_ident},\n")
+        source.write("};\n\n")
+
+        source.write("enum class layer_int_grid_value_ident {\n")
+        for ident, idx in self.layer_int_grid_value_idents:
+            source.write(
+                f"    LAYER_{ident.layer_ident}_INT_GRID_VALUE_{ident.int_grid_value_ident} = {idx},\n"
+            )
+        source.write("};\n\n")
+
+        source.write("enum class layer_int_grid_value_group_ident {\n")
+        for ident, idx in self.layer_int_grid_value_group_idents:
+            source.write(
+                f"    LAYER_{ident.layer_ident}_INT_GRID_VALUE_GROUP_{ident.int_grid_value_group_ident} = {idx},\n"
+            )
+        source.write("};\n\n")
+
+        source.write("enum class entity_ident {\n")
+        for ident in self.entity_idents:
+            source.write(f"    {ident.entity_ident},\n")
+        source.write("};\n\n")
+
+        source.write("enum class entity_field_ident {\n")
+        for ident, idx in self.entity_field_idents:
+            source.write(
+                f"    ENTITY_{ident.entity_ident}_FIELD_{ident.field_ident} = {idx},\n"
+            )
         source.write("};\n")
 
 
-class IidHeader(GenHeader):
+class IidsHeader(GenHeader):
     @staticmethod
     def base_file_path() -> Path:
-        return Path("ldtk_gen_iid.h")
+        return Path("ldtk_gen_iids.h")
 
     def __init__(self):
         super().__init__()
-        self.add_include("ldtk_gen_iid_fwd.h")
+        self.add_include("ldtk_gen_iids_fwd.h")
 
-        self.iids: Set[str] = set()
+        self.iids: DefaultDict[str, Set[str]] = DefaultDict(set)
+        """Context -> Set[iid value]"""
 
     def add_iid(self, iid: str, context: str):
-        self.iids.add(f"{context.upper()}_{iid.replace("-", "_")}")
+        self.iids[context.lower()].add(iid.replace("-", "_"))
 
     def _write_contents(self, source: TextIOWrapper):
-        source.write("enum class iid {\n")
-        for iid in self.iids:
-            source.write(f"    {iid},\n")
-        source.write("};\n")
+        num_value = 0
+        for context, iids in self.iids.items():
+            source.write(f"enum class {context}_iid {{\n")
+            for iid in iids:
+                source.write(f"    _{iid} = {num_value},\n")
+                num_value += 1
+            source.write("};\n\n")
 
 
-class TagHeader(GenHeader):
+class TagsHeader(GenHeader):
     @staticmethod
     def base_file_path() -> Path:
-        return Path("ldtk_gen_tag.h")
+        return Path("ldtk_gen_tags.h")
 
     def __init__(self):
         super().__init__()
-        self.add_include("ldtk_gen_tag_fwd.h")
+        self.add_include("ldtk_gen_tags_fwd.h")
 
-        self.tags: Set[str] = set()
+        self.tags: DefaultDict[str, Set[str]] = DefaultDict(set)
+        """Context -> Set[tag value]"""
 
     def add_tag(self, tag: str, context: str):
-        self.tags.add(f"{context.upper()}_{tag}")
+        self.tags[context.lower()].add(tag)
 
     def _write_contents(self, source: TextIOWrapper):
-        source.write("enum class tag {\n")
-        for tag in self.tags:
-            source.write(f"    {tag},\n")
-        source.write("};\n")
+        for context, tags in self.tags.items():
+            source.write(f"enum class {context}_tag {{\n")
+            for tag in tags:
+                source.write(f"    {tag},\n")
+            source.write("};\n\n")
 
 
 class EnumsHeader(GenHeader):
@@ -336,8 +366,8 @@ class EntityDefinitionsHeader(GenPrivHeader):
         self.add_include("ldtk_entity_definition.h")
         self.add_include("ldtk_gen_priv_entity_field_definitions.h")
         self.add_include("ldtk_gen_priv_entity_definitions_tags.h")
-        self.add_include("ldtk_gen_ident.h")
-        self.add_include("ldtk_gen_tag.h")
+        self.add_include("ldtk_gen_idents.h")
+        self.add_include("ldtk_gen_tags.h")
 
         self.entities: List[EntityDefinitionsHeader.Entity] = []
 
@@ -363,7 +393,7 @@ class EntityDefinitionsHeader(GenPrivHeader):
             for entity in self.entities:
                 source.write("    entity_definition(\n")
                 source.write(f"        {entity.size},\n")
-                source.write(f"        ident::ENTITY_{entity.identifier},\n")
+                source.write(f"        entity_ident::{entity.identifier},\n")
                 source.write(f"        {entity.pivot},\n")
                 source.write(f"        {entity.uid},\n")
                 source.write(
@@ -382,7 +412,7 @@ class EntityFieldDefinitionsHeader(GenPrivHeader):
     def __init__(self):
         super().__init__()
         self.add_include("ldtk_field_definition.h")
-        self.add_include("ldtk_gen_ident.h")
+        self.add_include("ldtk_gen_idents.h")
         self.add_include("ldtk_gen_enums.h")
 
         self.entity_fields: Dict[str, List[FieldDef]] = {}
@@ -423,7 +453,7 @@ class EntityFieldDefinitionsHeader(GenPrivHeader):
                         f'        {"true" if field.can_be_null else "false"},\n'
                     )
                     source.write(
-                        f"        ident::ENTITY_{entity_ident}_FIELD_{field.identifier},\n"
+                        f"        entity_field_ident::ENTITY_{entity_ident}_FIELD_{field.identifier},\n"
                     )
                     source.write(f"        {field.uid}\n")
                     source.write("    ),\n")
@@ -437,7 +467,7 @@ class EntityDefinitionsTagsHeader(GenPrivHeader):
 
     def __init__(self):
         super().__init__()
-        self.add_include("ldtk_gen_tag.h")
+        self.add_include("ldtk_gen_tags.h")
 
         self.tags: Dict[str, List[str]] = {}
         """Entity identifier -> List[tag]"""
@@ -449,14 +479,14 @@ class EntityDefinitionsTagsHeader(GenPrivHeader):
         for entity_ident, tags in self.tags.items():
             if len(tags) == 0:
                 source.write(
-                    f"inline constexpr bn::span<const tag> gen_priv_entity_{entity_ident}_tags;\n\n"
+                    f"inline constexpr bn::span<const entity_tag> gen_priv_entity_{entity_ident}_tags;\n\n"
                 )
             else:
                 source.write(
-                    f"inline constexpr const tag gen_priv_entity_{entity_ident}_tags[] {{\n"
+                    f"inline constexpr const entity_tag gen_priv_entity_{entity_ident}_tags[] {{\n"
                 )
                 for tag in tags:
-                    source.write(f"    tag::ENTITY_{tag},\n")
+                    source.write(f"    entity_tag::{tag},\n")
                 source.write("};\n\n")
 
 
@@ -483,7 +513,7 @@ class LayerDefinitionsHeader(GenPrivHeader):
     def __init__(self):
         super().__init__()
         self.add_include("ldtk_layer_definition.h")
-        self.add_include("ldtk_gen_ident.h")
+        self.add_include("ldtk_gen_idents.h")
         self.add_include("ldtk_gen_priv_layer_definitions_int_grid_values.h")
         self.add_include("ldtk_gen_priv_layer_definitions_int_grid_value_groups.h")
 
@@ -516,7 +546,7 @@ class LayerDefinitionsHeader(GenPrivHeader):
                 source.write(f"        layer_type::{layer.layer_type},\n")
                 source.write(f"        {layer.display_opacity},\n")
                 source.write(f"        {layer.grid_size},\n")
-                source.write(f"        ident::LAYER_{layer.identifier},\n")
+                source.write(f"        layer_ident::{layer.identifier},\n")
                 source.write(
                     f"        gen_priv_layer_{layer.identifier}_definition_int_grid_values,\n"
                 )
@@ -544,7 +574,7 @@ class LayerDefinitionsIntGridValuesHeader(GenPrivHeader):
     def __init__(self):
         super().__init__()
         self.add_include("ldtk_int_grid_value_info.h")
-        self.add_include("ldtk_gen_ident.h")
+        self.add_include("ldtk_gen_idents.h")
 
         self.int_grid_values: Dict[
             str, List[LayerDefinitionsIntGridValuesHeader.IntGridValueInfo]
@@ -579,7 +609,7 @@ class LayerDefinitionsIntGridValuesHeader(GenPrivHeader):
                     source.write(f"        {int_grid_value.color},\n")
                     source.write(f"        {int_grid_value.group_uid},\n")
                     source.write(
-                        f'        {f"ident::LAYER_{layer_ident}_INT_GRID_VALUE_{int_grid_value.identifier}" if int_grid_value.identifier is not None else "bn::nullopt"},\n'
+                        f'        {f"layer_int_grid_value_ident::LAYER_{layer_ident}_INT_GRID_VALUE_{int_grid_value.identifier}" if int_grid_value.identifier is not None else "bn::nullopt"},\n'
                     )
                     source.write(f"        {int_grid_value.value}\n")
                     source.write("    ),\n")
@@ -598,7 +628,7 @@ class LayerDefinitionsIntGridValueGroupsHeader(GenPrivHeader):
     def __init__(self):
         super().__init__()
         self.add_include("ldtk_int_grid_value_group_info.h")
-        self.add_include("ldtk_gen_ident.h")
+        self.add_include("ldtk_gen_idents.h")
 
         self.int_grid_value_groups: Dict[
             str, List[LayerDefinitionsIntGridValueGroupsHeader.IntGridValueGroupInfo]
@@ -628,7 +658,7 @@ class LayerDefinitionsIntGridValueGroupsHeader(GenPrivHeader):
                 for group in groups:
                     source.write("    int_grid_value_group_info(\n")
                     source.write(
-                        f'        {f"ident::LAYER_{layer_ident}_INT_GRID_VALUE_GROUP_{group.identifier}" if group.identifier is not None else "bn::nullopt"},\n'
+                        f'        {f"layer_int_grid_value_group_ident::LAYER_{layer_ident}_INT_GRID_VALUE_GROUP_{group.identifier}" if group.identifier is not None else "bn::nullopt"},\n'
                     )
                     source.write(f"        {group.uid}\n")
                     source.write("    ),\n")
@@ -643,7 +673,7 @@ class LevelFieldDefinitionsHeader(GenPrivHeader):
     def __init__(self, field_defs: List[LdtkJson.FieldDefinition]):
         super().__init__()
         self.add_include("ldtk_field_definition.h")
-        self.add_include("ldtk_gen_ident.h")
+        self.add_include("ldtk_gen_idents.h")
         self.add_include("ldtk_gen_enums.h")
 
         self.level_fields: List[FieldDef] = []
@@ -675,7 +705,7 @@ class LevelFieldDefinitionsHeader(GenPrivHeader):
                     f'        {f"bn::type_id<{field.enum_type}>()" if field.enum_type is not None else "bn::nullopt"},\n'
                 )
                 source.write(f'        {"true" if field.can_be_null else "false"},\n')
-                source.write(f"        ident::LEVEL_FIELD_{field.identifier},\n")
+                source.write(f"        level_field_ident::{field.identifier},\n")
                 source.write(f"        {field.uid}\n")
                 source.write(f"    ),\n")
             source.write("};\n")
@@ -699,8 +729,8 @@ class TilesetDefinitionsHeader(GenPrivHeader):
         self.add_include("ldtk_gen_priv_tileset_definitions_custom_datas.h")
         self.add_include("ldtk_gen_priv_tileset_definitions_enum_tags.h")
         self.add_include("ldtk_gen_priv_tileset_definitions_tags.h")
-        self.add_include("ldtk_gen_ident.h")
-        self.add_include("ldtk_gen_tag.h")
+        self.add_include("ldtk_gen_idents.h")
+        self.add_include("ldtk_gen_tags.h")
         self.add_include("ldtk_gen_enums.h")
 
         self.tilesets: List[TilesetDefinitionsHeader.Tileset] = []
@@ -749,7 +779,7 @@ class TilesetDefinitionsHeader(GenPrivHeader):
                 source.write(
                     f"        gen_priv_tileset_{tileset.identifier}_enum_tags,\n"
                 )
-                source.write(f"        ident::TILESET_{tileset.identifier},\n")
+                source.write(f"        tileset_ident::{tileset.identifier},\n")
                 source.write(f"        gen_priv_tileset_{tileset.identifier}_tags,\n")
                 source.write(
                     f'        {f"bn::type_id<{tileset.tags_source_enum_id}>()" if tileset.tags_source_enum_id is not None else "bn::nullopt"},\n'
@@ -902,7 +932,7 @@ class TilesetDefinitionsTagsHeader(GenPrivHeader):
 
     def __init__(self):
         super().__init__()
-        self.add_include("ldtk_gen_tag.h")
+        self.add_include("ldtk_gen_tags.h")
 
         self.tags: Dict[str, List[str]] = {}
         """Tileset identifier -> List[tag]"""
@@ -914,14 +944,14 @@ class TilesetDefinitionsTagsHeader(GenPrivHeader):
         for tileset_ident, tags in self.tags.items():
             if len(tags) == 0:
                 source.write(
-                    f"inline constexpr bn::span<const tag> gen_priv_tileset_{tileset_ident}_tags;\n\n"
+                    f"inline constexpr bn::span<const tileset_tag> gen_priv_tileset_{tileset_ident}_tags;\n\n"
                 )
             else:
                 source.write(
-                    f"inline constexpr const tag gen_priv_tileset_{tileset_ident}_tags[] {{\n"
+                    f"inline constexpr const tileset_tag gen_priv_tileset_{tileset_ident}_tags[] {{\n"
                 )
                 for tag in tags:
-                    source.write(f"    tag::TILESET_{tag},\n")
+                    source.write(f"    tileset_tag::{tag},\n")
                 source.write("};\n\n")
 
 
@@ -942,8 +972,8 @@ class LevelsHeader(GenPrivHeader):
     def __init__(self, levels: List[LdtkJson.Level]):
         super().__init__()
         self.add_include("ldtk_level.h")
-        self.add_include("ldtk_gen_ident.h")
-        self.add_include("ldtk_gen_iid.h")
+        self.add_include("ldtk_gen_idents.h")
+        self.add_include("ldtk_gen_iids.h")
         self.add_include("ldtk_gen_priv_level_field_instances.h")
         self.add_include("ldtk_gen_priv_level_layer_instances.h")
 
@@ -971,8 +1001,8 @@ class LevelsHeader(GenPrivHeader):
                 source.write(
                     f"        gen_priv_level_{level.identifier}_field_instances,\n"
                 )
-                source.write(f"        ident::LEVEL_{level.identifier},\n")
-                source.write(f"        iid::LEVEL_{level.iid},\n")
+                source.write(f"        level_ident::{level.identifier},\n")
+                source.write(f"        level_iid::_{level.iid},\n")
                 source.write(
                     f"        gen_priv_level_{level.identifier}_layer_instances,\n"
                 )
@@ -999,7 +1029,7 @@ class LevelFieldInstancesHeader(GenPrivHeader):
         self.add_include(f"ldtk_gen_priv_{self.parent_type()}_field_definitions.h")
         self.add_include(f"ldtk_gen_priv_{self.parent_type()}_field_arrays.h")
         self.add_include("ldtk_gen_enums.h")
-        self.add_include("ldtk_gen_iid.h")
+        self.add_include("ldtk_gen_iids.h")
 
         self.fields: Dict[str, List[str]] = {}
         """Parent id -> List[field value]"""
@@ -1048,7 +1078,7 @@ class LevelFieldInstancesHeader(GenPrivHeader):
                             field.value
                         )
                         result.append(
-                            f"entity_ref(iid::ENTITY_{entity_ref.entity_iid.replace("-", "_")}, iid::LAYER_{entity_ref.layer_iid.replace("-", "_")}, iid::LEVEL_{entity_ref.level_iid.replace("-", "_")})"
+                            f"entity_ref(entity_iid::_{entity_ref.entity_iid.replace("-", "_")}, layer_iid::_{entity_ref.layer_iid.replace("-", "_")}, level_iid::_{entity_ref.level_iid.replace("-", "_")})"
                         )
                     else:
                         result.append("bn::optional<entity_ref>()")
@@ -1137,7 +1167,7 @@ class LevelFieldArraysHeader(GenPrivHeader):
         self.add_include("bn_string_view.h", is_system_header=True)
         self.add_include("ldtk_typed_enum.h")
         self.add_include("ldtk_entity_ref.h")
-        self.add_include("ldtk_gen_iid.h")
+        self.add_include("ldtk_gen_iids.h")
         self.add_include("ldtk_gen_enums.h")
 
         self.arrays: Dict[LevelFieldArraysHeader.Key, LevelFieldArraysHeader.Value] = {}
@@ -1195,7 +1225,7 @@ class LevelFieldArraysHeader(GenPrivHeader):
                 value = LevelFieldArraysHeader.Value(
                     elem_type,
                     [
-                        f"entity_ref(iid::ENTITY_{r.entity_iid.replace("-", "_")}, iid::LAYER_{r.layer_iid.replace("-", "_")}, iid::LEVEL_{r.level_iid.replace("-", "_")})"
+                        f"entity_ref(entity_iid::_{r.entity_iid.replace("-", "_")}, layer_iid::_{r.layer_iid.replace("-", "_")}, level_iid::_{r.level_iid.replace("-", "_")})"
                         for r in entity_ref_arr
                     ],
                 )
@@ -1265,7 +1295,7 @@ class LevelFieldArraysHeader(GenPrivHeader):
                     elem_type,
                     [
                         (
-                            f"entity_ref(iid::ENTITY_{r.entity_iid.replace("-", "_")}, iid::LAYER_{r.layer_iid.replace("-", "_")}, iid::LEVEL_{r.level_iid.replace("-", "_")})"
+                            f"entity_ref(entity_iid::_{r.entity_iid.replace("-", "_")}, layer_iid::_{r.layer_iid.replace("-", "_")}, level_iid::_{r.level_iid.replace("-", "_")})"
                             if r is not None
                             else "bn::nullopt"
                         )
@@ -1335,8 +1365,8 @@ class LevelLayerInstancesHeader(GenPrivHeader):
         self.add_include("ldtk_gen_priv_layer_entity_instances.h")
         self.add_include("ldtk_gen_priv_layer_grid_tiles.h")
         self.add_include("ldtk_gen_priv_layer_int_grids.h")
-        self.add_include("ldtk_gen_ident.h")
-        self.add_include("ldtk_gen_iid.h")
+        self.add_include("ldtk_gen_idents.h")
+        self.add_include("ldtk_gen_iids.h")
 
         self.layers: Dict[str, List[LevelLayerInstancesHeader.LayerInfo]] = {}
         """Level identifier -> List[LayerInfo]"""
@@ -1398,7 +1428,7 @@ class LevelLayerInstancesHeader(GenPrivHeader):
                     source.write(
                         f"        gen_priv_level_{level_ident}_layer_{layer.layer_ident}_entities,\n"
                     )
-                    source.write(f"        iid::LAYER_{layer.iid},\n")
+                    source.write(f"        layer_iid::_{layer.iid},\n")
                     source.write(f"        {str(layer.visible).lower()}\n")
                     source.write("    ),\n")
                 source.write("};\n\n")
@@ -1553,7 +1583,7 @@ class LayerEntityInstancesHeader(GenPrivHeader):
         self.add_include("ldtk_entity.h")
         self.add_include("ldtk_gen_priv_entity_definitions.h")
         self.add_include("ldtk_gen_priv_layer_entity_field_instances.h")
-        self.add_include("ldtk_gen_iid.h")
+        self.add_include("ldtk_gen_iids.h")
 
         self.entities: Dict[
             LayerEntityInstancesHeader.Key, List[LayerEntityInstancesHeader.EntityInfo]
@@ -1601,7 +1631,7 @@ class LayerEntityInstancesHeader(GenPrivHeader):
                         f"        gen_priv_entity_{entity.iid}_field_instances,\n"
                     )
                     source.write(f"        {entity.size},\n")
-                    source.write(f"        iid::ENTITY_{entity.iid},\n")
+                    source.write(f"        entity_iid::_{entity.iid},\n")
                     source.write(f"        {entity.px}\n")
                     source.write("    ),\n")
                 source.write("};\n\n")
@@ -1773,7 +1803,7 @@ class ProjectHeader(GenHeader):
         self.add_include("ldtk_project.h")
         self.add_include("ldtk_gen_priv_definitions.h")
         self.add_include("ldtk_gen_priv_levels.h")
-        self.add_include("ldtk_gen_iid.h")
+        self.add_include("ldtk_gen_iids.h")
 
         self.iid = ldtk_project.iid.replace("-", "_")
         self.bg_color = Color(ldtk_project.bg_color)
@@ -1781,7 +1811,7 @@ class ProjectHeader(GenHeader):
     def _write_contents(self, source: TextIOWrapper):
         source.write("inline constexpr const project gen_project(\n")
         source.write(f"    priv::gen_priv_definitions,\n")
-        source.write(f"    iid::PROJECT_{self.iid},\n")
+        source.write(f"    project_iid::_{self.iid},\n")
         source.write(f"    priv::gen_priv_levels,\n")
         source.write(f"    {self.bg_color}\n")
         source.write(");\n")
