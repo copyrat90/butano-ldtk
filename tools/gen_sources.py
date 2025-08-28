@@ -1029,12 +1029,19 @@ class LevelFieldInstancesHeader(GenPrivHeader):
         self.add_include(f"ldtk_gen_priv_{self.parent_type()}_field_definitions.h")
         self.add_include(f"ldtk_gen_priv_{self.parent_type()}_field_arrays.h")
         self.add_include("ldtk_gen_enums.h")
+        self.add_include("ldtk_gen_idents.h")
         self.add_include("ldtk_gen_iids.h")
 
         self.fields: Dict[str, List[str]] = {}
         """Parent id -> List[field value]"""
 
-    def add_fields(self, parent_id: str, fields: List[LdtkJson.FieldInstance]):
+    def add_fields(
+        self,
+        parent_id: str,
+        fields: List[LdtkJson.FieldInstance],
+        layer_iid_to_ident: Dict[str, str],
+        level_iid_to_ident: Dict[str, str],
+    ):
         result: List[str] = []
         for field in fields:
             match field.type:
@@ -1078,7 +1085,7 @@ class LevelFieldInstancesHeader(GenPrivHeader):
                             field.value
                         )
                         result.append(
-                            f"entity_ref(entity_iid::_{entity_ref.entity_iid.replace("-", "_")}, layer_iid::_{entity_ref.layer_iid.replace("-", "_")}, level_iid::_{entity_ref.level_iid.replace("-", "_")})"
+                            f"entity_ref(entity_iid::_{entity_ref.entity_iid.replace("-", "_")}, layer_ident::{layer_iid_to_ident[entity_ref.layer_iid]}, level_ident::{level_iid_to_ident[entity_ref.level_iid]})"
                         )
                     else:
                         result.append("bn::optional<entity_ref>()")
@@ -1167,6 +1174,7 @@ class LevelFieldArraysHeader(GenPrivHeader):
         self.add_include("bn_string_view.h", is_system_header=True)
         self.add_include("ldtk_typed_enum.h")
         self.add_include("ldtk_entity_ref.h")
+        self.add_include("ldtk_gen_idents.h")
         self.add_include("ldtk_gen_iids.h")
         self.add_include("ldtk_gen_enums.h")
 
@@ -1177,6 +1185,8 @@ class LevelFieldArraysHeader(GenPrivHeader):
         parent_id: str,
         field: LdtkJson.FieldInstance,
         field_def: LdtkJson.FieldDefinition,
+        layer_iid_to_ident: Dict[str, str],
+        level_iid_to_ident: Dict[str, str],
     ):
         if not field.type.startswith("Array"):
             return
@@ -1225,7 +1235,7 @@ class LevelFieldArraysHeader(GenPrivHeader):
                 value = LevelFieldArraysHeader.Value(
                     elem_type,
                     [
-                        f"entity_ref(entity_iid::_{r.entity_iid.replace("-", "_")}, layer_iid::_{r.layer_iid.replace("-", "_")}, level_iid::_{r.level_iid.replace("-", "_")})"
+                        f"entity_ref(entity_iid::_{r.entity_iid.replace("-", "_")}, layer_ident::{layer_iid_to_ident[r.layer_iid]}, level_ident::{level_iid_to_ident[r.level_iid]})"
                         for r in entity_ref_arr
                     ],
                 )
@@ -1295,7 +1305,7 @@ class LevelFieldArraysHeader(GenPrivHeader):
                     elem_type,
                     [
                         (
-                            f"entity_ref(entity_iid::_{r.entity_iid.replace("-", "_")}, layer_iid::_{r.layer_iid.replace("-", "_")}, level_iid::_{r.level_iid.replace("-", "_")})"
+                            f"entity_ref(entity_iid::_{r.entity_iid.replace("-", "_")}, layer_ident::{layer_iid_to_ident[r.layer_iid]}, level_ident::{level_iid_to_ident[r.level_iid]})"
                             if r is not None
                             else "bn::nullopt"
                         )

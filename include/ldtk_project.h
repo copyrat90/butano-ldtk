@@ -40,7 +40,9 @@ public:
     /// @note If you know the identifier, prefer `get_level()` instead, as that's O(1).
     /// @param iid Instance id of the level to search for.
     /// @return Reference to the found level.
-    [[nodiscard]] constexpr auto find_level(gen::level_iid iid) const -> const level&
+    [[deprecated("Use `get_level()` instead. Linear searching a level with `iid` shouldn't be "
+                 "necessary.")]] [[nodiscard]] constexpr auto
+    find_level(gen::level_iid iid) const -> const level&
     {
         auto iter = std::ranges::find_if(_levels, [iid](const level& lv) { return lv.iid() == iid; });
         BN_ASSERT(iter != _levels.end(), "Level not found with (gen::level_iid)", (int)iid);

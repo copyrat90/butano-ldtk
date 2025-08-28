@@ -484,11 +484,28 @@ def generate_levels_headers(
     }
     """Entity def uid -> def idx"""
 
+    layer_iid_to_ident: Dict[str, str] = {}
+    level_iid_to_ident: Dict[str, str] = {}
     for level in ldtk_project.levels:
-        level_fields_header.add_fields(level.identifier, level.field_instances)
+        level_iid_to_ident[level.iid] = level.identifier
+        assert level.layer_instances is not None
+        for layer in level.layer_instances:
+            layer_iid_to_ident[layer.iid] = layer.identifier
+
+    for level in ldtk_project.levels:
+        level_fields_header.add_fields(
+            level.identifier,
+            level.field_instances,
+            layer_iid_to_ident,
+            level_iid_to_ident,
+        )
         for field_idx, field in enumerate(level.field_instances):
             level_field_arrays_header.add_field_array(
-                level.identifier, field, ldtk_project.defs.level_fields[field_idx]
+                level.identifier,
+                field,
+                ldtk_project.defs.level_fields[field_idx],
+                layer_iid_to_ident,
+                level_iid_to_ident,
             )
 
         assert level.layer_instances is not None
@@ -522,7 +539,10 @@ def generate_levels_headers(
             entities_header.add_entities(level.identifier, layer, entity_idx_lut)
             for entity in layer.entity_instances:
                 entity_fields_header.add_fields(
-                    entity.iid.replace("-", "_"), entity.field_instances
+                    entity.iid.replace("-", "_"),
+                    entity.field_instances,
+                    layer_iid_to_ident,
+                    level_iid_to_ident,
                 )
                 entity_fields_header.add_entity_iid_identifier_mapping(
                     entity.iid.replace("-", "_"),
@@ -533,6 +553,8 @@ def generate_levels_headers(
                         entity.iid.replace("-", "_"),
                         field,
                         entity_def_lut[entity.def_uid].field_defs[field_idx],
+                        layer_iid_to_ident,
+                        level_iid_to_ident,
                     )
 
     level_fields_header.write(build_folder_path)

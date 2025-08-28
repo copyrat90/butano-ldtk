@@ -48,7 +48,9 @@ public:
     /// You should @b never use layer IIDs that's for other level.
     /// @param iid Instance id of the layer to search for.
     /// @return Reference to the found layer.
-    [[nodiscard]] constexpr auto find_layer(gen::layer_iid iid) const -> const layer&
+    [[deprecated("Use `get_layer()` instead. Linear searching a layer with `iid` shouldn't be "
+                 "necessary.")]] [[nodiscard]] constexpr auto
+    find_layer(gen::layer_iid iid) const -> const layer&
     {
         auto iter = std::ranges::find_if(_layer_instances, [iid](const layer& ly) { return ly.iid() == iid; });
         BN_ASSERT(iter != _layer_instances.end(), "Layer not found with (gen::layer_iid)", (int)iid,
