@@ -205,28 +205,38 @@ void bg_t::reset_all_cells(const bn::fixed_point& final_pos)
     const int level_8x8_last_x = (screen_bottom_right.x() / 8).floor_integer();
 
     const int m_tile_cnt = layer_instance.grid_size() >> 3;
+    const int m_tile_cnt_squared = m_tile_cnt * m_tile_cnt;
+
+    // Optimization: accumulate divmod instead of recalculate every time
+    int my = py_div(level_8x8_first_y, m_tile_cnt);
+    int my_rnd_cnt = py_mod(level_8x8_first_y, m_tile_cnt);
+
+    int cy = py_mod(level_8x8_first_y, ROWS);
+
+    int mx_init = py_div(level_8x8_first_x, m_tile_cnt);
+    int mx_rnd_cnt_init = py_mod(level_8x8_first_x, m_tile_cnt);
+
+    int cx_init = py_mod(level_8x8_first_x, COLUMNS);
 
     for (int ly = level_8x8_first_y; ly <= level_8x8_last_y; ++ly)
     {
-        const int my = py_div(ly, m_tile_cnt);
-        const int cy = py_mod(ly, ROWS);
+        int mx = mx_init;
+        int mx_rnd_cnt = mx_rnd_cnt_init;
+        int cx = cx_init;
 
         for (int lx = level_8x8_first_x; lx <= level_8x8_last_x; ++lx)
         {
-            const int mx = py_div(lx, m_tile_cnt);
-            const int cx = py_mod(lx, COLUMNS);
-
             // Optimization: no virtual function call
             const auto m_tile_info = grid_bloated ? static_cast<const tile_grid_t<true>&>(grid).cell_tile_info(mx, my)
                                                   : static_cast<const tile_grid_t<false>&>(grid).cell_tile_info(mx, my);
 
-            const int tx = m_tile_info.x_flip ? m_tile_cnt - 1 - py_mod(lx, m_tile_cnt) : py_mod(lx, m_tile_cnt);
-            const int ty = m_tile_info.y_flip ? m_tile_cnt - 1 - py_mod(ly, m_tile_cnt) : py_mod(ly, m_tile_cnt);
+            const int tx = m_tile_info.x_flip ? m_tile_cnt - 1 - mx_rnd_cnt : mx_rnd_cnt;
+            const int ty = m_tile_info.y_flip ? m_tile_cnt - 1 - my_rnd_cnt : my_rnd_cnt;
             const bn::regular_bg_map_cell raw_cell =
                 layer_instance.tileset_def()
                     ->bg_item()
                     .map_item()
-                    .cells_ptr()[(m_tile_info.index * m_tile_cnt * m_tile_cnt) + (ty * m_tile_cnt) + tx];
+                    .cells_ptr()[(m_tile_info.index * m_tile_cnt_squared) + (ty * m_tile_cnt) + tx];
 
             bn::regular_bg_map_cell_info cell_info(raw_cell);
             if (m_tile_info.x_flip)
@@ -235,6 +245,26 @@ void bg_t::reset_all_cells(const bn::fixed_point& final_pos)
                 cell_info.set_vertical_flip(!cell_info.vertical_flip());
 
             cells[map_item.cell_index(cx, cy)] = cell_info.cell();
+
+            if (++mx_rnd_cnt == m_tile_cnt)
+            {
+                ++mx;
+                mx_rnd_cnt = 0;
+            }
+            if (++cx == COLUMNS)
+            {
+                cx = 0;
+            }
+        }
+
+        if (++my_rnd_cnt == m_tile_cnt)
+        {
+            ++my;
+            my_rnd_cnt = 0;
+        }
+        if (++cy == ROWS)
+        {
+            cy = 0;
         }
     }
 }
