@@ -15,6 +15,7 @@
 #include <bn_core.h>
 #include <bn_display.h>
 #include <bn_fixed_point.h>
+#include <bn_point.h>
 #include <bn_pool.h>
 #include <bn_regular_bg_builder.h>
 #include <bn_regular_bg_map_cell.h>
@@ -61,8 +62,15 @@ private:
     void update_camera_applied_position(const bn::fixed_point& cam_applied_pos);
 
     void update_all_cells(const bn::fixed_point& cam_applied_pos);
+    void update_part_cells(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_point& prev_cam_applied_pos);
 
     void reset_all_cells(const bn::fixed_point& final_pos);
+    void reset_part_cells(const bn::fixed_point& next_final_pos, const bn::fixed_point& prev_final_pos);
+
+    void reset_rows(const int level_8x8_first_y, const int level_8x8_last_y, const int level_8x8_first_x,
+                    const int level_8x8_last_x);
+    void reset_columns(const int level_8x8_first_y, const int level_8x8_last_y, const int level_8x8_first_x,
+                       const int level_8x8_last_x);
 
     auto init_bg_ptr(const layer& layer_, const bn::fixed_point& cam_applied_pos, const level_bgs_builder&)
         -> bn::regular_bg_ptr;
@@ -159,8 +167,8 @@ void bg_t::update(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_p
         // Update cells when level position changed
         else if (next_cam_applied_pos != prev_cam_applied_pos)
         {
-            // TODO: Only update cells that needs to be changed
-            update_all_cells(next_cam_applied_pos);
+            // Only update cells that needs to be changed
+            update_part_cells(next_cam_applied_pos, prev_cam_applied_pos);
         }
     }
 
@@ -186,24 +194,70 @@ void bg_t::update_all_cells(const bn::fixed_point& cam_applied_pos)
     map_ptr.reload_cells_ref();
 }
 
+void bg_t::update_part_cells(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_point& prev_cam_applied_pos)
+{
+    reset_part_cells(apply_layer_diff(next_cam_applied_pos), apply_layer_diff(prev_cam_applied_pos));
+    map_ptr.reload_cells_ref();
+}
+
 void bg_t::reset_all_cells(const bn::fixed_point& final_pos)
 {
     // Everything is top-left coordinate, (0, 0) being top-left of the level
-    static constexpr bn::fixed_point SCREEN_SIZE(bn::display::width(), bn::display::height());
-    static constexpr bn::fixed_point HALF_SCREEN_SIZE(SCREEN_SIZE / 2);
-    static constexpr bn::fixed_point CANVAS_SIZE(COLUMNS * 8, ROWS * 8);
-    static constexpr bn::fixed_point HALF_CANVAS_SIZE(CANVAS_SIZE / 2);
-    const bn::fixed_point level_size(lv.px_width(), lv.px_height());
-    const bn::fixed_point half_level_size(level_size / 2);
+    static constexpr bn::point SCREEN_CELLS(bn::display::width() / 8, bn::display::height() / 8);
+    static constexpr bn::fixed_point HALF_SCREEN_SIZE(bn::display::width() / 2, bn::display::height() / 2);
+    const bn::fixed_point half_level_size(lv.px_width() / 2, lv.px_height() / 2);
 
     const bn::fixed_point screen_top_left = -final_pos - HALF_SCREEN_SIZE + half_level_size;
-    const bn::fixed_point screen_bottom_right = screen_top_left + SCREEN_SIZE;
 
-    const int level_8x8_first_y = (screen_top_left.y() / 8).floor_integer();
-    const int level_8x8_first_x = (screen_top_left.x() / 8).floor_integer();
-    const int level_8x8_last_y = (screen_bottom_right.y() / 8).floor_integer();
-    const int level_8x8_last_x = (screen_bottom_right.x() / 8).floor_integer();
+    const bn::point level_8x8_first((screen_top_left.x() / 8).floor_integer(),
+                                    (screen_top_left.y() / 8).floor_integer());
+    const bn::point level_8x8_last(level_8x8_first + SCREEN_CELLS);
 
+    reset_rows(level_8x8_first.y(), level_8x8_last.y(), level_8x8_first.x(), level_8x8_last.x());
+}
+
+void bg_t::reset_part_cells(const bn::fixed_point& next_final_pos, const bn::fixed_point& prev_final_pos)
+{
+    // Everything is top-left coordinate, (0, 0) being top-left of the level
+    static constexpr bn::point SCREEN_CELLS(bn::display::width() / 8, bn::display::height() / 8);
+    static constexpr bn::fixed_point HALF_SCREEN_SIZE(bn::display::width() / 2, bn::display::height() / 2);
+    const bn::fixed_point half_level_size(lv.px_width() / 2, lv.px_height() / 2);
+
+    const bn::fixed_point next_screen_top_left = -next_final_pos - HALF_SCREEN_SIZE + half_level_size;
+    const bn::fixed_point prev_screen_top_left = -prev_final_pos - HALF_SCREEN_SIZE + half_level_size;
+
+    const bn::point level_8x8_next_top_left((next_screen_top_left.x() / 8).floor_integer(),
+                                            (next_screen_top_left.y() / 8).floor_integer());
+    const bn::point level_8x8_next_bottom_right(level_8x8_next_top_left + SCREEN_CELLS);
+    const bn::point level_8x8_prev_top_left((prev_screen_top_left.x() / 8).floor_integer(),
+                                            (prev_screen_top_left.y() / 8).floor_integer());
+    const bn::point level_8x8_prev_bottom_right(level_8x8_prev_top_left + SCREEN_CELLS);
+
+    const int up_diff = -level_8x8_next_top_left.y() + level_8x8_prev_top_left.y();
+    const int down_diff = -up_diff;
+    const int left_diff = -level_8x8_next_top_left.x() + level_8x8_prev_top_left.x();
+    const int right_diff = -left_diff;
+
+    if (up_diff > 0)
+        reset_rows(level_8x8_next_top_left.y(), level_8x8_next_top_left.y() + (up_diff - 1),
+                   level_8x8_next_top_left.x(), level_8x8_next_bottom_right.x());
+    else if (down_diff > 0)
+        reset_rows(level_8x8_next_bottom_right.y() - (down_diff - 1), level_8x8_next_bottom_right.y(),
+                   level_8x8_next_top_left.x(), level_8x8_next_bottom_right.x());
+
+    if (left_diff > 0)
+        reset_columns(level_8x8_next_top_left.y() + (up_diff > 0 ? up_diff : 0),
+                      level_8x8_next_bottom_right.y() - (down_diff > 0 ? down_diff : 0), level_8x8_next_top_left.x(),
+                      level_8x8_next_top_left.x() + (left_diff - 1));
+    else if (right_diff > 0)
+        reset_columns(level_8x8_next_top_left.y() + (up_diff > 0 ? up_diff : 0),
+                      level_8x8_next_bottom_right.y() - (down_diff > 0 ? down_diff : 0),
+                      level_8x8_next_bottom_right.x() - (right_diff - 1), level_8x8_next_bottom_right.x());
+}
+
+void bg_t::reset_rows(const int level_8x8_first_y, const int level_8x8_last_y, const int level_8x8_first_x,
+                      const int level_8x8_last_x)
+{
     const int m_tile_cnt = layer_instance.grid_size() >> 3;
     const int m_tile_cnt_squared = m_tile_cnt * m_tile_cnt;
 
@@ -265,6 +319,74 @@ void bg_t::reset_all_cells(const bn::fixed_point& final_pos)
         if (++cy == ROWS)
         {
             cy = 0;
+        }
+    }
+}
+
+void bg_t::reset_columns(const int level_8x8_first_y, const int level_8x8_last_y, const int level_8x8_first_x,
+                         const int level_8x8_last_x)
+{
+    const int m_tile_cnt = layer_instance.grid_size() >> 3;
+    const int m_tile_cnt_squared = m_tile_cnt * m_tile_cnt;
+
+    // Optimization: accumulate divmod instead of recalculate every time
+    int mx = py_div(level_8x8_first_x, m_tile_cnt);
+    int mx_rnd_cnt = py_mod(level_8x8_first_x, m_tile_cnt);
+
+    int cx = py_mod(level_8x8_first_x, COLUMNS);
+
+    int my_init = py_div(level_8x8_first_y, m_tile_cnt);
+    int my_rnd_cnt_init = py_mod(level_8x8_first_y, m_tile_cnt);
+
+    int cy_init = py_mod(level_8x8_first_y, ROWS);
+
+    for (int lx = level_8x8_first_x; lx <= level_8x8_last_x; ++lx)
+    {
+        int my = my_init;
+        int my_rnd_cnt = my_rnd_cnt_init;
+        int cy = cy_init;
+
+        for (int ly = level_8x8_first_y; ly <= level_8x8_last_y; ++ly)
+        {
+            // Optimization: no virtual function call
+            const auto m_tile_info = grid_bloated ? static_cast<const tile_grid_t<true>&>(grid).cell_tile_info(mx, my)
+                                                  : static_cast<const tile_grid_t<false>&>(grid).cell_tile_info(mx, my);
+
+            const int tx = m_tile_info.x_flip ? m_tile_cnt - 1 - mx_rnd_cnt : mx_rnd_cnt;
+            const int ty = m_tile_info.y_flip ? m_tile_cnt - 1 - my_rnd_cnt : my_rnd_cnt;
+            const bn::regular_bg_map_cell raw_cell =
+                layer_instance.tileset_def()
+                    ->bg_item()
+                    .map_item()
+                    .cells_ptr()[(m_tile_info.index * m_tile_cnt_squared) + (ty * m_tile_cnt) + tx];
+
+            bn::regular_bg_map_cell_info cell_info(raw_cell);
+            if (m_tile_info.x_flip)
+                cell_info.set_horizontal_flip(!cell_info.horizontal_flip());
+            if (m_tile_info.y_flip)
+                cell_info.set_vertical_flip(!cell_info.vertical_flip());
+
+            cells[map_item.cell_index(cx, cy)] = cell_info.cell();
+
+            if (++my_rnd_cnt == m_tile_cnt)
+            {
+                ++my;
+                my_rnd_cnt = 0;
+            }
+            if (++cy == ROWS)
+            {
+                cy = 0;
+            }
+        }
+
+        if (++mx_rnd_cnt == m_tile_cnt)
+        {
+            ++mx;
+            mx_rnd_cnt = 0;
+        }
+        if (++cx == COLUMNS)
+        {
+            cx = 0;
         }
     }
 }
