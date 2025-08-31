@@ -58,9 +58,14 @@ public:
                   ", != ", grid.size());
     }
 
+    [[nodiscard]] constexpr auto bloated() const -> bool override
+    {
+        return Bloated;
+    }
+
 public:
     // @brief Get the cell tile info with the grid coordinate
-    [[nodiscard]] constexpr auto cell_tile_info(int grid_x, int grid_y) const -> tile_info override
+    [[nodiscard]] constexpr auto cell_tile_info(int grid_x, int grid_y) const -> tile_info
     {
         tile t = get_tile(grid_x, grid_y);
 
@@ -72,19 +77,19 @@ public:
     }
 
     // @brief Get the cell tile index with the grid coordinate
-    [[nodiscard]] constexpr auto cell_tile_index(int grid_x, int grid_y) const -> tile_index override
+    [[nodiscard]] constexpr auto cell_tile_index(int grid_x, int grid_y) const -> tile_index
     {
         return get_tile(grid_x, grid_y).fields.index;
     }
 
     // @brief Get the cell tile X flip with the grid coordinate
-    [[nodiscard]] constexpr auto cell_tile_x_flip(int grid_x, int grid_y) const -> bool override
+    [[nodiscard]] constexpr auto cell_tile_x_flip(int grid_x, int grid_y) const -> bool
     {
         return get_tile(grid_x, grid_y).fields.x_flip;
     }
 
     // @brief Get the cell tile Y flip with the grid coordinate
-    [[nodiscard]] constexpr auto cell_tile_y_flip(int grid_x, int grid_y) const -> bool override
+    [[nodiscard]] constexpr auto cell_tile_y_flip(int grid_x, int grid_y) const -> bool
     {
         return get_tile(grid_x, grid_y).fields.y_flip;
     }

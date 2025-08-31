@@ -5,6 +5,7 @@
 
 #include "ldtk_gen_idents_fwd.h"
 #include "ldtk_layer.h"
+#include "ldtk_tile_grid_t.h"
 #include "ldtk_tileset_definition.h"
 
 #include <bn_assert.h>
@@ -50,6 +51,7 @@ struct bg_t
     bn::regular_bg_ptr bg_ptr;
     bn::regular_bg_map_ptr map_ptr;
     bool next_visible;
+    bool grid_bloated;
 
     bg_t(const level& lv_, const layer& layer_, const bn::fixed_point& cam_applied_pos, const level_bgs_builder&);
 
@@ -142,7 +144,7 @@ bg_t::bg_t(const level& lv_, const layer& layer_, const bn::fixed_point& cam_app
     : lv(lv_), layer_instance(layer_),
       grid(layer_.auto_layer_tiles() ? *layer_.auto_layer_tiles() : *layer_.grid_tiles()),
       map_item(cells[0], bn::size(COLUMNS, ROWS)), bg_ptr(init_bg_ptr(layer_, cam_applied_pos, builder)),
-      map_ptr(bg_ptr.map()), next_visible(bg_ptr.visible())
+      map_ptr(bg_ptr.map()), next_visible(bg_ptr.visible()), grid_bloated(grid.bloated())
 {
 }
 
@@ -214,7 +216,9 @@ void bg_t::reset_all_cells(const bn::fixed_point& final_pos)
             const int mx = py_div(lx, m_tile_cnt);
             const int cx = py_mod(lx, COLUMNS);
 
-            const auto m_tile_info = grid.cell_tile_info(mx, my);
+            // Optimization: no virtual function call
+            const auto m_tile_info = grid_bloated ? static_cast<const tile_grid_t<true>&>(grid).cell_tile_info(mx, my)
+                                                  : static_cast<const tile_grid_t<false>&>(grid).cell_tile_info(mx, my);
 
             const int tx = m_tile_info.x_flip ? m_tile_cnt - 1 - py_mod(lx, m_tile_cnt) : py_mod(lx, m_tile_cnt);
             const int ty = m_tile_info.y_flip ? m_tile_cnt - 1 - py_mod(ly, m_tile_cnt) : py_mod(ly, m_tile_cnt);

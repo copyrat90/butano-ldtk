@@ -24,18 +24,7 @@ public:
     {
     }
 
-public:
-    // @brief Get the cell tile info with the grid coordinate
-    [[nodiscard]] constexpr virtual auto cell_tile_info(int grid_x, int grid_y) const -> tile_info = 0;
-
-    // @brief Get the cell tile index with the grid coordinate
-    [[nodiscard]] constexpr virtual auto cell_tile_index(int grid_x, int grid_y) const -> tile_index = 0;
-
-    // @brief Get the cell tile X flip with the grid coordinate
-    [[nodiscard]] constexpr virtual auto cell_tile_x_flip(int grid_x, int grid_y) const -> bool = 0;
-
-    // @brief Get the cell tile Y flip with the grid coordinate
-    [[nodiscard]] constexpr virtual auto cell_tile_y_flip(int grid_x, int grid_y) const -> bool = 0;
+    constexpr virtual auto bloated() const -> bool = 0;
 
 public:
     [[nodiscard]] constexpr auto c_size() const -> const bn::size&
