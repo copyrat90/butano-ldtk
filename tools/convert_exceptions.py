@@ -67,16 +67,6 @@ class DifferentOpacitiesNotSupportedException(Exception):
         self.layer_2 = layer_2
 
 
-class LevelSizeTooSmallException(Exception):
-    def __init__(self, width: int, height: int, level: str):
-        super().__init__(
-            f'Level size {width}x{height} is smaller than GBA resolution 240x160 - (found in Level "{level}")'
-        )
-        self.width = width
-        self.height = height
-        self.level = level
-
-
 class LdtkInternalIconUsedAsVisibleTileException(Exception):
     def __init__(self):
         super().__init__("LDtk internal icon is used as a tile, which is forbidden")

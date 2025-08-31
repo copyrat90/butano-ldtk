@@ -169,14 +169,6 @@ def ensure_no_different_opacities(ldtk_project: LdtkJson.LdtkJSON):
                 )
 
 
-def ensure_minimum_level_size(ldtk_project: LdtkJson.LdtkJSON):
-    for level in ldtk_project.levels:
-        if level.px_wid < 240 or level.px_hei < 160:
-            raise LevelSizeTooSmallException(
-                level.px_wid, level.px_hei, level.identifier
-            )
-
-
 def ensure_no_unaligned_tiles(ldtk_project: LdtkJson.LdtkJSON):
     def raise_if_unaligned(
         tile: LdtkJson.TileInstance,
@@ -221,7 +213,6 @@ def ensure_no_unsupported_features(ldtk_project: LdtkJson.LdtkJSON):
     ensure_no_parallax_scaling(ldtk_project)
     ensure_no_unsupported_fields(ldtk_project)
     ensure_no_different_opacities(ldtk_project)
-    ensure_minimum_level_size(ldtk_project)
     ensure_no_unaligned_tiles(ldtk_project)
     ensure_no_more_than_4_visible_layers(ldtk_project)
 
