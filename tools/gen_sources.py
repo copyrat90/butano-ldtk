@@ -1817,11 +1817,13 @@ class ProjectHeader(GenHeader):
 
         self.iid = ldtk_project.iid.replace("-", "_")
         self.bg_color = Color(ldtk_project.bg_color)
+        self.opacity = min(layer.display_opacity for layer in ldtk_project.defs.layers)
 
     def _write_contents(self, source: TextIOWrapper):
         source.write("inline constexpr const project gen_project(\n")
         source.write(f"    priv::gen_priv_definitions,\n")
         source.write(f"    project_iid::_{self.iid},\n")
         source.write(f"    priv::gen_priv_levels,\n")
-        source.write(f"    {self.bg_color}\n")
+        source.write(f"    {self.bg_color},\n")
+        source.write(f"    bn::fixed({self.opacity})")
         source.write(");\n")

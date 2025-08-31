@@ -7,6 +7,7 @@
 
 #include <bn_assert.h>
 #include <bn_color.h>
+#include <bn_fixed.h>
 #include <bn_span.h>
 
 #include <algorithm>
@@ -18,8 +19,8 @@ class project
 {
 public:
     constexpr project(const definitions& defs, gen::project_iid iid, const bn::span<const level>& levels,
-                      bn::color bg_color)
-        : _defs(defs), _iid(iid), _levels(levels), _bg_color(bg_color)
+                      bn::color bg_color, bn::fixed opacity)
+        : _defs(defs), _iid(iid), _levels(levels), _bg_color(bg_color), _opacity(opacity)
     {
     }
 
@@ -78,12 +79,19 @@ public:
         return _bg_color;
     }
 
+    /// @brief Global opacity used for semi-transparent layers
+    [[nodiscard]] constexpr auto opacity() const -> bn::fixed
+    {
+        return _opacity;
+    }
+
 private:
     const definitions& _defs;
 
     gen::project_iid _iid;
     bn::span<const level> _levels;
     bn::color _bg_color;
+    bn::fixed _opacity;
 };
 
 } // namespace ldtk
