@@ -1,6 +1,7 @@
 import LdtkJson
 from typing import Final, Optional, List, Dict, Set, NamedTuple
 from PIL import ImageColor
+from math import floor
 
 
 class Point(NamedTuple):
@@ -30,9 +31,9 @@ class Size(NamedTuple):
 class Color:
     def __init__(self, color_code: str):
         color = ImageColor.getrgb(color_code)
-        self.r = min(31, round(color[0] / 8))
-        self.g = min(31, round(color[1] / 8))
-        self.b = min(31, round(color[2] / 8))
+        self.r = min(31, floor(color[0] / 8))
+        self.g = min(31, floor(color[1] / 8))
+        self.b = min(31, floor(color[2] / 8))
 
     def __str__(self) -> str:
         return f"bn::color({self.r}, {self.g}, {self.b})"
