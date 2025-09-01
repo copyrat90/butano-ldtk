@@ -14,6 +14,10 @@ public:
     {
     }
 
+    /// @brief Get the size of bytes used for cell storage. \n
+    /// (empty: 0, `u8`: 1, `u16`: 2, `u32`: 4)
+    [[nodiscard]] constexpr virtual auto cell_storage_size() const -> int = 0;
+
 public:
     /// @brief Get the cell int value with the grid coordinate
     [[nodiscard]] constexpr virtual auto cell_int(int grid_x, int grid_y) const -> int = 0;

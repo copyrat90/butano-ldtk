@@ -292,8 +292,9 @@ void bg_t::reset_rows(const int level_8x8_first_y, const int level_8x8_last_y, c
             else
             {
                 // Optimization: no virtual function call
-                m_tile_info = grid_bloated ? static_cast<const tile_grid_t<true>&>(grid).cell_tile_info(mx, my)
-                                           : static_cast<const tile_grid_t<false>&>(grid).cell_tile_info(mx, my);
+                m_tile_info = grid_bloated
+                                  ? static_cast<const tile_grid_t<true>&>(grid).cell_tile_info_no_virtual(mx, my)
+                                  : static_cast<const tile_grid_t<false>&>(grid).cell_tile_info_no_virtual(mx, my);
             }
 
             const int tx = m_tile_info.x_flip ? m_tile_cnt - 1 - mx_rnd_cnt : mx_rnd_cnt;
@@ -371,8 +372,9 @@ void bg_t::reset_columns(const int level_8x8_first_y, const int level_8x8_last_y
             else
             {
                 // Optimization: no virtual function call
-                m_tile_info = grid_bloated ? static_cast<const tile_grid_t<true>&>(grid).cell_tile_info(mx, my)
-                                           : static_cast<const tile_grid_t<false>&>(grid).cell_tile_info(mx, my);
+                m_tile_info = grid_bloated
+                                  ? static_cast<const tile_grid_t<true>&>(grid).cell_tile_info_no_virtual(mx, my)
+                                  : static_cast<const tile_grid_t<false>&>(grid).cell_tile_info_no_virtual(mx, my);
             }
 
             const int tx = m_tile_info.x_flip ? m_tile_cnt - 1 - mx_rnd_cnt : mx_rnd_cnt;
