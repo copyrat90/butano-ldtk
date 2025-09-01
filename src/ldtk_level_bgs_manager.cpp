@@ -432,6 +432,8 @@ void lv_t::reset_bgs()
 {
     for (bg_t* bg : bgs)
         data_ref().bgs_pool.destroy(*bg);
+
+    bgs.clear();
 }
 
 void lv_t::set_level(level_bgs_builder&& builder)
