@@ -98,6 +98,7 @@ struct lv_t
     ~lv_t();
 
     void reset_bgs();
+    void set_level(const level& level_);
     void set_level(level_bgs_builder&& builder);
 
     auto get_bg(gen::layer_ident layer_identifier) -> bg_t&;
@@ -436,6 +437,15 @@ void lv_t::reset_bgs()
     bgs.clear();
 }
 
+void lv_t::set_level(const level& level_)
+{
+    level_bgs_builder builder(level_);
+    builder.set_position(cur_raw_pos);
+    builder.set_camera(cam);
+
+    set_level(std::move(builder));
+}
+
 void lv_t::set_level(level_bgs_builder&& builder)
 {
     reset_bgs();
@@ -567,6 +577,12 @@ void decrease_usages(id_t id)
         bn::erase(data.levels_vector, lv);
         data.levels_pool.destroy(*lv);
     }
+}
+
+void set_level(id_t id, const level& level)
+{
+    auto lv = static_cast<lv_t*>(id);
+    lv->set_level(level);
 }
 
 void set_level(id_t id, level_bgs_builder&& builder)

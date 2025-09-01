@@ -40,6 +40,8 @@ void increase_usages(id_t id);
 
 void decrease_usages(id_t id);
 
+void set_level(id_t id, const level& level);
+
 void set_level(id_t id, level_bgs_builder&& builder);
 
 auto has_background(id_t id, gen::layer_ident layer_identifier) -> bool;

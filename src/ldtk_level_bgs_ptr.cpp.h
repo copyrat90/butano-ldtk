@@ -139,7 +139,7 @@ auto level_bgs_ptr::has_background(gen::layer_ident layer_identifier) const -> b
 
 void level_bgs_ptr::set_level(const level& level)
 {
-    level_bgs_manager::set_level(_handle, level_bgs_builder(level));
+    level_bgs_manager::set_level(_handle, level);
 }
 
 void level_bgs_ptr::set_level(const level_bgs_builder& builder)
