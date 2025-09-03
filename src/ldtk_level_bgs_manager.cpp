@@ -15,6 +15,7 @@
 #include <bn_core.h>
 #include <bn_display.h>
 #include <bn_fixed_point.h>
+#include <bn_math.h>
 #include <bn_point.h>
 #include <bn_pool.h>
 #include <bn_regular_bg_builder.h>
@@ -239,21 +240,32 @@ void bg_t::reset_part_cells(const bn::fixed_point& next_final_pos, const bn::fix
     const int left_diff = -level_8x8_next_top_left.x() + level_8x8_prev_top_left.x();
     const int right_diff = -left_diff;
 
-    if (up_diff > 0)
-        reset_rows(level_8x8_next_top_left.y(), level_8x8_next_top_left.y() + (up_diff - 1),
-                   level_8x8_next_top_left.x(), level_8x8_next_bottom_right.x());
-    else if (down_diff > 0)
-        reset_rows(level_8x8_next_bottom_right.y() - (down_diff - 1), level_8x8_next_bottom_right.y(),
-                   level_8x8_next_top_left.x(), level_8x8_next_bottom_right.x());
+    // If `diff` is over the screen size, you can actually overwrite the same cell twice.
+    // If we're moving left or up, the last overwritting one will be the wrong source tile.
+    //
+    // I'm doing a cheap fix to just full reload for that case.
+    if (bn::abs(up_diff) >= SCREEN_CELLS.y() || bn::abs(left_diff) >= SCREEN_CELLS.x())
+    {
+        reset_all_cells(next_final_pos);
+    }
+    else
+    {
+        if (up_diff > 0)
+            reset_rows(level_8x8_next_top_left.y(), level_8x8_next_top_left.y() + (up_diff - 1),
+                       level_8x8_next_top_left.x(), level_8x8_next_bottom_right.x());
+        else if (down_diff > 0)
+            reset_rows(level_8x8_next_bottom_right.y() - (down_diff - 1), level_8x8_next_bottom_right.y(),
+                       level_8x8_next_top_left.x(), level_8x8_next_bottom_right.x());
 
-    if (left_diff > 0)
-        reset_columns(level_8x8_next_top_left.y() + (up_diff > 0 ? up_diff : 0),
-                      level_8x8_next_bottom_right.y() - (down_diff > 0 ? down_diff : 0), level_8x8_next_top_left.x(),
-                      level_8x8_next_top_left.x() + (left_diff - 1));
-    else if (right_diff > 0)
-        reset_columns(level_8x8_next_top_left.y() + (up_diff > 0 ? up_diff : 0),
-                      level_8x8_next_bottom_right.y() - (down_diff > 0 ? down_diff : 0),
-                      level_8x8_next_bottom_right.x() - (right_diff - 1), level_8x8_next_bottom_right.x());
+        if (left_diff > 0)
+            reset_columns(level_8x8_next_top_left.y() + (up_diff > 0 ? up_diff : 0),
+                          level_8x8_next_bottom_right.y() - (down_diff > 0 ? down_diff : 0),
+                          level_8x8_next_top_left.x(), level_8x8_next_top_left.x() + (left_diff - 1));
+        else if (right_diff > 0)
+            reset_columns(level_8x8_next_top_left.y() + (up_diff > 0 ? up_diff : 0),
+                          level_8x8_next_bottom_right.y() - (down_diff > 0 ? down_diff : 0),
+                          level_8x8_next_bottom_right.x() - (right_diff - 1), level_8x8_next_bottom_right.x());
+    }
 }
 
 void bg_t::reset_rows(const int level_8x8_first_y, const int level_8x8_last_y, const int level_8x8_first_x,
