@@ -5,7 +5,9 @@
 
 [butano-ldtk](https://github.com/copyrat90/butano-ldtk) is a [LDtk](https://ldtk.io/) level importer for the [Butano engine](https://github.com/GValiente/butano).
 
-![](docs/images/parallax_level_bgs.gif)
+| [Parallax level bgs example](examples/parallax_level_bgs/) | [Typical 2d platformer example](examples/typical_2d_platformer/) |
+|:---------------------------------------:|:------------------------------------------:|
+| ![](docs/images/parallax_level_bgs.gif) | ![](docs/images/typical_2d_platformer.gif) |
 
 ## Features
 
