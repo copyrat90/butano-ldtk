@@ -182,7 +182,7 @@ class IdentsHeader(GenHeader):
             key = IdentsHeader.LayerIntGridValueIdent(
                 layer_ident, int_grid_value_def.identifier
             )
-            self.layer_int_grid_value_idents.append((key, idx))
+            self.layer_int_grid_value_idents.append((key, idx + 1))
 
     def add_layer_int_grid_value_group_idents(
         self,
@@ -195,7 +195,7 @@ class IdentsHeader(GenHeader):
             key = IdentsHeader.LayerIntGridValueGroupIdent(
                 layer_ident, int_grid_value_group_def.identifier
             )
-            self.layer_int_grid_value_group_idents.append((key, idx))
+            self.layer_int_grid_value_group_idents.append((key, idx + 1))
 
     def add_entity_idents(self, entity_defs: List[LdtkJson.EntityDefinition]):
         for entity_def in entity_defs:
