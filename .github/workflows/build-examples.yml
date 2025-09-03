@@ -1,0 +1,88 @@
+name: Build examples
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{matrix.name}}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: butano-ldtk
+    strategy:
+      matrix:
+        name: [parallax_level_bgs]
+
+    steps:
+      - name: Checkout butano
+        uses: actions/checkout@v5
+        with:
+          repository: GValiente/butano
+          path: butano
+
+      - name: Checkout butano-ldtk
+        uses: actions/checkout@v5
+        with:
+          path: butano-ldtk
+
+      - name: Check update for wonderful toolchain `target-gba-syslibs`
+        id: gba-syslibs-latest-commit
+        uses: nmbgeek/github-action-get-latest-commit@main
+        with:
+          repository: WonderfulToolchain/target-gba-syslibs
+
+      - name: Check update for wonderful toolchain `wf-picolibc`
+        id: wf-picolibc-latest-commit
+        uses: nmbgeek/github-action-get-latest-commit@main
+        with:
+          repository: WonderfulToolchain/wf-picolibc
+
+      - name: Check update for blocksds sdk
+        id: blocksds-latest-commit
+        uses: nmbgeek/github-action-get-latest-commit@main
+        with:
+          repository: blocksds/sdk
+
+      - name: Cache wonderful toolchain
+        id: cache-wonderful
+        uses: actions/cache@v4
+        env:
+          cache-name: wonderful-toolchain
+        with:
+          path: /opt/wonderful
+          key: ${{runner.os}}-wf-sys-${{steps.gba-syslibs-latest-commit.outputs.shorthash}}-pico-${{steps.wf-picolibc-latest-commit.outputs.shorthash}}-blocksds-${{steps.blocksds-latest-commit.outputs.shorthash}}
+
+      - name: Install wonderful toolchain
+        if: ${{steps.cache-wonderful.outputs.cache-hit != 'true'}}
+        run: |
+          mkdir /opt/wonderful
+          cd /opt/wonderful
+          wget -qO- https://wonderful.asie.pl/bootstrap/wf-bootstrap-x86_64.tar.gz | tar xvz
+          export PATH=/opt/wonderful/bin:$PATH
+          export WONDERFUL_TOOLCHAIN=/opt/wonderful
+          wf-pacman -Syu wf-tools --noconfirm
+          wf-pacman -Syu wf-tools --noconfirm
+          wf-config repo enable blocksds
+          wf-pacman -Syu --noconfirm
+          wf-pacman -S target-gba --noconfirm
+          wf-pacman -S blocksds-toolchain --noconfirm
+
+      - name: Setup Python3
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install Python3 dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build example
+        run: |
+          export PATH=/opt/wonderful/bin:$PATH
+          export WONDERFUL_TOOLCHAIN=/opt/wonderful
+          cd examples/${{matrix.name}}
+          make -j$(nproc)

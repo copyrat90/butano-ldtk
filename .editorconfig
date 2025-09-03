@@ -9,15 +9,11 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-# Data interchange files
-[*.{xml,xaml,yml,yaml,json}]
-indent_style = space
-indent_size = 2
-
-# C/C++ source files
-[*.{c,cxx,cpp,cc,h,hxx,hpp,hh,inl,tpp}]
-indent_style = space
+[*.json]
 indent_size = 4
+
+[*.yml]
+indent_size = 2
 
 # GNU Make
 [{Makefile,*.mk,*.mak}]
