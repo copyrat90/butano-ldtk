@@ -33,7 +33,7 @@ public:
     [[nodiscard]] constexpr auto cell_int_no_virtual(int grid_x, int grid_y) const -> int
     {
         BN_ASSERT(grid_x >= 0 && grid_x < c_width(), "Invalid grid_x: ", grid_x, " [0..", c_width(), ")");
-        BN_ASSERT(grid_x >= 0 && grid_x < c_height(), "Invalid grid_y: ", grid_y, " [0..", c_height(), ")");
+        BN_ASSERT(grid_y >= 0 && grid_y < c_height(), "Invalid grid_y: ", grid_y, " [0..", c_height(), ")");
 
         return 0;
     }
