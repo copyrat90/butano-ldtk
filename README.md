@@ -169,8 +169,13 @@ If you have questions, you can go to the [GitHub Discussions](https://github.com
    * The identifiers of those enum values are mostly same as LDtk's, but there are exceptions:
       * Level fields & entity fields are converted like this:
          ```cpp
-         ldtk::gen::level_field_ident::LEVEL_your_level_name_FIELD_your_field_name
-         ldtk::gen::entity_field_ident::ENTITY_your_entity_name_FIELD_your_field_name
+         ldtk::gen::level_field_ident::LEVEL_level_name_FIELD_field_name
+         ldtk::gen::entity_field_ident::ENTITY_entity_name_FIELD_field_name
+         ```
+      * Layer int grid values & int grid value groups are converted like this:
+         ```cpp
+         ldtk::gen::layer_int_grid_value_ident::LAYER_layer_name_INT_GRID_VALUE_value_name
+         ldtk::gen::layer_int_grid_value_group_ident::LAYER_layer_name_INT_GRID_VALUE_GROUP_group_name
          ```
       * IIDs are prefixed with single underscore `_`. Also, `-` is replace with `_` too:
          ```cpp
