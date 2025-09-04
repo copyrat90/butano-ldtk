@@ -445,7 +445,7 @@ public:
 public:
     /// @brief Extract the concrete object from the field.
     /// @tparam T Type of the field to be extracted.
-    /// @note If you privide the incorrect type parameter `T`, it will error out.
+    /// @note If you provide an incorrect type argument to `T`, it will error out.
     template <typename T>
     [[nodiscard]] constexpr auto get() const -> const T&
     {

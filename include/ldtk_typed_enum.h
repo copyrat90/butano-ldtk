@@ -26,6 +26,10 @@ public:
     /// @endcond
 
 public:
+    /// @brief Extract the concrete enum from this typed enum.
+    /// @tparam Enum Type of the enum to be extracted.
+    /// @note If you provide an incorrect type argument to `Enum`, it will error out. \n
+    /// If you don't like that, you can use `get_optional()` instead.
     template <typename Enum>
         requires(std::is_enum_v<Enum> && sizeof(Enum) <= sizeof(_number))
     [[nodiscard]] constexpr auto get() const -> Enum
@@ -35,6 +39,10 @@ public:
         return static_cast<Enum>(_number);
     }
 
+    /// @brief Extract the concrete enum from this typed enum.
+    /// @tparam Enum Type of the enum to be extracted.
+    /// @note If you provide an incorrect type argument to `Enum`, it will return `bn::nullopt`. \n
+    /// If you don't like that, you can use `get()` instead.
     template <typename Enum>
         requires(std::is_enum_v<Enum> && sizeof(Enum) <= sizeof(_number))
     [[nodiscard]] constexpr auto get_optional() const -> bn::optional<Enum>
