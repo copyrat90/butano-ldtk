@@ -11,11 +11,13 @@ namespace ldtk
 class int_grid_value_info
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr int_grid_value_info(bn::color color, int group_uid,
                                   const bn::optional<gen::layer_int_grid_value_ident>& identifier, int value)
         : _color(color), _group_uid(group_uid), _identifier(identifier), _value(value)
     {
     }
+    /// @endcond
 
 public:
     [[nodiscard]] constexpr auto color() const -> bn::color

@@ -11,6 +11,8 @@
 namespace ldtk
 {
 
+/// @cond DO_NOT_DOCUMENT
+
 struct compact_tile_traits
 {
     using cell = std::uint8_t;
@@ -41,6 +43,8 @@ struct bloated_tile_traits
     };
 };
 
+/// @endcond
+
 template <bool Bloated>
 class tile_grid_t final : public tile_grid_base,
                           private std::conditional_t<Bloated, bloated_tile_traits, compact_tile_traits>
@@ -52,12 +56,14 @@ private:
     using typename tile_traits::tile;
 
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr tile_grid_t(int c_width, int c_height, const bn::span<const cell>& grid)
         : tile_grid_base(c_width, c_height), _grid(grid)
     {
         BN_ASSERT(c_width * c_height == grid.size(), "Invalid grid dimensions: ", c_width, "x", c_height,
                   ", != ", grid.size());
     }
+    /// @endcond
 
     /// @brief Get whether the cell storage is bloated (`u16`) or not (`u8`).
     [[nodiscard]] constexpr auto bloated() const -> bool override final

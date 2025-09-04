@@ -11,10 +11,12 @@ namespace ldtk
 
 class tileset_enum_tag
 {
+    /// @cond DO_NOT_DOCUMENT
 public:
     constexpr tileset_enum_tag(const bn::span<const tile_index>& tile_ids) : _tile_ids(tile_ids)
     {
     }
+    /// @endcond
 
 public:
     [[nodiscard]] constexpr auto has_tile_id(tile_index id) const -> bool

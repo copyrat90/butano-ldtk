@@ -24,6 +24,7 @@ namespace ldtk
 class layer
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr layer(const layer_definition& def, const tileset_definition* tileset_def, const bn::size& c_size,
                     const bn::point& px_total_offset, const tile_grid_base* auto_layer_tiles,
                     const tile_grid_base* grid_tiles, const int_grid_base* int_grid,
@@ -33,6 +34,7 @@ public:
           _entity_instances(entity_instances), _iid(iid), _visible(visible)
     {
     }
+    /// @endcond
 
 public:
     /// @brief Linear searches an entity with its Instance id.

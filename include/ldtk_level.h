@@ -21,6 +21,7 @@ namespace ldtk
 class level
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr level(bn::color bg_color, const bn::span<const field>& field_instances, gen::level_ident identifier,
                     gen::level_iid iid, const bn::span<const layer>& layer_instances, const bn::size& px_size, int uid,
                     int world_depth, const bn::point& world_coord)
@@ -29,6 +30,7 @@ public:
           _world_coord(world_coord)
     {
     }
+    /// @endcond
 
 public:
     /// @brief Looks up a layer with its identifier.

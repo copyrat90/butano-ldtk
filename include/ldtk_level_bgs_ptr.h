@@ -10,6 +10,8 @@
 #include <cstdint>
 #include <utility>
 
+/// @cond DO_NOT_DOCUMENT
+
 namespace bn
 {
 
@@ -18,6 +20,8 @@ class window;
 enum class green_swap_mode : std::uint8_t;
 
 } // namespace bn
+
+/// @endcond
 
 namespace ldtk
 {

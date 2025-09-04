@@ -410,6 +410,7 @@ public:
     [[nodiscard]] auto release_build_optional() -> bn::optional<level_bgs_ptr>;
 
 private:
+    /// @cond DO_NOT_DOCUMENT
     struct bg_unique_attributes
     {
         const layer& layer_instance;
@@ -422,6 +423,7 @@ private:
         bool mosaic_enabled = false;
         bool blending_bottom_enabled = true;
     };
+    /// @endcond
 
 private:
     [[nodiscard]] auto dimensions() const -> const bn::size&;

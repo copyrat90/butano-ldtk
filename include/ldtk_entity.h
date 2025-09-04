@@ -19,11 +19,13 @@ namespace ldtk
 class entity
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr entity(const entity_definition& def, const bn::point& grid, const bn::span<const field>& field_instances,
                      const bn::size& size, gen::entity_iid iid, const bn::point& px)
         : _def(def), _grid(grid), _field_instances(field_instances), _size(size), _iid(iid), _px(px)
     {
     }
+    /// @endcond
 
 public:
     /// @brief Looks up a field with its identifier.

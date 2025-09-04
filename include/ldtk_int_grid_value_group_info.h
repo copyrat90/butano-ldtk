@@ -10,10 +10,12 @@ namespace ldtk
 class int_grid_value_group_info
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr int_grid_value_group_info(const bn::optional<gen::layer_int_grid_value_group_ident>& identifier, int uid)
         : _identifier(identifier), _uid(uid)
     {
     }
+    /// @endcond
 
 public:
     /// @brief User defined unique identifier

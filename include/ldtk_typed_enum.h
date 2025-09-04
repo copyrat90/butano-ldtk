@@ -15,12 +15,14 @@ private:
     bn::type_id_t _type_id;
     int _number;
 
+    /// @cond DO_NOT_DOCUMENT
 public:
     template <typename Enum>
         requires(std::is_enum_v<Enum> && sizeof(Enum) <= sizeof(_number))
     constexpr typed_enum(Enum raw) : _type_id(bn::type_id<Enum>()), _number(static_cast<decltype(_number)>(raw))
     {
     }
+    /// @endcond
 
 public:
     template <typename Enum>

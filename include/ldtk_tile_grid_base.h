@@ -18,11 +18,13 @@ public:
     };
 
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr virtual ~tile_grid_base() = default;
 
     constexpr tile_grid_base(int c_width, int c_height) : _c_size(c_width, c_height)
     {
     }
+    /// @endcond
 
     /// @brief Get whether the cell storage is bloated (`u16`) or not (`u8`).
     [[nodiscard]] constexpr virtual auto bloated() const -> bool = 0;

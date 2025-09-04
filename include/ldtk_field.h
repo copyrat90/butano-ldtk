@@ -18,12 +18,14 @@
 #include <memory>
 #include <type_traits>
 
+/// @cond DO_NOT_DOCUMENT
 #define LDTK_FIELD_INIT_TYPE_ASSERT(expected) \
     BN_ASSERT(type() == expected, "Field definition type is not ", #expected, " - it was (field_type)", (int)type())
 
 #define LDTK_FIELD_GETTER_TYPE_ASSERT(expected) \
     BN_ASSERT(type() == expected, "Field type is not ", #expected, " - it was (field_type)", (int)type())
 #define LDTK_FIELD_GETTER_NULL_CHECK BN_ASSERT(has_value(), "Field was null")
+/// @endcond
 
 namespace ldtk
 {
@@ -31,6 +33,7 @@ namespace ldtk
 class field
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr field(const field_definition& def, int value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_INIT_TYPE_ASSERT(field_type::INT);
@@ -407,6 +410,7 @@ public:
             std::destroy_at(&_value.empty);
         }
     }
+    /// @endcond
 
 public:
     [[nodiscard]] constexpr auto def() const -> const field_definition&
@@ -582,6 +586,7 @@ private:
     // spans are always initialized, thus always `true`.
     bool _has_value;
 
+    /// @cond DO_NOT_DOCUMENT
     union data_t {
         char empty;
 
@@ -621,6 +626,7 @@ private:
         {
         }
     } _value;
+    /// @endcond
 };
 
 } // namespace ldtk

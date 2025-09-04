@@ -15,6 +15,7 @@ namespace ldtk
 class definitions
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr definitions(const bn::span<const entity_definition>& entities,
                           const bn::span<const layer_definition>& layers,
                           const bn::span<const field_definition>& level_fields,
@@ -22,6 +23,7 @@ public:
         : _entities(entities), _layers(layers), _level_fields(level_fields), _tilesets(tilesets)
     {
     }
+    /// @endcond
 
 public:
     /// @brief Looks up a entity definition with its identifier.

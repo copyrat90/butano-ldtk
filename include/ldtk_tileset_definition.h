@@ -20,6 +20,7 @@ namespace ldtk
 
 class tileset_definition
 {
+    /// @cond DO_NOT_DOCUMENT
 public:
     constexpr tileset_definition(const bn::regular_bg_item& bg_item, int tiles_count,
                                  bn::span<const tileset_custom_data> custom_data,
@@ -31,6 +32,7 @@ public:
           _tile_grid_size(tile_grid_size), _uid(uid)
     {
     }
+    /// @endcond
 
 public:
     /// @brief Looks up the enum tag via the enum value.

@@ -10,9 +10,11 @@ namespace ldtk
 class int_grid_empty_t final : public int_grid_base
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr int_grid_empty_t(int c_width, int c_height) : int_grid_base(c_width, c_height)
     {
     }
+    /// @endcond
 
     /// @brief Get the size of bytes used for cell storage. \n
     /// (empty: 0, `u8`: 1, `u16`: 2, `u32`: 4)

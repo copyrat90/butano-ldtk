@@ -14,6 +14,7 @@ namespace ldtk
 class layer_definition
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr layer_definition(layer_type type, bn::fixed display_opacity, int grid_size, gen::layer_ident identifier,
                                const bn::span<const int_grid_value_info>& int_grid_values,
                                const bn::span<const int_grid_value_group_info>& int_grid_value_groups,
@@ -23,6 +24,7 @@ public:
           _parallax_factor_x(parallax_factor_x), _parallax_factor_y(parallax_factor_y), _uid(uid)
     {
     }
+    /// @endcond
 
 public:
     /// @brief (Only *IntGrid layer*) Gets the info associated with the IntGrid value for this layer.

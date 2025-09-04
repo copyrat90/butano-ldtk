@@ -9,10 +9,12 @@ namespace ldtk
 
 class tileset_custom_data
 {
+    /// @cond DO_NOT_DOCUMENT
 public:
     constexpr tileset_custom_data(const bn::string_view& data, tile_index tile_id) : _data(data), _tile_id(tile_id)
     {
     }
+    /// @endcond
 
 public:
     [[nodiscard]] constexpr auto data() const -> const bn::string_view&

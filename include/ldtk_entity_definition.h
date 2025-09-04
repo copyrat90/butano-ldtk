@@ -14,12 +14,14 @@ namespace ldtk
 class entity_definition
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr entity_definition(const bn::size& size, gen::entity_ident identifier, bn::fixed_point pivot, int uid,
                                 const bn::span<const field_definition>& field_defs,
                                 const bn::span<const gen::entity_tag>& tags)
         : _size(size), _identifier(identifier), _pivot(pivot), _uid(uid), _field_defs(field_defs), _tags(tags)
     {
     }
+    /// @endcond
 
 public:
     /// @brief Pixel size

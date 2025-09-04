@@ -9,10 +9,12 @@ namespace ldtk
 class entity_ref
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr entity_ref(gen::entity_iid entity_iid, gen::layer_ident layer_ident, gen::level_ident level_ident)
         : _entity_iid(entity_iid), _layer_ident(layer_ident), _level_ident(level_ident)
     {
     }
+    /// @endcond
 
 public:
     /// @brief IID of the refered EntityInstance

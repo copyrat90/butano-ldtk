@@ -14,6 +14,7 @@ namespace ldtk
 class field_definition
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr field_definition(field_type type, const bn::optional<bn::type_id_t>& enum_type, bool can_be_null,
                                gen::level_field_ident identifier, int uid)
         : _type(type), _can_be_null(can_be_null), _enum_type(enum_type), _identifier((int)identifier), _uid(uid)
@@ -25,6 +26,7 @@ public:
         : _type(type), _can_be_null(can_be_null), _enum_type(enum_type), _identifier((int)identifier), _uid(uid)
     {
     }
+    /// @endcond
 
 public:
     /// @brief Value type.

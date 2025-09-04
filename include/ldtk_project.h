@@ -18,11 +18,13 @@ namespace ldtk
 class project
 {
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr project(const definitions& defs, gen::project_iid iid, const bn::span<const level>& levels,
                       bn::color bg_color, bn::fixed opacity)
         : _defs(defs), _iid(iid), _levels(levels), _bg_color(bg_color), _opacity(opacity)
     {
     }
+    /// @endcond
 
 public:
     /// @brief Looks up a level with its identifier.
