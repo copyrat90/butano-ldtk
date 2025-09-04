@@ -72,32 +72,41 @@ public:
     }
 
 public:
-    // @brief Get the cell tile info with the grid coordinate
+    /// @brief Get the cell tile info with the grid coordinate
+    /// @note If you know the concrete type, you can use `cell_tile_info_no_virtual()` instead
+    /// to avoid virtual function call overhead.
     [[nodiscard]] constexpr auto cell_tile_info(int grid_x, int grid_y) const -> tile_info override final
     {
         return cell_tile_info_no_virtual(grid_x, grid_y);
     }
 
-    // @brief Get the cell tile index with the grid coordinate
+    /// @brief Get the cell tile index with the grid coordinate
+    /// @note If you know the concrete type, you can use `cell_tile_index_no_virtual()` instead
+    /// to avoid virtual function call overhead.
     [[nodiscard]] constexpr auto cell_tile_index(int grid_x, int grid_y) const -> tile_index override final
     {
         return cell_tile_index_no_virtual(grid_x, grid_y);
     }
 
-    // @brief Get the cell tile X flip with the grid coordinate
+    /// @brief Get the cell tile X flip with the grid coordinate
+    /// @note If you know the concrete type, you can use `cell_tile_x_flip_no_virtual()` instead
+    /// to avoid virtual function call overhead.
     [[nodiscard]] constexpr auto cell_tile_x_flip(int grid_x, int grid_y) const -> bool override final
     {
         return cell_tile_x_flip_no_virtual(grid_x, grid_y);
     }
 
-    // @brief Get the cell tile Y flip with the grid coordinate
+    /// @brief Get the cell tile Y flip with the grid coordinate
+    /// @note If you know the concrete type, you can use `cell_tile_y_flip_no_virtual()` instead
+    /// to avoid virtual function call overhead.
     [[nodiscard]] constexpr auto cell_tile_y_flip(int grid_x, int grid_y) const -> bool override final
     {
         return cell_tile_y_flip_no_virtual(grid_x, grid_y);
     }
 
 public:
-    // @brief Get the cell tile info with the grid coordinate
+    /// @brief Get the cell tile info with the grid coordinate
+    /// @note This is provided to avoid virtual function call overhead when you know the concrete type.
     [[nodiscard]] constexpr auto cell_tile_info_no_virtual(int grid_x, int grid_y) const -> tile_info
     {
         tile t = get_tile(grid_x, grid_y);
@@ -109,19 +118,22 @@ public:
         };
     }
 
-    // @brief Get the cell tile index with the grid coordinate
+    /// @brief Get the cell tile index with the grid coordinate
+    /// @note This is provided to avoid virtual function call overhead when you know the concrete type.
     [[nodiscard]] constexpr auto cell_tile_index_no_virtual(int grid_x, int grid_y) const -> tile_index
     {
         return get_tile(grid_x, grid_y).fields.index;
     }
 
-    // @brief Get the cell tile X flip with the grid coordinate
+    /// @brief Get the cell tile X flip with the grid coordinate
+    /// @note This is provided to avoid virtual function call overhead when you know the concrete type.
     [[nodiscard]] constexpr auto cell_tile_x_flip_no_virtual(int grid_x, int grid_y) const -> bool
     {
         return get_tile(grid_x, grid_y).fields.x_flip;
     }
 
-    // @brief Get the cell tile Y flip with the grid coordinate
+    /// @brief Get the cell tile Y flip with the grid coordinate
+    /// @note This is provided to avoid virtual function call overhead when you know the concrete type.
     [[nodiscard]] constexpr auto cell_tile_y_flip_no_virtual(int grid_x, int grid_y) const -> bool
     {
         return get_tile(grid_x, grid_y).fields.y_flip;

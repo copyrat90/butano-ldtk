@@ -32,6 +32,8 @@ public:
 
 public:
     /// @brief Get the cell int value with the grid coordinate
+    /// @note If you know the concrete type, you can use `cell_int_no_virtual()` instead
+    /// to avoid virtual function call overhead.
     [[nodiscard]] constexpr auto cell_int(int grid_x, int grid_y) const -> int override final
     {
         return cell_int_no_virtual(grid_x, grid_y);
@@ -39,6 +41,7 @@ public:
 
 public:
     /// @brief Get the cell int value with the grid coordinate
+    /// @note This is provided to avoid virtual function call overhead when you know the concrete type.
     [[nodiscard]] constexpr auto cell_int_no_virtual(int grid_x, int grid_y) const -> int
     {
         BN_ASSERT(grid_x >= 0 && grid_x < c_width(), "Invalid grid_x: ", grid_x, " [0..", c_width(), ")");

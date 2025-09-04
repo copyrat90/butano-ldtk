@@ -9,6 +9,7 @@
 namespace ldtk
 {
 
+/// @brief Enum value that's stored in the `field` with `bn::type_id_t`
 class typed_enum
 {
 private:
@@ -45,11 +46,13 @@ public:
     }
 
 public:
+    /// @brief Type id of this enum
     [[nodiscard]] constexpr auto type_id() const -> bn::type_id_t
     {
         return _type_id;
     }
 
+    /// @brief Numeric value of the enum
     [[nodiscard]] constexpr auto number() const -> decltype(_number)
     {
         return _number;

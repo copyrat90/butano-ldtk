@@ -413,11 +413,15 @@ public:
     /// @endcond
 
 public:
+    /// @brief Reference to the Field definition
     [[nodiscard]] constexpr auto def() const -> const field_definition&
     {
         return _def;
     }
 
+    /// @brief Field definition identifier
+    /// @tparam Ident Either `gen::level_field_ident` or `gen::entity_field_ident`, depending on where this field
+    /// belongs
     template <typename Ident>
         requires(std::is_same_v<Ident, gen::level_field_ident> || std::is_same_v<Ident, gen::entity_field_ident>)
     [[nodiscard]] constexpr auto identifier() const -> Ident
@@ -425,17 +429,23 @@ public:
         return def().identifier<Ident>();
     }
 
+    /// @brief Type of the field
     [[nodiscard]] constexpr auto type() const -> field_type
     {
         return def().type();
     }
 
+    /// @brief If this field has a value or not.
+    /// @note If this field is a span, this always returns `true`.
     [[nodiscard]] constexpr auto has_value() const -> bool
     {
         return _has_value;
     }
 
 public:
+    /// @brief Extract the concrete object from the field.
+    /// @tparam T Type of the field to be extracted.
+    /// @note If you privide the incorrect type parameter `T`, it will error out.
     template <typename T>
     [[nodiscard]] constexpr auto get() const -> const T&
     {

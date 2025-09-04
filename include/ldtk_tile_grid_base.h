@@ -12,8 +12,11 @@ class tile_grid_base
 public:
     struct tile_info
     {
+        /// @brief Index of the tile.
         tile_index index;
+        /// @brief Whether the tile is flipped horizontally or not.
         bool x_flip;
+        /// @brief Whether the tile is flipped vertically or not.
         bool y_flip;
     };
 
@@ -30,19 +33,20 @@ public:
     [[nodiscard]] constexpr virtual auto bloated() const -> bool = 0;
 
 public:
-    // @brief Get the cell tile info with the grid coordinate
+    /// @brief Get the cell tile info with the grid coordinate
     [[nodiscard]] constexpr virtual auto cell_tile_info(int grid_x, int grid_y) const -> tile_info = 0;
 
-    // @brief Get the cell tile index with the grid coordinate
+    /// @brief Get the cell tile index with the grid coordinate
     [[nodiscard]] constexpr virtual auto cell_tile_index(int grid_x, int grid_y) const -> tile_index = 0;
 
-    // @brief Get the cell tile X flip with the grid coordinate
+    /// @brief Get the cell tile X flip with the grid coordinate
     [[nodiscard]] constexpr virtual auto cell_tile_x_flip(int grid_x, int grid_y) const -> bool = 0;
 
-    // @brief Get the cell tile Y flip with the grid coordinate
+    /// @brief Get the cell tile Y flip with the grid coordinate
     [[nodiscard]] constexpr virtual auto cell_tile_y_flip(int grid_x, int grid_y) const -> bool = 0;
 
 public:
+    /// @brief Grid-based size
     [[nodiscard]] constexpr auto c_size() const -> const bn::size&
     {
         return _c_size;
