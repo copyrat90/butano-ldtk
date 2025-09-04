@@ -1078,7 +1078,7 @@ class LevelFieldInstancesHeader(GenPrivHeader):
                             f"typed_enum({parsed.enum_type}::{str(field.value)})"
                         )
                     else:
-                        result.append(f"bn::optional<{parsed.enum_type}>()")
+                        result.append(f"bn::optional<typed_enum>()")
                 case "EntityRef":
                     if field.value is not None:
                         entity_ref = LdtkJson.ReferenceToAnEntityInstance.from_dict(
