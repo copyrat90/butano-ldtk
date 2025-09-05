@@ -460,19 +460,58 @@ public:
     }
 
     /// @brief If this field has a value or not.
-    /// @note If this field is a span, this always returns `true`.
+    /// @note You @b must check this for the non-array types. \n
+    /// If this field is an array (span), this always returns `true`.
     [[nodiscard]] constexpr auto has_value() const -> bool
     {
         return _has_value;
     }
 
 public:
+    // clang-format off
+
     /// @brief Extract the concrete object from the field.
     /// @tparam T Type of the field to be extracted.
-    /// @note If you provide an incorrect type argument to `T`, it will error out.
+    /// @details Type parameter `T` depends on your LDtk level/entity field type.
+    ///
+    /// If it is a non-array type, you use one of these type:
+    /// | LDtk non-array type | Butano type `T`        |
+    /// | ------------------- | ---------------------- |
+    /// | Integer             | `int`                  |
+    /// | Float               | `bn::fixed`            |
+    /// | Boolean             | `bool`                 |
+    /// | String              | `bn::string_view`      |
+    /// | Multilines          | `bn::string_view`      |
+    /// | Color               | `bn::color`            |
+    /// | Enum (`enum_name`)  | `ldtk::gen::enum_name` |
+    /// | Entity ref          | `ldtk::entity_ref`     |
+    /// | Point               | `bn::point`            |
+    /// And if the field is set to `Can be null`/`Is optional` in the LDtk field value specifications, \n
+    /// you @b must check `has_value()` before calling `get()`. (See the image below.)
+    ///
+    /// ![](docs/images/field_null.png)
+    ///
+    /// If it is an array type, you also need to think if it is set to `Can contain nulls` in the LDtk field value specifications:
+    /// | LDtk array type     | CAN'T contain nulls                    | CAN contain nulls                                    |
+    /// | ------------------- | -------------------------------------- | ---------------------------------------------------- |
+    /// | Integer             | `bn::span<const int>`                  | `bn::span<const bn::optional<int>>`                  |
+    /// | Float               | `bn::span<const bn::fixed>`            | `bn::span<const bn::optional<bn::fixed>>`            |
+    /// | Boolean             | `bn::span<const bool>`                 | `bn::span<const bn::optional<bool>>`                 |
+    /// | String              | `bn::span<const bn::string_view>`      | `bn::span<const bn::optional<bn::string_view>>`      |
+    /// | Multilines          | `bn::span<const bn::string_view>`      | `bn::span<const bn::optional<bn::string_view>>`      |
+    /// | Color               | `bn::span<const bn::color>`            | `bn::span<const bn::optional<bn::color>>`            |
+    /// | Enum (`enum_name`)  | `bn::span<const ldtk::gen::enum_name>` | `bn::span<const bn::optional<ldtk::gen::enum_name>>` |
+    /// | Entity ref          | `bn::span<const ldtk::entity_ref>`     | `bn::span<const bn::optional<ldtk::entity_ref>>`     |
+    /// | Point               | `bn::span<const bn::point>`            | `bn::span<const bn::optional<bn::point>>`            |
+    /// For arrays, checking `has_value()` is not necessary, as it always returns `true`.
+    ///
+    /// @note If you provide an incorrect type argument to `T`, it will error out. \n\n
+    /// If it is a non-array type, and the field is set to `Can be null`/`Is optional`, \n
+    /// you @b must check `has_value()` first to ensure if it contains a value or not.
     template <typename T>
     [[nodiscard]] constexpr auto get() const -> T
     {
+        // clang-format on
         if constexpr (std::is_same_v<T, int>)
         {
             LDTK_FIELD_TYPE_ASSERT(field_type::INT);
