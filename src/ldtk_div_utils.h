@@ -1,4 +1,4 @@
-// Copied from https://stackoverflow.com/questions/828092/python-style-integer-division-modulus-in-c
+// Copied from https://stackoverflow.com/a/38999752/12875525
 
 #pragma once
 

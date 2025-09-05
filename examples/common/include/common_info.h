@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020-2025 Gustavo Valiente gustavo.valiente@protonmail.com
- * zlib License, see LICENSE file.
+ * zlib License, see `licenses/butano.txt` file.
  */
 
 #ifndef COMMON_INFO_H

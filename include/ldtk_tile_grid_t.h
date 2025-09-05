@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2025 Guyeon Yu <copyrat90@gmail.com>
+// SPDX-License-Identifier: Zlib
+
 #pragma once
 
 #include "ldtk_tile_grid_base.h"

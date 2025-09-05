@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright 2025 Guyeon Yu <copyrat90@gmail.com>
+// SPDX-License-Identifier: Zlib
+
 #include "ldtk_level_bgs_manager.h"
 
 #include "ldtk_level_bgs_builder.cpp.h"

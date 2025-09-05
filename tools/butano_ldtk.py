@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+
+# SPDX-FileCopyrightText: Copyright 2025 Guyeon Yu <copyrat90@gmail.com>
+# SPDX-License-Identifier: Zlib
+
 from pathlib import Path
 import LdtkJson
 from gen_sources import *

@@ -206,7 +206,31 @@ If you have questions, you can go to the [GitHub Discussions](https://github.com
 
 ### Source codes
 
-butano-ldtk is licensed under the [zlib license](./LICENSE).
+#### Directly included sources
+
+butano-ldtk is licensed under the [zlib license](./LICENSE), *mostly*.<br/>
+Those source codes have SPDX license identifiers on top.
+
+There are few parts I don't write myself, which is licensed differently:
+* [`tools/LdtkJson.py`](tools/LdtkJson.py)
+   * Generated with [quicktype](https://quicktype.io) with [LDtk JSON schema file](https://github.com/deepnight/ldtk/blob/master/docs/JSON_SCHEMA.json).
+   * I believe this one should use the same license as [LDtk's MIT license](licenses/ldtk.txt)?
+* [`src/bn_top_left_utils.h`](src/bn_top_left_utils.h)
+   * [Copied from Butano](https://github.com/GValiente/butano/blob/master/butano/src/bn_top_left_utils.h), which is licensed under the [zlib license](licenses/butano.txt).
+* [`src/ldtk_div_utils.h`](src/ldtk_div_utils.h)
+   * [Copied from this stackoverflow answer](https://stackoverflow.com/a/38999752/12875525), license unknown.
+* [`include/ldtk_priv_typed_enum_span_traits.h`](include/ldtk_priv_typed_enum_span_traits.h)
+   * Written with a help of [Microsoft Copilot](https://copilot.microsoft.com/), license unknown.
+
+There are few parts I borrowed ideas from Butano:
+* [`include/ldtk_level_bgs_ptr.h`](include/ldtk_level_bgs_ptr.h) & [`src/ldtk_level_bgs_ptr.cpp.h`](src/ldtk_level_bgs_ptr.cpp.h)
+   * Borrowed ideas from [`bn::regular_bg_ptr`](https://github.com/GValiente/butano/blob/master/butano/include/bn_regular_bg_ptr.h)
+* [`include/ldtk_level_bgs_builder.h`](include/ldtk_level_bgs_builder.h) & [`src/ldtk_level_bgs_builder.cpp.h`](src/ldtk_level_bgs_builder.cpp.h)
+   * Borrowed ideas from [`bn::regular_bg_builder`](https://github.com/GValiente/butano/blob/master/butano/include/bn_regular_bg_builder.h)
+* [`src/ldtk_level_bgs_manager.h`](src/ldtk_level_bgs_manager.h) & [`src/ldtk_level_bgs_builder.cpp.h`](src/ldtk_level_bgs_manager.cpp)
+   * Borrowed ideas from [`bn::bgs_manager`](https://github.com/GValiente/butano/blob/master/butano/src/bn_bgs_manager.h)
+
+#### Indirectly used third-party programs
 
 * [Butano](https://github.com/GValiente/butano) is licensed under the [zlib license](licenses/butano.txt).
 * [LDtk](https://github.com/deepnight/ldtk) is licensed under the [MIT license](licenses/ldtk.txt).
@@ -221,3 +245,5 @@ API Documentation is generated via [Doxygen](https://www.doxygen.nl/index.html),
 ### Assets
 
 License files of the graphics used for examples can be found in each example folders. (`examples/*/licenses/`)
+
+For now, all of them are [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/legalcode.en).
