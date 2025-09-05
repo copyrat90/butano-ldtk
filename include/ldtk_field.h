@@ -8,10 +8,10 @@
 #include "ldtk_entity_ref.h"
 #include "ldtk_field_type.h"
 #include "ldtk_gen_idents_fwd.h"
+#include "ldtk_priv_concepts.h"
 #include "ldtk_priv_optional_typed_enum_span.h"
 #include "ldtk_priv_typed_enum.h"
 #include "ldtk_priv_typed_enum_span.h"
-#include "ldtk_priv_typed_enum_span_traits.h"
 
 #include <bn_assert.h>
 #include <bn_color.h>
@@ -592,9 +592,9 @@ public:
             LDTK_FIELD_TYPE_ASSERT(field_type::COLOR_SPAN);
             return _value.color_span;
         }
-        else if constexpr (priv::is_span_of_const_scoped_enum_v<T>)
+        else if constexpr (priv::span_of_const_scoped_enum<T>)
         {
-            using Enum = typename priv::extract_scoped_enum_from_const_span_t<T>;
+            using Enum = std::remove_const_t<typename T::value_type>;
 
             LDTK_FIELD_TYPE_ASSERT(field_type::TYPED_ENUM_SPAN);
             LDTK_FIELD_ENUM_TYPE_ASSERT(bn::type_id<Enum>());
@@ -630,9 +630,9 @@ public:
             LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_STRING_SPAN);
             return _value.opt_str_span;
         }
-        else if constexpr (priv::is_span_of_const_optional_scoped_enum_v<T>)
+        else if constexpr (priv::span_of_const_optional_scoped_enum<T>)
         {
-            using Enum = typename priv::extract_scoped_enum_from_const_optional_span_t<T>;
+            using Enum = std::remove_const_t<typename T::value_type::value_type>;
 
             LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_TYPED_ENUM_SPAN);
             LDTK_FIELD_ENUM_TYPE_ASSERT(bn::type_id<Enum>());
