@@ -38,7 +38,7 @@ public:
     /// @brief Looks up the enum tag via the enum value.
     /// @note Look-up is done via indexing, thus it's O(1).
     template <typename Enum>
-        requires(std::is_enum_v<Enum> && sizeof(Enum) <= sizeof(int))
+        requires std::is_scoped_enum_v<Enum>
     [[nodiscard]] constexpr auto get_enum_tag(Enum value) -> const tileset_enum_tag&
     {
         BN_ASSERT(_tags_source_enum_id.has_value(), "No enum is associated with this tileset");

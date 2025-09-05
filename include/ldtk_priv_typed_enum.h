@@ -6,7 +6,9 @@
 
 #include <type_traits>
 
-namespace ldtk
+/// @cond DO_NOT_DOCUMENT
+
+namespace ldtk::priv
 {
 
 /// @brief Enum value that's stored in the `field` with `bn::type_id_t`
@@ -14,16 +16,14 @@ class typed_enum
 {
 private:
     bn::type_id_t _type_id;
-    int _number;
+    int _number; // No, I'm not checking `sizeof(Enum) > 4` case, it simply won't happen.
 
-    /// @cond DO_NOT_DOCUMENT
 public:
     template <typename Enum>
-        requires(std::is_enum_v<Enum> && sizeof(Enum) <= sizeof(_number))
+        requires std::is_scoped_enum_v<Enum>
     constexpr typed_enum(Enum raw) : _type_id(bn::type_id<Enum>()), _number(static_cast<decltype(_number)>(raw))
     {
     }
-    /// @endcond
 
 public:
     /// @brief Extract the concrete enum from this typed enum.
@@ -31,7 +31,7 @@ public:
     /// @note If you provide an incorrect type argument to `Enum`, it will error out. \n
     /// If you don't like that, you can use `get_optional()` instead.
     template <typename Enum>
-        requires(std::is_enum_v<Enum> && sizeof(Enum) <= sizeof(_number))
+        requires std::is_scoped_enum_v<Enum>
     [[nodiscard]] constexpr auto get() const -> Enum
     {
         BN_ASSERT(bn::type_id<Enum>() == _type_id, "Invalid Enum type");
@@ -44,7 +44,7 @@ public:
     /// @note If you provide an incorrect type argument to `Enum`, it will return `bn::nullopt`. \n
     /// If you don't like that, you can use `get()` instead.
     template <typename Enum>
-        requires(std::is_enum_v<Enum> && sizeof(Enum) <= sizeof(_number))
+        requires std::is_scoped_enum_v<Enum>
     [[nodiscard]] constexpr auto get_optional() const -> bn::optional<Enum>
     {
         if (bn::type_id<Enum>() != _type_id)
@@ -67,4 +67,6 @@ public:
     }
 };
 
-} // namespace ldtk
+} // namespace ldtk::priv
+
+/// @endcond

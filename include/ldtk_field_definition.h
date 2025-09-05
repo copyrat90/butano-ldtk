@@ -35,6 +35,7 @@ public:
         return _type;
     }
 
+    /// @brief Enum type.
     [[nodiscard]] constexpr auto enum_type() const -> const bn::optional<bn::type_id_t>&
     {
         return _enum_type;

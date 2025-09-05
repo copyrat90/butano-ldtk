@@ -306,24 +306,34 @@ class TagsHeader(GenHeader):
 
 
 class EnumsHeader(GenHeader):
+    class EnumInfo(NamedTuple):
+        storage_bits: int
+        enum_values: List[str]
+
     @staticmethod
     def base_file_path() -> Path:
         return Path("ldtk_gen_enums.h")
 
     def __init__(self):
         super().__init__()
+        self.add_include("cstdint", is_system_header=True)
 
-        self.enums: Dict[str, List[str]] = {}
-        """Enum identifier -> enum values"""
+        self.enums: Dict[str, EnumsHeader.EnumInfo] = {}
+        """Enum identifier -> enum info"""
 
     def add_enum(self, enum_def: LdtkJson.EnumDefinition):
         enum_values = [val_def.id for val_def in enum_def.values]
-        self.enums[enum_def.identifier] = enum_values
+        self.enums[enum_def.identifier] = EnumsHeader.EnumInfo(
+            8 if len(enum_values) < 256 else 16 if len(enum_values) < 65536 else 32,
+            enum_values,
+        )
 
     def _write_contents(self, source: TextIOWrapper):
-        for enum_ident, enum_values in self.enums.items():
-            source.write(f"enum class {enum_ident} {{\n")
-            for val in enum_values:
+        for enum_ident, enum_info in self.enums.items():
+            source.write(
+                f"enum class {enum_ident} : std::uint{enum_info.storage_bits}_t {{\n"
+            )
+            for val in enum_info.enum_values:
                 source.write(f"    {val},\n")
             source.write("};\n\n")
 
@@ -1074,11 +1084,9 @@ class LevelFieldInstancesHeader(GenPrivHeader):
                     assert parsed.enum_type is not None
 
                     if field.value is not None:
-                        result.append(
-                            f"typed_enum({parsed.enum_type}::{str(field.value)})"
-                        )
+                        result.append(f"{parsed.enum_type}::{str(field.value)}")
                     else:
-                        result.append(f"bn::optional<typed_enum>()")
+                        result.append(f"bn::optional<{parsed.enum_type}>()")
                 case "EntityRef":
                     if field.value is not None:
                         entity_ref = LdtkJson.ReferenceToAnEntityInstance.from_dict(
@@ -1144,14 +1152,14 @@ class LevelFieldArraysHeader(GenPrivHeader):
         "BOOL_SPAN": "bool",
         "STRING_SPAN": "bn::string_view",
         "COLOR_SPAN": "bn::color",
-        "TYPED_ENUM_SPAN": "typed_enum",
+        "TYPED_ENUM_SPAN": "Enum",
         # "TILE_SPAN": "tile",
         "ENTITY_REF_SPAN": "entity_ref",
         "POINT_SPAN": "bn::point",
         "OPTIONAL_INT_SPAN": "bn::optional<int>",
         "OPTIONAL_FIXED_SPAN": "bn::optional<bn::fixed>",
         "OPTIONAL_STRING_SPAN": "bn::optional<bn::string_view>",
-        "OPTIONAL_TYPED_ENUM_SPAN": "bn::optional<typed_enum>",
+        "OPTIONAL_TYPED_ENUM_SPAN": "bn::optional<Enum>",
         # "OPTIONAL_TILE_SPAN": "bn::optional<tile>",
         "OPTIONAL_ENTITY_REF_SPAN": "bn::optional<entity_ref>",
         "OPTIONAL_POINT_SPAN": "bn::optional<bn::point>",
@@ -1172,7 +1180,7 @@ class LevelFieldArraysHeader(GenPrivHeader):
         self.add_include("bn_optional.h", is_system_header=True)
         self.add_include("bn_point.h", is_system_header=True)
         self.add_include("bn_string_view.h", is_system_header=True)
-        self.add_include("ldtk_typed_enum.h")
+        self.add_include("ldtk_priv_typed_enum.h")
         self.add_include("ldtk_entity_ref.h")
         self.add_include("ldtk_gen_idents.h")
         self.add_include("ldtk_gen_iids.h")
@@ -1222,8 +1230,8 @@ class LevelFieldArraysHeader(GenPrivHeader):
                 assert parsed.enum_type is not None
                 enum_arr: List[str] = field.value
                 value = LevelFieldArraysHeader.Value(
-                    elem_type,
-                    [f"typed_enum({parsed.enum_type}::{e})" for e in enum_arr],
+                    parsed.enum_type,
+                    [f"{parsed.enum_type}::{e}" for e in enum_arr],
                 )
             # case "TILE_SPAN":
             #     pass
@@ -1278,12 +1286,12 @@ class LevelFieldArraysHeader(GenPrivHeader):
                 assert parsed.enum_type is not None
                 opt_enum_arr: List[Optional[str]] = field.value
                 value = LevelFieldArraysHeader.Value(
-                    elem_type,
+                    f"bn::optional<{parsed.enum_type}>",
                     [
                         (
-                            f"typed_enum({parsed.enum_type}::{e})"
+                            f"{parsed.enum_type}::{e}"
                             if e is not None
-                            else "bn::nullopt"
+                            else f"bn::optional<{parsed.enum_type}>()"
                         )
                         for e in opt_enum_arr
                     ],
