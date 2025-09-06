@@ -369,6 +369,8 @@ class EntityDefinitionsHeader(GenPrivHeader):
         identifier: str
         pivot: FixedPoint
         uid: int
+        max_count: int
+        limit_scope: str
 
     @staticmethod
     def base_file_path() -> Path:
@@ -391,6 +393,8 @@ class EntityDefinitionsHeader(GenPrivHeader):
                 entity_def.identifier,
                 FixedPoint(entity_def.pivot_x, entity_def.pivot_y),
                 entity_def.uid,
+                entity_def.max_count,
+                entity_def.limit_scope.name,
             )
         )
 
@@ -412,7 +416,11 @@ class EntityDefinitionsHeader(GenPrivHeader):
                 source.write(
                     f"        gen_priv_entity_{entity.identifier}_field_definitions,\n"
                 )
-                source.write(f"        gen_priv_entity_{entity.identifier}_tags\n")
+                source.write(f"        gen_priv_entity_{entity.identifier}_tags,\n")
+                source.write(f"        {entity.max_count},\n")
+                source.write(
+                    f"        entity_definition::limit_scope_kind::{entity.limit_scope}\n"
+                )
                 source.write("    ),\n")
             source.write("};\n")
 

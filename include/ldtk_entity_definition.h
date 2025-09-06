@@ -11,17 +11,30 @@
 #include <bn_size.h>
 #include <bn_span.h>
 
+#include <cstdint>
+
 namespace ldtk
 {
 
 class entity_definition
 {
 public:
+    /// @brief How the `max_count()` limits the number of max entities
+    enum class limit_scope_kind : std::uint8_t
+    {
+        PER_LAYER,
+        PER_LEVEL,
+        PER_WORLD
+    };
+
+public:
     /// @cond DO_NOT_DOCUMENT
     constexpr entity_definition(const bn::size& size, gen::entity_ident identifier, bn::fixed_point pivot, int uid,
                                 const bn::span<const field_definition>& field_defs,
-                                const bn::span<const gen::entity_tag>& tags)
-        : _size(size), _identifier(identifier), _pivot(pivot), _uid(uid), _field_defs(field_defs), _tags(tags)
+                                const bn::span<const gen::entity_tag>& tags, std::uint16_t max_count,
+                                limit_scope_kind limit_scope)
+        : _size(size), _identifier(identifier), _pivot(pivot), _uid(uid), _field_defs(field_defs), _tags(tags),
+          _max_count(max_count), _limit_scope(limit_scope)
     {
     }
     /// @endcond
@@ -75,6 +88,19 @@ public:
         return _tags;
     }
 
+    /// @brief Max entities count. The scope is indicated via `limit_scope()`
+    /// @note `0` means it's unlimited.
+    [[nodiscard]] constexpr auto max_count() const -> int
+    {
+        return _max_count;
+    }
+
+    /// @brief Indicates how the `max_count()` limits the number of max entities
+    [[nodiscard]] constexpr auto limit_scope() const -> limit_scope_kind
+    {
+        return _limit_scope;
+    }
+
 private:
     bn::size _size;
     gen::entity_ident _identifier;
@@ -82,6 +108,8 @@ private:
     int _uid;
     bn::span<const field_definition> _field_defs;
     bn::span<const gen::entity_tag> _tags;
+    std::uint16_t _max_count;
+    limit_scope_kind _limit_scope;
 };
 
 } // namespace ldtk
