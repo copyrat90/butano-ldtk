@@ -440,10 +440,21 @@ class EntityFieldDefinitionsHeader(GenPrivHeader):
             result.append(
                 FieldDef(
                     parsed_type.field_type,
+                    field_def.is_array,
                     parsed_type.enum_type,
                     field_def.can_be_null,
                     field_def.identifier,
                     field_def.uid,
+                    (
+                        field_def.array_min_length
+                        if field_def.array_min_length is not None
+                        else -1
+                    ),
+                    (
+                        field_def.array_max_length
+                        if field_def.array_max_length is not None
+                        else -1
+                    ),
                 )
             )
         self.entity_fields[entity_def.identifier] = result
@@ -461,6 +472,7 @@ class EntityFieldDefinitionsHeader(GenPrivHeader):
                 for field in field_defs:
                     source.write("    field_definition(\n")
                     source.write(f"        field_type::{field.field_type},\n")
+                    source.write(f"        {str(field.is_array).lower()},\n")
                     source.write(
                         f'        {f"bn::type_id<{field.enum_type}>()" if field.enum_type is not None else "bn::nullopt"},\n'
                     )
@@ -470,7 +482,9 @@ class EntityFieldDefinitionsHeader(GenPrivHeader):
                     source.write(
                         f"        entity_field_ident::ENTITY_{entity_ident}_FIELD_{field.identifier},\n"
                     )
-                    source.write(f"        {field.uid}\n")
+                    source.write(f"        {field.uid},\n")
+                    source.write(f"        {field.array_min_length},\n")
+                    source.write(f"        {field.array_max_length}\n")
                     source.write("    ),\n")
                 source.write("};\n\n")
 
@@ -699,10 +713,21 @@ class LevelFieldDefinitionsHeader(GenPrivHeader):
             self.level_fields.append(
                 FieldDef(
                     parsed_type.field_type,
+                    field_def.is_array,
                     parsed_type.enum_type,
                     field_def.can_be_null,
                     field_def.identifier,
                     field_def.uid,
+                    (
+                        field_def.array_min_length
+                        if field_def.array_min_length is not None
+                        else -1
+                    ),
+                    (
+                        field_def.array_max_length
+                        if field_def.array_max_length is not None
+                        else -1
+                    ),
                 )
             )
 
@@ -718,12 +743,15 @@ class LevelFieldDefinitionsHeader(GenPrivHeader):
             for field in self.level_fields:
                 source.write(f"    field_definition(\n")
                 source.write(f"        field_type::{field.field_type},\n")
+                source.write(f"        {str(field.is_array).lower()},\n")
                 source.write(
                     f'        {f"bn::type_id<{field.enum_type}>()" if field.enum_type is not None else "bn::nullopt"},\n'
                 )
                 source.write(f'        {"true" if field.can_be_null else "false"},\n')
                 source.write(f"        level_field_ident::{field.identifier},\n")
-                source.write(f"        {field.uid}\n")
+                source.write(f"        {field.uid},\n")
+                source.write(f"        {field.array_min_length},\n")
+                source.write(f"        {field.array_max_length}\n")
                 source.write(f"    ),\n")
             source.write("};\n")
 

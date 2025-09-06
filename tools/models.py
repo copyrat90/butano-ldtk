@@ -57,10 +57,13 @@ FIELD_TYPE: Final[Dict[str, str]] = {
 
 class FieldDef(NamedTuple):
     field_type: str
+    is_array: bool
     enum_type: Optional[str]
     can_be_null: bool
     identifier: str
     uid: int
+    array_min_length: int
+    array_max_length: int
 
 
 class ParsedFieldType(NamedTuple):

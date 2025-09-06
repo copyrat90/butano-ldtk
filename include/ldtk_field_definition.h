@@ -18,15 +18,21 @@ class field_definition
 {
 public:
     /// @cond DO_NOT_DOCUMENT
-    constexpr field_definition(field_type type, const bn::optional<bn::type_id_t>& enum_type, bool can_be_null,
-                               gen::level_field_ident identifier, int uid)
-        : _type(type), _can_be_null(can_be_null), _enum_type(enum_type), _identifier((int)identifier), _uid(uid)
+    constexpr field_definition(field_type type, bool is_array, const bn::optional<bn::type_id_t>& enum_type,
+                               bool can_be_null, gen::level_field_ident identifier, int uid, int array_min_length,
+                               int array_max_length)
+        : _type(type), _is_array(is_array), _can_be_null(can_be_null), _enum_type(enum_type),
+          _identifier((int)identifier), _uid(uid), _array_min_length(array_min_length),
+          _array_max_length(array_max_length)
     {
     }
 
-    constexpr field_definition(field_type type, const bn::optional<bn::type_id_t>& enum_type, bool can_be_null,
-                               gen::entity_field_ident identifier, int uid)
-        : _type(type), _can_be_null(can_be_null), _enum_type(enum_type), _identifier((int)identifier), _uid(uid)
+    constexpr field_definition(field_type type, bool is_array, const bn::optional<bn::type_id_t>& enum_type,
+                               bool can_be_null, gen::entity_field_ident identifier, int uid, int array_min_length,
+                               int array_max_length)
+        : _type(type), _is_array(is_array), _can_be_null(can_be_null), _enum_type(enum_type),
+          _identifier((int)identifier), _uid(uid), _array_min_length(array_min_length),
+          _array_max_length(array_max_length)
     {
     }
     /// @endcond
@@ -36,6 +42,12 @@ public:
     [[nodiscard]] constexpr auto type() const -> field_type
     {
         return _type;
+    }
+
+    /// @brief Whether the field is array or not.
+    [[nodiscard]] constexpr auto is_array() const -> bool
+    {
+        return _is_array;
     }
 
     /// @brief Enum type.
@@ -66,12 +78,29 @@ public:
         return _uid;
     }
 
+    /// @brief Minimum length of this array field.
+    /// @note If no limit is provided, it returns `-1`.
+    [[nodiscard]] constexpr auto array_min_length() const -> int
+    {
+        return _array_min_length;
+    }
+
+    /// @brief Maximum length of this array field.
+    /// @note If no limit is provided, it returns `-1`.
+    [[nodiscard]] constexpr auto array_max_length() const -> int
+    {
+        return _array_max_length;
+    }
+
 private:
     field_type _type;
+    bool _is_array;
     bool _can_be_null;
     bn::optional<bn::type_id_t> _enum_type;
     int _identifier;
     int _uid;
+    int _array_min_length;
+    int _array_max_length;
 };
 
 } // namespace ldtk
