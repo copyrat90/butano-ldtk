@@ -31,7 +31,7 @@ class GenSource(metaclass=ABCMeta):
             self.base_file_path()
         )
         try:
-            with source_path.open("w") as source:
+            with source_path.open("w", encoding="utf-8") as source:
                 self.__write_heading(source)
                 self.__write_includes(source)
                 self.__write_namespace_open(source)

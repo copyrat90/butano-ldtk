@@ -37,7 +37,7 @@ def layer_def_has_visible_tiles(layer: LdtkJson.LayerDefinition) -> bool:
 def load_ldtk_project(ldtk_project_file_path: Path) -> LdtkJson.LdtkJSON:
     import json
 
-    with open(ldtk_project_file_path) as ldtk_project_file:
+    with open(ldtk_project_file_path, encoding="utf-8") as ldtk_project_file:
         ldtk_project_raw_dict: dict[Any, Any] = json.load(ldtk_project_file)
         ldtk_project_version: str = ldtk_project_raw_dict["jsonVersion"]
         if (
@@ -303,7 +303,9 @@ def generate_tilesets_bg_items(
             tileset_bg = tileset_bg.crop((0, 0, TILESET_BG_WIDTH, tileset_bg_height))
             tileset_bg.save(tileset_out_path.with_suffix(".bmp"))
 
-        with tileset_out_path.with_suffix(".json").open("w") as tileset_json:
+        with tileset_out_path.with_suffix(".json").open(
+            "w", encoding="utf-8"
+        ) as tileset_json:
             tileset_json.write('{"type":"regular_bg","bpp_mode":"bpp_4_auto"}')
 
 
