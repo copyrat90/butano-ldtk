@@ -21,19 +21,19 @@ public:
 
 public:
     /// @brief IID of the refered EntityInstance
-    [[nodiscard]] constexpr auto entity_iid() -> gen::entity_iid
+    [[nodiscard]] constexpr auto entity_iid() const -> gen::entity_iid
     {
         return _entity_iid;
     }
 
     /// @brief Identifier of the LayerInstance containing the refered EntityInstance
-    [[nodiscard]] constexpr auto layer_ident() -> gen::layer_ident
+    [[nodiscard]] constexpr auto layer_ident() const -> gen::layer_ident
     {
         return _layer_ident;
     }
 
     /// @brief Identifier of the Level containing the refered EntityInstance
-    [[nodiscard]] constexpr auto level_ident() -> gen::level_ident
+    [[nodiscard]] constexpr auto level_ident() const -> gen::level_ident
     {
         return _level_ident;
     }
