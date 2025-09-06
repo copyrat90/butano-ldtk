@@ -68,32 +68,71 @@ class ParsedFieldType(NamedTuple):
     enum_type: Optional[str]
 
 
-def parse_field_type(raw: str, can_contain_null: bool) -> ParsedFieldType:
+def parse_field_type(
+    raw: str, can_contain_null: bool, min: Optional[float], max: Optional[float]
+) -> ParsedFieldType:
+    int_signedness_prefix: str = ""  # "U" if unsigned
+    int_size_suffix: str = "_16"  # "_8", "_32" are also possible
+    min = -32768 if min is None else min
+    max = 32767 if max is None else max
+    assert min <= max
+    if 0 <= int(min) and int(max) <= 255:
+        int_signedness_prefix = "U"
+        int_size_suffix = "_8"
+    elif -128 <= int(min) and int(max) <= 127:
+        int_signedness_prefix = ""
+        int_size_suffix = "_8"
+    elif 0 <= int(min) and int(max) <= 65535:
+        int_signedness_prefix = "U"
+        int_size_suffix = "_16"
+    elif -32768 <= int(min) and int(max) <= 32767:
+        int_signedness_prefix = ""
+        int_size_suffix = "_16"
+    else:
+        int_signedness_prefix = ""
+        int_size_suffix = "_32"
+
     arr_split = raw.replace(">", "<").split("<")
     if arr_split[0] == "Array":
         enum_split = arr_split[1].split(".")
         if enum_split[0] == "LocalEnum":
+            is_int = FIELD_TYPE[enum_split[0]] == "INT"
             enum_type = enum_split[1]
             field_type = (
                 ("OPTIONAL_" if can_contain_null else "")
+                + (int_signedness_prefix if is_int else "")
                 + FIELD_TYPE[enum_split[0]]
+                + (int_size_suffix if is_int else "")
                 + "_SPAN"
             )
         else:
+            is_int = FIELD_TYPE[arr_split[1]] == "INT"
             enum_type = None
             field_type = (
                 ("OPTIONAL_" if can_contain_null else "")
+                + (int_signedness_prefix if is_int else "")
                 + FIELD_TYPE[arr_split[1]]
+                + (int_size_suffix if is_int else "")
                 + "_SPAN"
             )
     else:
         enum_split = raw.split(".")
         if enum_split[0] == "LocalEnum":
+            is_int = FIELD_TYPE[enum_split[0]] == "INT"
             enum_type = enum_split[1]
-            field_type = FIELD_TYPE[enum_split[0]]
+            field_type = (
+                (int_signedness_prefix if is_int else "")
+                + FIELD_TYPE[enum_split[0]]
+                + (int_size_suffix if is_int else "")
+            )
         else:
+            is_int = FIELD_TYPE[raw] == "INT"
             enum_type = None
-            field_type = FIELD_TYPE[raw]
+            field_type = (
+                (int_signedness_prefix if is_int else "")
+                + FIELD_TYPE[raw]
+                + (int_size_suffix if is_int else "")
+            )
 
     return ParsedFieldType(field_type, enum_type)
 

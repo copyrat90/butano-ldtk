@@ -482,6 +482,17 @@ def generate_levels_headers(
     }
     """Entity def uid -> def idx"""
 
+    entity_field_def_lut: Dict[int, LdtkJson.FieldDefinition] = {}
+    """Entity field def uid -> field def"""
+    for entity_def in ldtk_project.defs.entities:
+        for field_def in entity_def.field_defs:
+            entity_field_def_lut[field_def.uid] = field_def
+
+    level_field_def_lut: Dict[int, LdtkJson.FieldDefinition] = {
+        field_def.uid: field_def for field_def in ldtk_project.defs.level_fields
+    }
+    """Level field def uid -> field def"""
+
     layer_iid_to_ident: Dict[str, str] = {}
     level_iid_to_ident: Dict[str, str] = {}
     for level in ldtk_project.levels:
@@ -496,6 +507,7 @@ def generate_levels_headers(
             level.field_instances,
             layer_iid_to_ident,
             level_iid_to_ident,
+            level_field_def_lut,
         )
         for field_idx, field in enumerate(level.field_instances):
             level_field_arrays_header.add_field_array(
@@ -541,6 +553,7 @@ def generate_levels_headers(
                     entity.field_instances,
                     layer_iid_to_ident,
                     level_iid_to_ident,
+                    entity_field_def_lut,
                 )
                 entity_fields_header.add_entity_iid_identifier_mapping(
                     entity.iid.replace("-", "_"),

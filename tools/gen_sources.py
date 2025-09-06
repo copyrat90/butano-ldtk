@@ -434,7 +434,9 @@ class EntityFieldDefinitionsHeader(GenPrivHeader):
     def add_entity(self, entity_def: LdtkJson.EntityDefinition):
         result: List[FieldDef] = []
         for field_def in entity_def.field_defs:
-            parsed_type = parse_field_type(field_def.type, field_def.can_be_null)
+            parsed_type = parse_field_type(
+                field_def.type, field_def.can_be_null, field_def.min, field_def.max
+            )
             result.append(
                 FieldDef(
                     parsed_type.field_type,
@@ -691,7 +693,9 @@ class LevelFieldDefinitionsHeader(GenPrivHeader):
 
         self.level_fields: List[FieldDef] = []
         for field_def in field_defs:
-            parsed_type = parse_field_type(field_def.type, field_def.can_be_null)
+            parsed_type = parse_field_type(
+                field_def.type, field_def.can_be_null, field_def.min, field_def.max
+            )
             self.level_fields.append(
                 FieldDef(
                     parsed_type.field_type,
@@ -1038,6 +1042,7 @@ class LevelFieldInstancesHeader(GenPrivHeader):
 
     def __init__(self):
         super().__init__()
+        self.add_include("cstdint", is_system_header=True)
         self.add_include("ldtk_field.h")
         self.add_include(f"ldtk_gen_priv_{self.parent_type()}_field_definitions.h")
         self.add_include(f"ldtk_gen_priv_{self.parent_type()}_field_arrays.h")
@@ -1054,15 +1059,31 @@ class LevelFieldInstancesHeader(GenPrivHeader):
         fields: List[LdtkJson.FieldInstance],
         layer_iid_to_ident: Dict[str, str],
         level_iid_to_ident: Dict[str, str],
+        field_def_lut: Dict[int, LdtkJson.FieldDefinition],
     ):
         result: List[str] = []
         for field in fields:
             match field.type:
                 case "Int":
+                    field_def = field_def_lut[field.def_uid]
+                    int_type = "std::int16_t"
+                    min = int(field_def.min) if field_def.min is not None else -32768
+                    max = int(field_def.max) if field_def.max is not None else 32767
+                    if 0 <= min and max <= 255:
+                        int_type = "std::uint8_t"
+                    elif -128 <= min and max <= 127:
+                        int_type = "std::int8_t"
+                    elif 0 <= min and max <= 65535:
+                        int_type = "std::uint16_t"
+                    elif -32768 <= min and max <= 32767:
+                        int_type = "std::int16_t"
+                    else:
+                        int_type = "std::int32_t"
+
                     result.append(
-                        str(field.value)
+                        f"({int_type})({field.value})"
                         if field.value is not None
-                        else "bn::optional<int>()"
+                        else f"bn::optional<{int_type}>()"
                     )
                 case "Float":
                     result.append(
@@ -1083,7 +1104,7 @@ class LevelFieldInstancesHeader(GenPrivHeader):
                     assert field.value is not None
                     result.append(str(Color(field.value)))
                 case str(t) if t.startswith("LocalEnum"):
-                    parsed = parse_field_type(t, False)
+                    parsed = parse_field_type(t, False, None, None)
                     assert parsed.enum_type is not None
 
                     if field.value is not None:
@@ -1150,7 +1171,11 @@ class LevelFieldArraysHeader(GenPrivHeader):
         elements: List[str]
 
     ELEM_TYPE: Final[Dict[str, str]] = {
-        "INT_SPAN": "int",
+        "UINT_8_SPAN": "std::uint8_t",
+        "INT_8_SPAN": "std::int8_t",
+        "UINT_16_SPAN": "std::uint16_t",
+        "INT_16_SPAN": "std::int16_t",
+        "INT_32_SPAN": "std::int32_t",
         "FIXED_SPAN": "bn::fixed",
         "BOOL_SPAN": "bool",
         "STRING_SPAN": "bn::string_view",
@@ -1159,7 +1184,11 @@ class LevelFieldArraysHeader(GenPrivHeader):
         # "TILE_SPAN": "tile",
         "ENTITY_REF_SPAN": "entity_ref",
         "POINT_SPAN": "bn::point",
-        "OPTIONAL_INT_SPAN": "bn::optional<int>",
+        "OPTIONAL_UINT_8_SPAN": "bn::optional<std::uint8_t>",
+        "OPTIONAL_INT_8_SPAN": "bn::optional<std::int8_t>",
+        "OPTIONAL_UINT_16_SPAN": "bn::optional<std::uint16_t>",
+        "OPTIONAL_INT_16_SPAN": "bn::optional<std::int16_t>",
+        "OPTIONAL_INT_32_SPAN": "bn::optional<std::int32_t>",
         "OPTIONAL_FIXED_SPAN": "bn::optional<bn::fixed>",
         "OPTIONAL_STRING_SPAN": "bn::optional<bn::string_view>",
         "OPTIONAL_TYPED_ENUM_SPAN": "bn::optional<Enum>",
@@ -1178,6 +1207,7 @@ class LevelFieldArraysHeader(GenPrivHeader):
 
     def __init__(self):
         super().__init__()
+        self.add_include("cstdint", is_system_header=True)
         self.add_include("bn_color.h", is_system_header=True)
         self.add_include("bn_fixed.h", is_system_header=True)
         self.add_include("bn_optional.h", is_system_header=True)
@@ -1201,10 +1231,18 @@ class LevelFieldArraysHeader(GenPrivHeader):
     ):
         if not field.type.startswith("Array"):
             return
-        parsed = parse_field_type(field.type, field_def.can_be_null)
+        parsed = parse_field_type(
+            field.type, field_def.can_be_null, field_def.min, field_def.max
+        )
         elem_type = LevelFieldArraysHeader.ELEM_TYPE[parsed.field_type]
         match parsed.field_type:
-            case "INT_SPAN":
+            case (
+                "UINT_8_SPAN"
+                | "INT_8_SPAN"
+                | "UINT_16_SPAN"
+                | "INT_16_SPAN"
+                | "INT_32_SPAN"
+            ):
                 int_arr: List[int] = field.value
                 value = LevelFieldArraysHeader.Value(
                     elem_type, [str(n) for n in int_arr]
@@ -1257,7 +1295,13 @@ class LevelFieldArraysHeader(GenPrivHeader):
                 value = LevelFieldArraysHeader.Value(
                     elem_type, [f"bn::point({p.cx}, {p.cy})" for p in point_arr]
                 )
-            case "OPTIONAL_INT_SPAN":
+            case (
+                "OPTIONAL_UINT_8_SPAN"
+                | "OPTIONAL_INT_8_SPAN"
+                | "OPTIONAL_UINT_16_SPAN"
+                | "OPTIONAL_INT_16_SPAN"
+                | "OPTIONAL_INT_32_SPAN"
+            ):
                 opt_int_arr: List[Optional[int]] = field.value
                 value = LevelFieldArraysHeader.Value(
                     elem_type,

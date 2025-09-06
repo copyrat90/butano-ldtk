@@ -22,6 +22,7 @@
 #include <bn_string_view.h>
 #include <bn_type_id.h>
 
+#include <cstdint>
 #include <memory>
 #include <type_traits>
 
@@ -41,20 +42,92 @@ class field
 {
 public:
     /// @cond DO_NOT_DOCUMENT
-    constexpr field(const field_definition& def, int value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, std::uint8_t value) : _def(def), _has_value(true)
     {
-        LDTK_FIELD_TYPE_ASSERT(field_type::INT);
+        LDTK_FIELD_TYPE_ASSERT(field_type::UINT_8);
 
-        std::construct_at(&_value.integral, value);
+        std::construct_at(&_value.u8, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<int>& value)
+    constexpr field(const field_definition& def, const bn::optional<std::uint8_t>& value)
         : _def(def), _has_value(value.has_value())
     {
-        LDTK_FIELD_TYPE_ASSERT(field_type::INT);
+        LDTK_FIELD_TYPE_ASSERT(field_type::UINT_8);
 
         if (value.has_value())
-            std::construct_at(&_value.integral, value.value());
+            std::construct_at(&_value.u8, value.value());
+        else
+            std::construct_at(&_value.empty, 0);
+    }
+
+    constexpr field(const field_definition& def, std::int8_t value) : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::INT_8);
+
+        std::construct_at(&_value.s8, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::optional<std::int8_t>& value)
+        : _def(def), _has_value(value.has_value())
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::INT_8);
+
+        if (value.has_value())
+            std::construct_at(&_value.s8, value.value());
+        else
+            std::construct_at(&_value.empty, 0);
+    }
+
+    constexpr field(const field_definition& def, std::uint16_t value) : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::UINT_16);
+
+        std::construct_at(&_value.u16, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::optional<std::uint16_t>& value)
+        : _def(def), _has_value(value.has_value())
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::UINT_16);
+
+        if (value.has_value())
+            std::construct_at(&_value.u16, value.value());
+        else
+            std::construct_at(&_value.empty, 0);
+    }
+
+    constexpr field(const field_definition& def, std::int16_t value) : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::INT_16);
+
+        std::construct_at(&_value.s16, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::optional<std::int16_t>& value)
+        : _def(def), _has_value(value.has_value())
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::INT_16);
+
+        if (value.has_value())
+            std::construct_at(&_value.s16, value.value());
+        else
+            std::construct_at(&_value.empty, 0);
+    }
+
+    constexpr field(const field_definition& def, std::int32_t value) : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::INT_32);
+
+        std::construct_at(&_value.s32, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::optional<std::int32_t>& value)
+        : _def(def), _has_value(value.has_value())
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::INT_32);
+
+        if (value.has_value())
+            std::construct_at(&_value.s32, value.value());
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -209,11 +282,43 @@ public:
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(const field_definition& def, const bn::span<const int>& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, const bn::span<const std::uint8_t>& value)
+        : _def(def), _has_value(true)
     {
-        LDTK_FIELD_TYPE_ASSERT(field_type::INT_SPAN);
+        LDTK_FIELD_TYPE_ASSERT(field_type::UINT_8_SPAN);
 
-        std::construct_at(&_value.int_span, value);
+        std::construct_at(&_value.u8_span, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::span<const std::int8_t>& value) : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::INT_8_SPAN);
+
+        std::construct_at(&_value.s8_span, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::span<const std::uint16_t>& value)
+        : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::UINT_16_SPAN);
+
+        std::construct_at(&_value.u16_span, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::span<const std::int16_t>& value)
+        : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::INT_16_SPAN);
+
+        std::construct_at(&_value.s16_span, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::span<const std::int32_t>& value)
+        : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::INT_32_SPAN);
+
+        std::construct_at(&_value.s32_span, value);
     }
 
     constexpr field(const field_definition& def, const bn::span<const bn::fixed>& value) : _def(def), _has_value(true)
@@ -277,12 +382,44 @@ public:
         std::construct_at(&_value.point_span, value);
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<int>>& value)
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::uint8_t>>& value)
         : _def(def), _has_value(true)
     {
-        LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_SPAN);
+        LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_UINT_8_SPAN);
 
-        std::construct_at(&_value.opt_int_span, value);
+        std::construct_at(&_value.opt_u8_span, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::int8_t>>& value)
+        : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_8_SPAN);
+
+        std::construct_at(&_value.opt_s8_span, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::uint16_t>>& value)
+        : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_UINT_16_SPAN);
+
+        std::construct_at(&_value.opt_u16_span, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::int16_t>>& value)
+        : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_16_SPAN);
+
+        std::construct_at(&_value.opt_s16_span, value);
+    }
+
+    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::int32_t>>& value)
+        : _def(def), _has_value(true)
+    {
+        LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_32_SPAN);
+
+        std::construct_at(&_value.opt_s32_span, value);
     }
 
     constexpr field(const field_definition& def, const bn::span<const bn::optional<bn::fixed>>& value)
@@ -342,8 +479,20 @@ public:
         {
             switch (type())
             {
-            case field_type::INT:
-                std::destroy_at(&_value.integral);
+            case field_type::UINT_8:
+                std::destroy_at(&_value.u8);
+                break;
+            case field_type::INT_8:
+                std::destroy_at(&_value.s8);
+                break;
+            case field_type::UINT_16:
+                std::destroy_at(&_value.u16);
+                break;
+            case field_type::INT_16:
+                std::destroy_at(&_value.s16);
+                break;
+            case field_type::INT_32:
+                std::destroy_at(&_value.s32);
                 break;
             case field_type::FIXED:
                 std::destroy_at(&_value.fixed);
@@ -370,8 +519,20 @@ public:
                 std::destroy_at(&_value.point);
                 break;
 
-            case field_type::INT_SPAN:
-                std::destroy_at(&_value.int_span);
+            case field_type::UINT_8_SPAN:
+                std::destroy_at(&_value.u8_span);
+                break;
+            case field_type::INT_8_SPAN:
+                std::destroy_at(&_value.s8_span);
+                break;
+            case field_type::UINT_16_SPAN:
+                std::destroy_at(&_value.u16_span);
+                break;
+            case field_type::INT_16_SPAN:
+                std::destroy_at(&_value.s16_span);
+                break;
+            case field_type::INT_32_SPAN:
+                std::destroy_at(&_value.s32_span);
                 break;
             case field_type::FIXED_SPAN:
                 std::destroy_at(&_value.fixed_span);
@@ -398,8 +559,20 @@ public:
                 std::destroy_at(&_value.point_span);
                 break;
 
-            case field_type::OPTIONAL_INT_SPAN:
-                std::destroy_at(&_value.opt_int_span);
+            case field_type::OPTIONAL_UINT_8_SPAN:
+                std::destroy_at(&_value.opt_u8_span);
+                break;
+            case field_type::OPTIONAL_INT_8_SPAN:
+                std::destroy_at(&_value.opt_s8_span);
+                break;
+            case field_type::OPTIONAL_UINT_16_SPAN:
+                std::destroy_at(&_value.opt_u16_span);
+                break;
+            case field_type::OPTIONAL_INT_16_SPAN:
+                std::destroy_at(&_value.opt_s16_span);
+                break;
+            case field_type::OPTIONAL_INT_32_SPAN:
+                std::destroy_at(&_value.opt_s32_span);
                 break;
             case field_type::OPTIONAL_FIXED_SPAN:
                 std::destroy_at(&_value.opt_fixed_span);
@@ -460,7 +633,7 @@ public:
     }
 
     /// @brief If this field has a value or not.
-    /// @note You @b must check this for the non-array types. \n
+    /// @note You @b must check this for the non-array types that are set to `Can be null`/`Is optional`. (See `get()`) \n
     /// If this field is an array (span), this always returns `true`.
     [[nodiscard]] constexpr auto has_value() const -> bool
     {
@@ -475,26 +648,35 @@ public:
     /// @details Type parameter `T` depends on your LDtk level/entity field type.
     ///
     /// If it is a non-array type, you use one of these type:
-    /// | LDtk non-array type | Butano type `T`        |
-    /// | ------------------- | ---------------------- |
-    /// | Integer             | `int`                  |
-    /// | Float               | `bn::fixed`            |
-    /// | Boolean             | `bool`                 |
-    /// | String              | `bn::string_view`      |
-    /// | Multilines          | `bn::string_view`      |
-    /// | Color               | `bn::color`            |
-    /// | Enum (`enum_name`)  | `ldtk::gen::enum_name` |
-    /// | Entity ref          | `ldtk::entity_ref`     |
-    /// | Point               | `bn::point`            |
-    /// And if the field is set to `Can be null`/`Is optional` in the LDtk field value specifications, \n
-    /// you @b must check `has_value()` before calling `get()`. (See the image below.)
+    /// | LDtk non-array type | Butano type `T`                        |
+    /// | ------------------- | -------------------------------------- |
+    /// | Integer             | INT (Various integer types, see below) |
+    /// | Float               | `bn::fixed`                            |
+    /// | Boolean             | `bool`                                 |
+    /// | String              | `bn::string_view`                      |
+    /// | Multilines          | `bn::string_view`                      |
+    /// | Color               | `bn::color`                            |
+    /// | Enum (`enum_name`)  | `ldtk::gen::enum_name`                 |
+    /// | Entity ref          | `ldtk::entity_ref`                     |
+    /// | Point               | `bn::point`                            |
     ///
-    /// ![](docs/images/field_null.png)
+    /// If the field is set to `Can be null`/`Is optional` in the LDtk field value specifications, (See the image below) \n
+    /// you @b must check `has_value()` before calling `get()`.
     ///
-    /// If it is an array type, you also need to think if it is set to `Can contain nulls` in the LDtk field value specifications:
-    /// | LDtk array type     | CAN'T contain nulls                    | CAN contain nulls                                    |
+    /// INT is determined by the limits you set in the LDtk field value specifications. (See the image below) \n
+    /// By default, it uses `std::int16_t`. \n
+    /// * If the limits are set to small range, it can use either `std::uint8_t` or `std::int8_t`. \n
+    /// * If the limits are set to large range, it will use `std::int32_t`.
+    ///    * LDtk [does not allow values out of [-2147483..2147483]](https://github.com/deepnight/ldtk/issues/1191), so unsigned 4 bytes integer is never used.
+    /// * Unsigned always takes precedence over the same size of signed integer type, whenever possible.
+    ///    * [0..127] will be `std::uint8_t`, @b not signed.
+    ///
+    /// ![](docs/images/field_limits_and_null.png)
+    ///
+    /// If it is an array type, you also need to consider if it is set to `Can contain nulls` in the LDtk field value specifications:
+    /// | LDtk array type     | `T` when CAN'T contain nulls           | `T` when CAN contain nulls                           |
     /// | ------------------- | -------------------------------------- | ---------------------------------------------------- |
-    /// | Integer             | `bn::span<const int>`                  | `bn::span<const bn::optional<int>>`                  |
+    /// | Integer             | `bn::span<const INT>`                  | `bn::span<const bn::optional<INT>>`                  |
     /// | Float               | `bn::span<const bn::fixed>`            | `bn::span<const bn::optional<bn::fixed>>`            |
     /// | Boolean             | `bn::span<const bool>`                 | `bn::span<const bn::optional<bool>>`                 |
     /// | String              | `bn::span<const bn::string_view>`      | `bn::span<const bn::optional<bn::string_view>>`      |
@@ -512,11 +694,35 @@ public:
     [[nodiscard]] constexpr auto get() const -> T
     {
         // clang-format on
-        if constexpr (std::is_same_v<T, int>)
+        if constexpr (std::is_same_v<T, std::uint8_t>)
         {
-            LDTK_FIELD_TYPE_ASSERT(field_type::INT);
+            LDTK_FIELD_TYPE_ASSERT(field_type::UINT_8);
             LDTK_FIELD_GETTER_NULL_CHECK;
-            return _value.integral;
+            return _value.u8;
+        }
+        else if constexpr (std::is_same_v<T, std::int8_t>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::INT_8);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.s8;
+        }
+        else if constexpr (std::is_same_v<T, std::uint16_t>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::UINT_16);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.u16;
+        }
+        else if constexpr (std::is_same_v<T, std::int16_t>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::INT_16);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.s16;
+        }
+        else if constexpr (std::is_same_v<T, std::int32_t>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::INT_32);
+            LDTK_FIELD_GETTER_NULL_CHECK;
+            return _value.s32;
         }
         else if constexpr (std::is_same_v<T, bn::fixed>)
         {
@@ -567,10 +773,30 @@ public:
             LDTK_FIELD_GETTER_NULL_CHECK;
             return _value.point;
         }
-        else if constexpr (std::is_same_v<T, bn::span<const int>>)
+        else if constexpr (std::is_same_v<T, bn::span<const std::uint8_t>>)
         {
-            LDTK_FIELD_TYPE_ASSERT(field_type::INT_SPAN);
-            return _value.int_span;
+            LDTK_FIELD_TYPE_ASSERT(field_type::UINT_8_SPAN);
+            return _value.u8_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const std::int8_t>>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::INT_8_SPAN);
+            return _value.s8_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const std::uint16_t>>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::UINT_16_SPAN);
+            return _value.u16_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const std::int16_t>>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::INT_16_SPAN);
+            return _value.s16_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const std::int32_t>>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::INT_32_SPAN);
+            return _value.s32_span;
         }
         else if constexpr (std::is_same_v<T, bn::span<const bn::fixed>>)
         {
@@ -615,10 +841,30 @@ public:
             LDTK_FIELD_TYPE_ASSERT(field_type::POINT_SPAN);
             return _value.point_span;
         }
-        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<int>>>)
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<std::uint8_t>>>)
         {
-            LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_SPAN);
-            return _value.opt_int_span;
+            LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_UINT_8_SPAN);
+            return _value.opt_u8_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<std::int8_t>>>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_8_SPAN);
+            return _value.opt_s8_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<std::uint16_t>>>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_UINT_16_SPAN);
+            return _value.opt_u16_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<std::int16_t>>>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_16_SPAN);
+            return _value.opt_s16_span;
+        }
+        else if constexpr (std::is_same_v<T, bn::span<const bn::optional<std::int32_t>>>)
+        {
+            LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_32_SPAN);
+            return _value.opt_s32_span;
         }
         else if constexpr (std::is_same_v<T, bn::span<const bn::optional<bn::fixed>>>)
         {
@@ -670,7 +916,11 @@ private:
     union data_t {
         char empty;
 
-        int integral;
+        std::uint8_t u8;
+        std::int8_t s8;
+        std::uint16_t u16;
+        std::int16_t s16;
+        std::int32_t s32;
         bn::fixed fixed;
         bool flag;
         bn::string_view str;
@@ -680,7 +930,11 @@ private:
         entity_ref ent_ref;
         bn::point point;
 
-        bn::span<const int> int_span;
+        bn::span<const std::uint8_t> u8_span;
+        bn::span<const std::int8_t> s8_span;
+        bn::span<const std::uint16_t> u16_span;
+        bn::span<const std::int16_t> s16_span;
+        bn::span<const std::int32_t> s32_span;
         bn::span<const bn::fixed> fixed_span;
         bn::span<const bool> flag_span;
         bn::span<const bn::string_view> str_span;
@@ -690,7 +944,11 @@ private:
         bn::span<const entity_ref> ent_ref_span;
         bn::span<const bn::point> point_span;
 
-        bn::span<const bn::optional<int>> opt_int_span;
+        bn::span<const bn::optional<std::uint8_t>> opt_u8_span;
+        bn::span<const bn::optional<std::int8_t>> opt_s8_span;
+        bn::span<const bn::optional<std::uint16_t>> opt_u16_span;
+        bn::span<const bn::optional<std::int16_t>> opt_s16_span;
+        bn::span<const bn::optional<std::int32_t>> opt_s32_span;
         bn::span<const bn::optional<bn::fixed>> opt_fixed_span;
         bn::span<const bn::optional<bn::string_view>> opt_str_span;
         priv::optional_typed_enum_span opt_t_enum_span;

@@ -10,7 +10,11 @@ namespace ldtk
 
 enum class field_type : std::uint8_t
 {
-    INT,
+    UINT_8,
+    INT_8,
+    UINT_16,
+    INT_16,
+    INT_32,
     FIXED,
     BOOL,
     STRING,
@@ -20,7 +24,11 @@ enum class field_type : std::uint8_t
     ENTITY_REF,
     POINT,
 
-    INT_SPAN,
+    UINT_8_SPAN,
+    INT_8_SPAN,
+    UINT_16_SPAN,
+    INT_16_SPAN,
+    INT_32_SPAN,
     FIXED_SPAN,
     BOOL_SPAN,
     STRING_SPAN,
@@ -30,7 +38,11 @@ enum class field_type : std::uint8_t
     ENTITY_REF_SPAN,
     POINT_SPAN,
 
-    OPTIONAL_INT_SPAN,
+    OPTIONAL_UINT_8_SPAN,
+    OPTIONAL_INT_8_SPAN,
+    OPTIONAL_UINT_16_SPAN,
+    OPTIONAL_INT_16_SPAN,
+    OPTIONAL_INT_32_SPAN,
     OPTIONAL_FIXED_SPAN,
     OPTIONAL_STRING_SPAN,
     OPTIONAL_TYPED_ENUM_SPAN,
