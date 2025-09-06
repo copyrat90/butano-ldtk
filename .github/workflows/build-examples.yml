@@ -2,7 +2,7 @@ name: Build examples
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "dev", "feature-*"]
   pull_request:
   workflow_dispatch:
 

@@ -1,7 +1,7 @@
 # butano-ldtk
 
-[![Build examples status badge](https://github.com/copyrat90/butano-ldtk/actions/workflows/build-examples.yml/badge.svg)](https://github.com/copyrat90/butano-ldtk/actions/workflows/build-examples.yml)
-![API Docs status badge](https://github.com/copyrat90/butano-ldtk/actions/workflows/doxygen.yml/badge.svg)
+[![Build examples status badge](https://github.com/copyrat90/butano-ldtk/actions/workflows/build-examples.yml/badge.svg?branch=main)](https://github.com/copyrat90/butano-ldtk/actions/workflows/build-examples.yml)
+![API Docs status badge](https://github.com/copyrat90/butano-ldtk/actions/workflows/doxygen.yml/badge.svg?branch=main)
 
 [butano-ldtk](https://github.com/copyrat90/butano-ldtk) is a [LDtk](https://ldtk.io/) level importer for the [Butano engine](https://github.com/GValiente/butano).
 
