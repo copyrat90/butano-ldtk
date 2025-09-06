@@ -15,7 +15,7 @@ jobs:
         working-directory: butano-ldtk
     strategy:
       matrix:
-        name: [parallax_level_bgs]
+        name: [tests, parallax_level_bgs]
 
     steps:
       - name: Checkout butano
