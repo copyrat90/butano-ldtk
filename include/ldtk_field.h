@@ -670,6 +670,7 @@ public:
     ///    * LDtk [does not allow values out of [-2147483..2147483]](https://github.com/deepnight/ldtk/issues/1191), so unsigned 4 bytes integer is never used.
     /// * Unsigned always takes precedence over the same size of signed integer type, whenever possible.
     ///    * [0..127] will be `std::uint8_t`, @b not signed.
+    ///    * `std::int32_t` is the exception, unsigned 4 bytes integer is @b never used as mentioned above.
     ///
     /// ![](docs/images/field_limits_and_null.png)
     ///
