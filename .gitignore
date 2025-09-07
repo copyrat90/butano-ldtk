@@ -1,6 +1,7 @@
 
-# vscode
+# editors
 .vscode/
+.qtc_clangd/
 
 # python
 .venv/
@@ -13,3 +14,12 @@ build*/
 
 # save file for testing
 *.sav
+
+# misc (derived from butano)
+*.creator
+*.user
+*.files
+*.includes
+*.config
+*.cflags
+*.cxxflags
