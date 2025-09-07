@@ -64,10 +64,15 @@ int main()
 
         if (bn::keypad::b_pressed())
         {
-            bool top_layer_visible = level_bgs.visible(ldtk::gen::layer_ident::tiles_layer_24);
+            // You MUST check if `level_bgs` has the background of the layer before calling gettes/setters;
+            // If `tiles_layer_24` doesn't have a single visible tile, it doesn't generate a BG, so it will error out.
+            if (level_bgs.has_background(ldtk::gen::layer_ident::tiles_layer_24))
+            {
+                bool top_layer_visible = level_bgs.visible(ldtk::gen::layer_ident::tiles_layer_24);
 
-            top_layer_visible = !top_layer_visible;
-            level_bgs.set_visible(top_layer_visible, ldtk::gen::layer_ident::tiles_layer_24);
+                top_layer_visible = !top_layer_visible;
+                level_bgs.set_visible(top_layer_visible, ldtk::gen::layer_ident::tiles_layer_24);
+            }
         }
 
         static constexpr bn::fixed CAMERA_MOVE_SPEED = 4.0f;
