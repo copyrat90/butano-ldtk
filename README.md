@@ -1,7 +1,7 @@
 # butano-ldtk
 
-[![Build examples status badge](https://github.com/copyrat90/butano-ldtk/actions/workflows/build-examples.yml/badge.svg?branch=main)](https://github.com/copyrat90/butano-ldtk/actions/workflows/build-examples.yml)
-![API Docs status badge](https://github.com/copyrat90/butano-ldtk/actions/workflows/doxygen.yml/badge.svg?branch=main)
+[![Build examples status badge](https://github.com/copyrat90/butano-ldtk/actions/workflows/build-examples.yml/badge.svg)](https://github.com/copyrat90/butano-ldtk/actions/workflows/build-examples.yml)
+[![API Docs status badge](https://github.com/copyrat90/butano-ldtk/actions/workflows/doxygen.yml/badge.svg)](https://copyrat90.github.io/butano-ldtk)
 
 [butano-ldtk](https://github.com/copyrat90/butano-ldtk) is a [LDtk](https://ldtk.io/) level importer for the [Butano engine](https://github.com/GValiente/butano).
 
@@ -227,7 +227,7 @@ There are few parts I borrowed ideas from Butano:
    * Borrowed ideas from [`bn::regular_bg_ptr`](https://github.com/GValiente/butano/blob/master/butano/include/bn_regular_bg_ptr.h)
 * [`include/ldtk_level_bgs_builder.h`](include/ldtk_level_bgs_builder.h) & [`src/ldtk_level_bgs_builder.cpp.h`](src/ldtk_level_bgs_builder.cpp.h)
    * Borrowed ideas from [`bn::regular_bg_builder`](https://github.com/GValiente/butano/blob/master/butano/include/bn_regular_bg_builder.h)
-* [`src/ldtk_level_bgs_manager.h`](src/ldtk_level_bgs_manager.h) & [`src/ldtk_level_bgs_builder.cpp.h`](src/ldtk_level_bgs_manager.cpp)
+* [`src/ldtk_level_bgs_manager.h`](src/ldtk_level_bgs_manager.h) & [`src/ldtk_level_bgs_manager.cpp`](src/ldtk_level_bgs_manager.cpp)
    * Borrowed ideas from [`bn::bgs_manager`](https://github.com/GValiente/butano/blob/master/butano/src/bn_bgs_manager.h)
 
 #### Indirectly used third-party programs
