@@ -138,7 +138,6 @@ If you have questions, you can go to the [GitHub Discussions](https://github.com
 * Parallax scaling of layers is not supported.
    * If you set a parallax value, you need to **uncheck** the `[ ] Scale ?` box.
       ![](docs/images/uncheck_parallax_scale.png)
-* `Save levels to seperate files` option is not supported.
 * Importing external enum files is not supported.
 * Some field types are not supported:
    * File path

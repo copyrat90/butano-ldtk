@@ -20,11 +20,6 @@ class IdentifierStyleNotLowercase(Exception):
         self.style = style
 
 
-class ExternalLevelsNotSupportedException(Exception):
-    def __init__(self):
-        super().__init__("External levels are not supported")
-
-
 class ExternalEnumNotSupportedException(Exception):
     def __init__(self, source: str):
         super().__init__(f"External enum is not supported (found in {source})")

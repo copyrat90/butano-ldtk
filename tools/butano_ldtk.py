@@ -37,6 +37,8 @@ def layer_def_has_visible_tiles(layer: LdtkJson.LayerDefinition) -> bool:
 def load_ldtk_project(ldtk_project_file_path: Path) -> LdtkJson.LdtkJSON:
     import json
 
+    ldtk_project_folder_path: Path = ldtk_project_file_path.parent
+
     with open(ldtk_project_file_path, encoding="utf-8") as ldtk_project_file:
         ldtk_project_raw_dict: dict[Any, Any] = json.load(ldtk_project_file)
         ldtk_project_version: str = ldtk_project_raw_dict["jsonVersion"]
@@ -46,7 +48,23 @@ def load_ldtk_project(ldtk_project_file_path: Path) -> LdtkJson.LdtkJSON:
         ):
             raise UnsupportedProjectVersionException(ldtk_project_version)
 
-        return LdtkJson.ldtk_json_from_dict(ldtk_project_raw_dict)
+        ldtk_project = LdtkJson.ldtk_json_from_dict(ldtk_project_raw_dict)
+
+        # Load all external levels
+        levels: List[LdtkJson.Level] = []
+        for level in ldtk_project.levels:
+            if level.external_rel_path is None:
+                levels.append(level)
+            else:
+                level_path = ldtk_project_folder_path.joinpath(level.external_rel_path)
+                with open(level_path, encoding="utf-8") as ldtk_level_file:
+                    ldtk_level_raw_dict: dict[Any, Any] = json.load(ldtk_level_file)
+                    ext_level = LdtkJson.Level.from_dict(ldtk_level_raw_dict)
+                    levels.append(ext_level)
+
+        ldtk_project.levels = levels
+
+        return ldtk_project
 
 
 def load_ldtk_project_if_process_required(
@@ -86,11 +104,6 @@ def load_ldtk_project_if_process_required(
 def ensure_identifier_style_lowercase(ldtk_project: LdtkJson.LdtkJSON):
     if ldtk_project.identifier_style != LdtkJson.IdentifierStyle.LOWERCASE:
         raise IdentifierStyleNotLowercase(str(ldtk_project.identifier_style))
-
-
-def ensure_no_external_levels(ldtk_project: LdtkJson.LdtkJSON):
-    if ldtk_project.external_levels:
-        raise ExternalLevelsNotSupportedException()
 
 
 def ensure_no_tileset_without_image(ldtk_project: LdtkJson.LdtkJSON):
@@ -212,7 +225,6 @@ def ensure_no_more_than_4_visible_layers(ldtk_project: LdtkJson.LdtkJSON):
 
 def ensure_no_unsupported_features(ldtk_project: LdtkJson.LdtkJSON):
     ensure_identifier_style_lowercase(ldtk_project)
-    ensure_no_external_levels(ldtk_project)
     ensure_no_tileset_without_image(ldtk_project)
     ensure_tile_dimensions_valid(ldtk_project)
     ensure_no_parallax_scaling(ldtk_project)
