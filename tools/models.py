@@ -75,25 +75,35 @@ def parse_field_type(
     raw: str, can_contain_null: bool, min: Optional[float], max: Optional[float]
 ) -> ParsedFieldType:
     int_signedness_prefix: str = ""  # "U" if unsigned
-    int_size_suffix: str = "_16"  # "_8", "_32" are also possible
-    min = -32768 if min is None else min
-    max = 32767 if max is None else max
-    assert min <= max
-    if 0 <= int(min) and int(max) <= 255:
-        int_signedness_prefix = "U"
-        int_size_suffix = "_8"
-    elif -128 <= int(min) and int(max) <= 127:
-        int_signedness_prefix = ""
-        int_size_suffix = "_8"
-    elif 0 <= int(min) and int(max) <= 65535:
-        int_signedness_prefix = "U"
-        int_size_suffix = "_16"
-    elif -32768 <= int(min) and int(max) <= 32767:
-        int_signedness_prefix = ""
-        int_size_suffix = "_16"
-    else:
-        int_signedness_prefix = ""
-        int_size_suffix = "_32"
+    int_size_suffix: str = "_32"  # "_8", "_32" are also possible
+    if min is not None or max is not None:
+        min = (-1 << 31) if min is None else min
+        max = (1 << 31) - 1 if max is None else max
+        assert min <= max
+        if 0 <= int(min) and int(max) <= 255:
+            int_signedness_prefix = "U"
+            int_size_suffix = "_8"
+        elif -128 <= int(min) and int(max) <= 127:
+            int_signedness_prefix = ""
+            int_size_suffix = "_8"
+        elif 0 <= int(min) and int(max) <= 65535:
+            int_signedness_prefix = "U"
+            int_size_suffix = "_16"
+        elif -32768 <= int(min) and int(max) <= 32767:
+            int_signedness_prefix = ""
+            int_size_suffix = "_16"
+        elif 0 <= int(min) and int(max) <= (1 << 32) - 1:
+            int_signedness_prefix = "U"
+            int_size_suffix = "_32"
+        elif (-1 << 31) <= int(min) and int(max) <= (1 << 31) - 1:
+            int_signedness_prefix = ""
+            int_size_suffix = "_32"
+        elif 0 <= int(min):
+            int_signedness_prefix = "U"
+            int_size_suffix = "_64"
+        else:
+            int_signedness_prefix = ""
+            int_size_suffix = "_64"
 
     arr_split = raw.replace(">", "<").split("<")
     if arr_split[0] == "Array":

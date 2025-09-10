@@ -20,11 +20,12 @@ static_assert([] {
 
     using ef_id = ldtk::gen::entity_field_ident;
 
-    if ((0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_int).get<std::int16_t>()) ||
+    if ((0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_int).get<std::int32_t>()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_u8).get<std::uint8_t>()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_s8).get<std::int8_t>()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_u16).get<std::uint16_t>()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_s16).get<std::int16_t>()) ||
+        (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_u32).get<std::uint32_t>()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_s32).get<std::int32_t>()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_float).get<bn::fixed>()) ||
         (false != black_sq.get_field(ef_id::ENTITY_entity_FIELD_boolean).get<bool>()) ||
@@ -40,11 +41,12 @@ static_assert([] {
          ldtk::gen::entity_iid::_fefb7d50_8560_11f0_8a9b_6da874eeb8b3 !=
              black_sq.get_field(ef_id::ENTITY_entity_FIELD_entity_ref).get<ldtk::entity_ref>().entity_iid()) ||
         (bn::point(2, 5) != black_sq.get_field(ef_id::ENTITY_entity_FIELD_point).get<bn::point>()) ||
-        (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_int_arr).get<bn::span<const std::int16_t>>().size()) ||
+        (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_int_arr).get<bn::span<const std::int32_t>>().size()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_u8_arr).get<bn::span<const std::uint8_t>>().size()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_s8_arr).get<bn::span<const std::int8_t>>().size()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_u16_arr).get<bn::span<const std::uint16_t>>().size()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_s16_arr).get<bn::span<const std::int16_t>>().size()) ||
+        (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_arr).get<bn::span<const std::uint32_t>>().size()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_s32_arr).get<bn::span<const std::int32_t>>().size()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_float_arr).get<bn::span<const bn::fixed>>().size()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_boolean_arr).get<bn::span<const bool>>().size()) ||
@@ -72,7 +74,7 @@ static_assert([] {
         (false != black_sq.get_field(ef_id::ENTITY_entity_FIELD_entity_ref_opt).has_value()) ||
         (false != black_sq.get_field(ef_id::ENTITY_entity_FIELD_point_opt).has_value()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_int_opt_arr)
-                  .get<bn::span<const bn::optional<std::int16_t>>>()
+                  .get<bn::span<const bn::optional<std::int32_t>>>()
                   .size()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_u8_opt_arr)
                   .get<bn::span<const bn::optional<std::uint8_t>>>()
@@ -85,6 +87,9 @@ static_assert([] {
                   .size()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_s16_opt_arr)
                   .get<bn::span<const bn::optional<std::int16_t>>>()
+                  .size()) ||
+        (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_opt_arr)
+                  .get<bn::span<const bn::optional<std::uint32_t>>>()
                   .size()) ||
         (0 != black_sq.get_field(ef_id::ENTITY_entity_FIELD_s32_opt_arr)
                   .get<bn::span<const bn::optional<std::int32_t>>>()
@@ -109,11 +114,12 @@ static_assert([] {
                   .size()))
         return false;
 
-    if ((32767 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int).get<std::int16_t>()) ||
+    if ((32767 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int).get<std::int32_t>()) ||
         (255 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u8).get<std::uint8_t>()) ||
         (-128 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s8).get<std::int8_t>()) ||
         (65535 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u16).get<std::uint16_t>()) ||
         (-32768 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s16).get<std::int16_t>()) ||
+        (2147483u != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32).get<std::uint32_t>()) ||
         (-2147483 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s32).get<std::int32_t>()) ||
         (!zero_approx(bn::fixed(3.1415), green_sq.get_field(ef_id::ENTITY_entity_FIELD_float).get<bn::fixed>())) ||
         (true != green_sq.get_field(ef_id::ENTITY_entity_FIELD_boolean).get<bool>()) ||
@@ -129,10 +135,10 @@ static_assert([] {
          black_sq.iid() !=
              green_sq.get_field(ef_id::ENTITY_entity_FIELD_entity_ref).get<ldtk::entity_ref>().entity_iid()) ||
         (bn::point(8, 5) != green_sq.get_field(ef_id::ENTITY_entity_FIELD_point).get<bn::point>()) ||
-        (3 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_arr).get<bn::span<const std::int16_t>>().size() ||
-         -32768 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_arr).get<bn::span<const std::int16_t>>()[0] ||
-         0 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_arr).get<bn::span<const std::int16_t>>()[1] ||
-         32767 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_arr).get<bn::span<const std::int16_t>>()[2]) ||
+        (3 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_arr).get<bn::span<const std::int32_t>>().size() ||
+         -32768 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_arr).get<bn::span<const std::int32_t>>()[0] ||
+         0 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_arr).get<bn::span<const std::int32_t>>()[1] ||
+         32767 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_arr).get<bn::span<const std::int32_t>>()[2]) ||
         (3 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u8_arr).get<bn::span<const std::uint8_t>>().size() ||
          255 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u8_arr).get<bn::span<const std::uint8_t>>()[0] ||
          0 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u8_arr).get<bn::span<const std::uint8_t>>()[1] ||
@@ -151,6 +157,10 @@ static_assert([] {
          -32768 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s16_arr).get<bn::span<const std::int16_t>>()[1] ||
          0 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s16_arr).get<bn::span<const std::int16_t>>()[2] ||
          0 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s16_arr).get<bn::span<const std::int16_t>>()[3]) ||
+        (3 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_arr).get<bn::span<const std::uint32_t>>().size() ||
+         0u != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_arr).get<bn::span<const std::uint32_t>>()[0] ||
+         0u != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_arr).get<bn::span<const std::uint32_t>>()[1] ||
+         2147483u != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_arr).get<bn::span<const std::uint32_t>>()[2]) ||
         (3 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s32_arr).get<bn::span<const std::int32_t>>().size() ||
          2147483 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s32_arr).get<bn::span<const std::int32_t>>()[0] ||
          -2147483 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s32_arr).get<bn::span<const std::int32_t>>()[1] ||
@@ -231,7 +241,7 @@ static_assert([] {
          bn::point(14, 0) !=
              green_sq.get_field(ef_id::ENTITY_entity_FIELD_point_arr).get<bn::span<const bn::point>>()[2]) ||
         (!green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_opt).has_value() ||
-         32767 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_opt).get<std::int16_t>()) ||
+         32767 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_opt).get<std::int32_t>()) ||
         (!green_sq.get_field(ef_id::ENTITY_entity_FIELD_u8_opt).has_value() ||
          0 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u8_opt).get<std::uint8_t>()) ||
         (!green_sq.get_field(ef_id::ENTITY_entity_FIELD_s8_opt).has_value() ||
@@ -240,6 +250,8 @@ static_assert([] {
          0 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u16_opt).get<std::uint16_t>()) ||
         (!green_sq.get_field(ef_id::ENTITY_entity_FIELD_s16_opt).has_value() ||
          32767 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s16_opt).get<std::int16_t>()) ||
+        (!green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_opt).has_value() ||
+         2147483u != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_opt).get<std::uint32_t>()) ||
         (!green_sq.get_field(ef_id::ENTITY_entity_FIELD_s32_opt).has_value() ||
          2147483 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s32_opt).get<std::int32_t>()) ||
         (!green_sq.get_field(ef_id::ENTITY_entity_FIELD_float_opt).has_value() ||
@@ -261,16 +273,16 @@ static_assert([] {
         (!green_sq.get_field(ef_id::ENTITY_entity_FIELD_point_opt).has_value() ||
          bn::point(10, 2) != green_sq.get_field(ef_id::ENTITY_entity_FIELD_point_opt).get<bn::point>()) ||
         (4 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_opt_arr)
-                  .get<bn::span<const bn::optional<std::int16_t>>>()
+                  .get<bn::span<const bn::optional<std::int32_t>>>()
                   .size() ||
          bn::nullopt != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_opt_arr)
-                            .get<bn::span<const bn::optional<std::int16_t>>>()[0] ||
+                            .get<bn::span<const bn::optional<std::int32_t>>>()[0] ||
          -32768 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_opt_arr)
-                       .get<bn::span<const bn::optional<std::int16_t>>>()[1] ||
+                       .get<bn::span<const bn::optional<std::int32_t>>>()[1] ||
          bn::nullopt != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_opt_arr)
-                            .get<bn::span<const bn::optional<std::int16_t>>>()[2] ||
+                            .get<bn::span<const bn::optional<std::int32_t>>>()[2] ||
          32767 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_int_opt_arr)
-                      .get<bn::span<const bn::optional<std::int16_t>>>()[3]) ||
+                      .get<bn::span<const bn::optional<std::int32_t>>>()[3]) ||
         (3 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u8_opt_arr)
                   .get<bn::span<const bn::optional<std::uint8_t>>>()
                   .size() ||
@@ -309,6 +321,15 @@ static_assert([] {
                       .get<bn::span<const bn::optional<std::int16_t>>>()[2] ||
          bn::nullopt != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s16_opt_arr)
                             .get<bn::span<const bn::optional<std::int16_t>>>()[3]) ||
+        (3 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_opt_arr)
+                  .get<bn::span<const bn::optional<std::uint32_t>>>()
+                  .size() ||
+         0u != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_opt_arr)
+                   .get<bn::span<const bn::optional<std::uint32_t>>>()[0] ||
+         bn::nullopt != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_opt_arr)
+                            .get<bn::span<const bn::optional<std::uint32_t>>>()[1] ||
+         2147483u != green_sq.get_field(ef_id::ENTITY_entity_FIELD_u32_opt_arr)
+                         .get<bn::span<const bn::optional<std::uint32_t>>>()[2]) ||
         (2 != green_sq.get_field(ef_id::ENTITY_entity_FIELD_s32_opt_arr)
                   .get<bn::span<const bn::optional<std::int32_t>>>()
                   .size() ||

@@ -1102,19 +1102,34 @@ class LevelFieldInstancesHeader(GenPrivHeader):
             match field.type:
                 case "Int":
                     field_def = field_def_lut[field.def_uid]
-                    int_type = "std::int16_t"
-                    min = int(field_def.min) if field_def.min is not None else -32768
-                    max = int(field_def.max) if field_def.max is not None else 32767
-                    if 0 <= min and max <= 255:
-                        int_type = "std::uint8_t"
-                    elif -128 <= min and max <= 127:
-                        int_type = "std::int8_t"
-                    elif 0 <= min and max <= 65535:
-                        int_type = "std::uint16_t"
-                    elif -32768 <= min and max <= 32767:
-                        int_type = "std::int16_t"
-                    else:
-                        int_type = "std::int32_t"
+                    int_type = "std::int32_t"
+                    if field_def.min is not None or field_def.max is not None:
+                        min = (
+                            int(field_def.min)
+                            if field_def.min is not None
+                            else (-1 << 31)
+                        )
+                        max = (
+                            int(field_def.max)
+                            if field_def.max is not None
+                            else (1 << 31) - 1
+                        )
+                        if 0 <= min and max <= 255:
+                            int_type = "std::uint8_t"
+                        elif -128 <= min and max <= 127:
+                            int_type = "std::int8_t"
+                        elif 0 <= min and max <= 65535:
+                            int_type = "std::uint16_t"
+                        elif -32768 <= min and max <= 32767:
+                            int_type = "std::int16_t"
+                        elif 0 <= min and max <= (1 << 32) - 1:
+                            int_type = "std::uint32_t"
+                        elif (-1 << 31) <= min and max <= (1 << 31) - 1:
+                            int_type = "std::int32_t"
+                        elif 0 <= min:
+                            int_type = "std::uint64_t"
+                        else:
+                            int_type = "std::int64_t"
 
                     result.append(
                         f"({int_type})({field.value})"
@@ -1211,7 +1226,10 @@ class LevelFieldArraysHeader(GenPrivHeader):
         "INT_8_SPAN": "std::int8_t",
         "UINT_16_SPAN": "std::uint16_t",
         "INT_16_SPAN": "std::int16_t",
+        "UINT_32_SPAN": "std::uint32_t",
         "INT_32_SPAN": "std::int32_t",
+        "UINT_64_SPAN": "std::uint64_t",
+        "INT_64_SPAN": "std::int64_t",
         "FIXED_SPAN": "bn::fixed",
         "BOOL_SPAN": "bool",
         "STRING_SPAN": "bn::string_view",
@@ -1224,7 +1242,10 @@ class LevelFieldArraysHeader(GenPrivHeader):
         "OPTIONAL_INT_8_SPAN": "bn::optional<std::int8_t>",
         "OPTIONAL_UINT_16_SPAN": "bn::optional<std::uint16_t>",
         "OPTIONAL_INT_16_SPAN": "bn::optional<std::int16_t>",
+        "OPTIONAL_UINT_32_SPAN": "bn::optional<std::uint32_t>",
         "OPTIONAL_INT_32_SPAN": "bn::optional<std::int32_t>",
+        "OPTIONAL_UINT_64_SPAN": "bn::optional<std::uint64_t>",
+        "OPTIONAL_INT_64_SPAN": "bn::optional<std::int64_t>",
         "OPTIONAL_FIXED_SPAN": "bn::optional<bn::fixed>",
         "OPTIONAL_STRING_SPAN": "bn::optional<bn::string_view>",
         "OPTIONAL_TYPED_ENUM_SPAN": "bn::optional<Enum>",
@@ -1277,7 +1298,10 @@ class LevelFieldArraysHeader(GenPrivHeader):
                 | "INT_8_SPAN"
                 | "UINT_16_SPAN"
                 | "INT_16_SPAN"
+                | "UINT_32_SPAN"
                 | "INT_32_SPAN"
+                | "UINT_64_SPAN"
+                | "INT_64_SPAN"
             ):
                 int_arr: List[int] = field.value
                 value = LevelFieldArraysHeader.Value(
@@ -1336,7 +1360,10 @@ class LevelFieldArraysHeader(GenPrivHeader):
                 | "OPTIONAL_INT_8_SPAN"
                 | "OPTIONAL_UINT_16_SPAN"
                 | "OPTIONAL_INT_16_SPAN"
+                | "OPTIONAL_UINT_32_SPAN"
                 | "OPTIONAL_INT_32_SPAN"
+                | "OPTIONAL_UINT_64_SPAN"
+                | "OPTIONAL_INT_64_SPAN"
             ):
                 opt_int_arr: List[Optional[int]] = field.value
                 value = LevelFieldArraysHeader.Value(
