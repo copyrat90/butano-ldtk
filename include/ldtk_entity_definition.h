@@ -39,6 +39,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr entity_definition(const entity_definition&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr entity_definition& operator=(const entity_definition&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr entity_definition(entity_definition&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr entity_definition& operator=(entity_definition&&) = default;
+
 public:
     /// @brief Pixel size
     [[nodiscard]] constexpr auto size() const -> const bn::size&

@@ -19,6 +19,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr int_grid_base(const int_grid_base&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr int_grid_base& operator=(const int_grid_base&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr int_grid_base(int_grid_base&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr int_grid_base& operator=(int_grid_base&&) = default;
+
     /// @brief Get the size of bytes used for cell storage. \n
     /// (empty: 0, `u8`: 1, `u16`: 2, `u32`: 4)
     [[nodiscard]] constexpr virtual auto cell_storage_size() const -> int = 0;

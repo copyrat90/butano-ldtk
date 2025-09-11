@@ -29,6 +29,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr project(const project&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr project& operator=(const project&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr project(project&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr project& operator=(project&&) = default;
+
 public:
     /// @brief Looks up a level with its identifier.
     /// @note Look-up is done via indexing, thus it's O(1).

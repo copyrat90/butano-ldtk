@@ -20,6 +20,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr int_grid_value_group_info(const int_grid_value_group_info&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr int_grid_value_group_info& operator=(const int_grid_value_group_info&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr int_grid_value_group_info(int_grid_value_group_info&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr int_grid_value_group_info& operator=(int_grid_value_group_info&&) = default;
+
 public:
     /// @brief User defined unique identifier
     [[nodiscard]] constexpr auto identifier() const -> const bn::optional<gen::layer_int_grid_value_group_ident>&

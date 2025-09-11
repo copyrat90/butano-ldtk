@@ -22,6 +22,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr int_grid_value_info(const int_grid_value_info&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr int_grid_value_info& operator=(const int_grid_value_info&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr int_grid_value_info(int_grid_value_info&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr int_grid_value_info& operator=(int_grid_value_info&&) = default;
+
 public:
     [[nodiscard]] constexpr auto color() const -> bn::color
     {

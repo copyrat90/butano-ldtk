@@ -23,8 +23,8 @@ namespace ldtk
 
 class tileset_definition
 {
-    /// @cond DO_NOT_DOCUMENT
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr tileset_definition(const bn::regular_bg_item& bg_item, int tiles_count,
                                  bn::span<const tileset_custom_data> custom_data,
                                  bn::span<const tileset_enum_tag> enum_tags, gen::tileset_ident identifier,
@@ -36,6 +36,18 @@ public:
     {
     }
     /// @endcond
+
+    /// @brief Deleted copy constructor.
+    constexpr tileset_definition(const tileset_definition&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr tileset_definition& operator=(const tileset_definition&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr tileset_definition(tileset_definition&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr tileset_definition& operator=(tileset_definition&&) = default;
 
 public:
     /// @brief Looks up the enum tag via the enum value.

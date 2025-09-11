@@ -30,6 +30,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr entity(const entity&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr entity& operator=(const entity&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr entity(entity&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr entity& operator=(entity&&) = default;
+
 public:
     /// @brief Looks up a field with its identifier.
     /// @note Look-up is done via indexing, thus it's O(1). \n

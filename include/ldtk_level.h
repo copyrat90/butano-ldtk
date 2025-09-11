@@ -35,6 +35,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr level(const level&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr level& operator=(const level&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr level(level&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr level& operator=(level&&) = default;
+
 public:
     /// @brief Looks up a layer with its identifier.
     /// @note Look-up is done via indexing, thus it's O(1).

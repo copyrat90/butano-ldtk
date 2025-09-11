@@ -14,12 +14,24 @@ namespace ldtk
 
 class tileset_enum_tag
 {
-    /// @cond DO_NOT_DOCUMENT
 public:
+    /// @cond DO_NOT_DOCUMENT
     constexpr tileset_enum_tag(const bn::span<const tile_index>& tile_ids) : _tile_ids(tile_ids)
     {
     }
     /// @endcond
+
+    /// @brief Deleted copy constructor.
+    constexpr tileset_enum_tag(const tileset_enum_tag&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr tileset_enum_tag& operator=(const tileset_enum_tag&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr tileset_enum_tag(tileset_enum_tag&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr tileset_enum_tag& operator=(tileset_enum_tag&&) = default;
 
 public:
     [[nodiscard]] constexpr auto has_tile_id(tile_index id) const -> bool

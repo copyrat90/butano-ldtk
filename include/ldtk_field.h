@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <memory>
 #include <type_traits>
+#include <utility>
 
 /// @cond DO_NOT_DOCUMENT
 #define LDTK_FIELD_TYPE_ASSERT(expected) \
@@ -41,6 +42,19 @@ namespace ldtk
 class field
 {
 public:
+    /// @brief Deleted copy constructor.
+    constexpr field(const field&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr field& operator=(const field&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr field(field&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr field& operator=(field&&) = default;
+
+public:
     /// @cond DO_NOT_DOCUMENT
     constexpr field(const field_definition& def, std::uint8_t value) : _def(def), _has_value(true)
     {
@@ -49,13 +63,13 @@ public:
         std::construct_at(&_value.u8, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<std::uint8_t>& value)
+    constexpr field(const field_definition& def, bn::optional<std::uint8_t>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::UINT_8);
 
         if (value.has_value())
-            std::construct_at(&_value.u8, value.value());
+            std::construct_at(&_value.u8, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -67,13 +81,13 @@ public:
         std::construct_at(&_value.s8, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<std::int8_t>& value)
+    constexpr field(const field_definition& def, bn::optional<std::int8_t>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::INT_8);
 
         if (value.has_value())
-            std::construct_at(&_value.s8, value.value());
+            std::construct_at(&_value.s8, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -85,13 +99,13 @@ public:
         std::construct_at(&_value.u16, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<std::uint16_t>& value)
+    constexpr field(const field_definition& def, bn::optional<std::uint16_t>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::UINT_16);
 
         if (value.has_value())
-            std::construct_at(&_value.u16, value.value());
+            std::construct_at(&_value.u16, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -103,13 +117,13 @@ public:
         std::construct_at(&_value.s16, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<std::int16_t>& value)
+    constexpr field(const field_definition& def, bn::optional<std::int16_t>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::INT_16);
 
         if (value.has_value())
-            std::construct_at(&_value.s16, value.value());
+            std::construct_at(&_value.s16, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -121,13 +135,13 @@ public:
         std::construct_at(&_value.u32, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<std::uint32_t>& value)
+    constexpr field(const field_definition& def, bn::optional<std::uint32_t>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::UINT_32);
 
         if (value.has_value())
-            std::construct_at(&_value.u32, value.value());
+            std::construct_at(&_value.u32, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -139,13 +153,13 @@ public:
         std::construct_at(&_value.s32, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<std::int32_t>& value)
+    constexpr field(const field_definition& def, bn::optional<std::int32_t>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::INT_32);
 
         if (value.has_value())
-            std::construct_at(&_value.s32, value.value());
+            std::construct_at(&_value.s32, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -157,13 +171,13 @@ public:
         std::construct_at(&_value.u64, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<std::uint64_t>& value)
+    constexpr field(const field_definition& def, bn::optional<std::uint64_t>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::UINT_64);
 
         if (value.has_value())
-            std::construct_at(&_value.u64, value.value());
+            std::construct_at(&_value.u64, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -175,13 +189,13 @@ public:
         std::construct_at(&_value.s64, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<std::int64_t>& value)
+    constexpr field(const field_definition& def, bn::optional<std::int64_t>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::INT_64);
 
         if (value.has_value())
-            std::construct_at(&_value.s64, value.value());
+            std::construct_at(&_value.s64, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -193,13 +207,13 @@ public:
         std::construct_at(&_value.fixed, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<bn::fixed>& value)
+    constexpr field(const field_definition& def, bn::optional<bn::fixed>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::FIXED);
 
         if (value.has_value())
-            std::construct_at(&_value.fixed, value.value());
+            std::construct_at(&_value.fixed, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -211,31 +225,30 @@ public:
         std::construct_at(&_value.flag, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<bool>& value)
-        : _def(def), _has_value(value.has_value())
+    constexpr field(const field_definition& def, bn::optional<bool>&& value) : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::BOOL);
 
         if (value.has_value())
-            std::construct_at(&_value.flag, value.value());
+            std::construct_at(&_value.flag, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(const field_definition& def, const bn::string_view& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::string_view&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::STRING);
 
-        std::construct_at(&_value.str, value);
+        std::construct_at(&_value.str, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::optional<bn::string_view>& value)
+    constexpr field(const field_definition& def, bn::optional<bn::string_view>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::STRING);
 
         if (value.has_value())
-            std::construct_at(&_value.str, value.value());
+            std::construct_at(&_value.str, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -247,13 +260,13 @@ public:
         std::construct_at(&_value.color, value);
     }
 
-    constexpr field(const field_definition& def, const bn::optional<bn::color>& value)
+    constexpr field(const field_definition& def, bn::optional<bn::color>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::COLOR);
 
         if (value.has_value())
-            std::construct_at(&_value.color, value.value());
+            std::construct_at(&_value.color, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
@@ -270,309 +283,300 @@ public:
 
     template <typename Enum>
         requires std::is_scoped_enum_v<Enum>
-    constexpr field(const field_definition& def, const bn::optional<Enum>& value)
-        : _def(def), _has_value(value.has_value())
+    constexpr field(const field_definition& def, bn::optional<Enum>&& value) : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::TYPED_ENUM);
 
         if (value.has_value())
-            std::construct_at(&_value.t_enum, value.value());
+            std::construct_at(&_value.t_enum, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    // constexpr field(const field_definition& def, const tile& value)
+    // constexpr field(const field_definition& def, tile&& value)
     //     : _def(def), _has_value(true)
     // {
     //     LDTK_FIELD_TYPE_ASSERT(field_type::TILE);
     //
-    //     std::construct_at(&_value.tile, value);
+    //     std::construct_at(&_value.tile, std::move(value));
     // }
 
-    // constexpr field(const field_definition& def, const bn::optional<tile>& value)
+    // constexpr field(const field_definition& def, bn::optional<tile>&& value)
     //     : _def(def), _has_value(value.has_value())
     // {
     //     LDTK_FIELD_TYPE_ASSERT(field_type::TILE);
     //
     //     if (value.has_value())
-    //         std::construct_at(&_value.tile , value.value());
+    //         std::construct_at(&_value.tile , std::move(value.value()));
     //     else
     //         std::construct_at(&_value.empty, 0);
     // }
 
-    constexpr field(const field_definition& def, const entity_ref& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, entity_ref&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::ENTITY_REF);
 
-        std::construct_at(&_value.ent_ref, value);
+        std::construct_at(&_value.ent_ref, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::optional<entity_ref>& value)
+    constexpr field(const field_definition& def, bn::optional<entity_ref>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::ENTITY_REF);
 
         if (value.has_value())
-            std::construct_at(&_value.ent_ref, value.value());
+            std::construct_at(&_value.ent_ref, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(const field_definition& def, const bn::point& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::point&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::POINT);
 
-        std::construct_at(&_value.point, value);
+        std::construct_at(&_value.point, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::optional<bn::point>& value)
+    constexpr field(const field_definition& def, bn::optional<bn::point>&& value)
         : _def(def), _has_value(value.has_value())
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::POINT);
 
         if (value.has_value())
-            std::construct_at(&_value.point, value.value());
+            std::construct_at(&_value.point, std::move(value.value()));
         else
             std::construct_at(&_value.empty, 0);
     }
 
-    constexpr field(const field_definition& def, const bn::span<const std::uint8_t>& value)
-        : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const std::uint8_t>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::UINT_8_SPAN);
 
-        std::construct_at(&_value.u8_span, value);
+        std::construct_at(&_value.u8_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const std::int8_t>& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const std::int8_t>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::INT_8_SPAN);
 
-        std::construct_at(&_value.s8_span, value);
+        std::construct_at(&_value.s8_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const std::uint16_t>& value)
-        : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const std::uint16_t>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::UINT_16_SPAN);
 
-        std::construct_at(&_value.u16_span, value);
+        std::construct_at(&_value.u16_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const std::int16_t>& value)
-        : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const std::int16_t>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::INT_16_SPAN);
 
-        std::construct_at(&_value.s16_span, value);
+        std::construct_at(&_value.s16_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const std::uint32_t>& value)
-        : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const std::uint32_t>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::UINT_32_SPAN);
 
-        std::construct_at(&_value.u32_span, value);
+        std::construct_at(&_value.u32_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const std::int32_t>& value)
-        : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const std::int32_t>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::INT_32_SPAN);
 
-        std::construct_at(&_value.s32_span, value);
+        std::construct_at(&_value.s32_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const std::uint64_t>& value)
-        : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const std::uint64_t>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::UINT_64_SPAN);
 
-        std::construct_at(&_value.u64_span, value);
+        std::construct_at(&_value.u64_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const std::int64_t>& value)
-        : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const std::int64_t>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::INT_64_SPAN);
 
-        std::construct_at(&_value.s64_span, value);
+        std::construct_at(&_value.s64_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::fixed>& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const bn::fixed>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::FIXED_SPAN);
 
-        std::construct_at(&_value.fixed_span, value);
+        std::construct_at(&_value.fixed_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bool>& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const bool>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::BOOL_SPAN);
 
-        std::construct_at(&_value.flag_span, value);
+        std::construct_at(&_value.flag_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::string_view>& value)
-        : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const bn::string_view>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::STRING_SPAN);
 
-        std::construct_at(&_value.str_span, value);
+        std::construct_at(&_value.str_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::color>& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const bn::color>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::COLOR_SPAN);
 
-        std::construct_at(&_value.color_span, value);
+        std::construct_at(&_value.color_span, std::move(value));
     }
 
     template <typename Enum>
         requires(std::is_scoped_enum_v<Enum>)
-    constexpr field(const field_definition& def, const bn::span<const Enum>& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const Enum>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::TYPED_ENUM_SPAN);
         LDTK_FIELD_ENUM_TYPE_ASSERT(bn::type_id<Enum>());
 
-        std::construct_at(&_value.t_enum_span, value);
+        std::construct_at(&_value.t_enum_span, std::move(value));
     }
 
-    // constexpr field(const field_definition& def, const bn::span<const tile>& value)
+    // constexpr field(const field_definition& def, bn::span<const tile>&& value)
     //     : _def(def), _has_value(true)
     // {
     //     LDTK_FIELD_TYPE_ASSERT(field_type::TILE_SPAN);
     //
-    //     std::construct_at(&_value.tile_span, value);
+    //     std::construct_at(&_value.tile_span, std::move(value));
     // }
 
-    constexpr field(const field_definition& def, const bn::span<const entity_ref>& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const entity_ref>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::ENTITY_REF_SPAN);
 
-        std::construct_at(&_value.ent_ref_span, value);
+        std::construct_at(&_value.ent_ref_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::point>& value) : _def(def), _has_value(true)
+    constexpr field(const field_definition& def, bn::span<const bn::point>&& value) : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::POINT_SPAN);
 
-        std::construct_at(&_value.point_span, value);
+        std::construct_at(&_value.point_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::uint8_t>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<std::uint8_t>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_UINT_8_SPAN);
 
-        std::construct_at(&_value.opt_u8_span, value);
+        std::construct_at(&_value.opt_u8_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::int8_t>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<std::int8_t>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_8_SPAN);
 
-        std::construct_at(&_value.opt_s8_span, value);
+        std::construct_at(&_value.opt_s8_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::uint16_t>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<std::uint16_t>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_UINT_16_SPAN);
 
-        std::construct_at(&_value.opt_u16_span, value);
+        std::construct_at(&_value.opt_u16_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::int16_t>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<std::int16_t>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_16_SPAN);
 
-        std::construct_at(&_value.opt_s16_span, value);
+        std::construct_at(&_value.opt_s16_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::uint32_t>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<std::uint32_t>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_UINT_32_SPAN);
 
-        std::construct_at(&_value.opt_u32_span, value);
+        std::construct_at(&_value.opt_u32_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::int32_t>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<std::int32_t>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_32_SPAN);
 
-        std::construct_at(&_value.opt_s32_span, value);
+        std::construct_at(&_value.opt_s32_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::uint64_t>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<std::uint64_t>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_UINT_64_SPAN);
 
-        std::construct_at(&_value.opt_u64_span, value);
+        std::construct_at(&_value.opt_u64_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<std::int64_t>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<std::int64_t>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_INT_64_SPAN);
 
-        std::construct_at(&_value.opt_s64_span, value);
+        std::construct_at(&_value.opt_s64_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<bn::fixed>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<bn::fixed>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_FIXED_SPAN);
 
-        std::construct_at(&_value.opt_fixed_span, value);
+        std::construct_at(&_value.opt_fixed_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<bn::string_view>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<bn::string_view>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_STRING_SPAN);
 
-        std::construct_at(&_value.opt_str_span, value);
+        std::construct_at(&_value.opt_str_span, std::move(value));
     }
 
     template <typename Enum>
         requires(std::is_scoped_enum_v<Enum>)
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<Enum>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<Enum>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_TYPED_ENUM_SPAN);
         LDTK_FIELD_ENUM_TYPE_ASSERT(bn::type_id<Enum>());
 
-        std::construct_at(&_value.opt_t_enum_span, value);
+        std::construct_at(&_value.opt_t_enum_span, std::move(value));
     }
 
-    // constexpr field(const field_definition& def, const bn::span<const bn::optional<tile>>& value)
+    // constexpr field(const field_definition& def, bn::span<const bn::optional<tile>>&& value)
     //     : _def(def), _has_value(true)
     // {
     //     LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_TILE_SPAN);
     //
-    //     std::construct_at(&_value.opt_tile_span, value);
+    //     std::construct_at(&_value.opt_tile_span, std::move(value));
     // }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<entity_ref>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<entity_ref>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_ENTITY_REF_SPAN);
 
-        std::construct_at(&_value.opt_ent_ref_span, value);
+        std::construct_at(&_value.opt_ent_ref_span, std::move(value));
     }
 
-    constexpr field(const field_definition& def, const bn::span<const bn::optional<bn::point>>& value)
+    constexpr field(const field_definition& def, bn::span<const bn::optional<bn::point>>&& value)
         : _def(def), _has_value(true)
     {
         LDTK_FIELD_TYPE_ASSERT(field_type::OPTIONAL_POINT_SPAN);
 
-        std::construct_at(&_value.opt_point_span, value);
+        std::construct_at(&_value.opt_point_span, std::move(value));
     }
 
     constexpr ~field()

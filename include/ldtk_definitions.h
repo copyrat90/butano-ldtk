@@ -28,6 +28,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr definitions(const definitions&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr definitions& operator=(const definitions&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr definitions(definitions&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr definitions& operator=(definitions&&) = default;
+
 public:
     /// @brief Looks up a entity definition with its identifier.
     /// @note Look-up is done via indexing, thus it's O(1).

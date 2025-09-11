@@ -37,6 +37,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr field_definition(const field_definition&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr field_definition& operator=(const field_definition&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr field_definition(field_definition&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr field_definition& operator=(field_definition&&) = default;
+
 public:
     /// @brief Value type.
     [[nodiscard]] constexpr auto type() const -> field_type

@@ -39,6 +39,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr layer(const layer&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr layer& operator=(const layer&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr layer(layer&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr layer& operator=(layer&&) = default;
+
 public:
     /// @brief Linear searches an entity with its Instance id.
     /// @note Not finding the entity errors out;

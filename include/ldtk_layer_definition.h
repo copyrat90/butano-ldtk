@@ -29,6 +29,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr layer_definition(const layer_definition&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr layer_definition& operator=(const layer_definition&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr layer_definition(layer_definition&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr layer_definition& operator=(layer_definition&&) = default;
+
 public:
     /// @brief (Only *IntGrid layer*) Gets the info associated with the IntGrid value for this layer.
     /// @param int_grid_value Actual IntGrid value.

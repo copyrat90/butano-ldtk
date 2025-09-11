@@ -32,6 +32,18 @@ public:
     }
     /// @endcond
 
+    /// @brief Deleted copy constructor.
+    constexpr tile_grid_base(const tile_grid_base&) = delete;
+
+    /// @brief Deleted copy assignment operator.
+    constexpr tile_grid_base& operator=(const tile_grid_base&) = delete;
+
+    /// @brief Defaulted move constructor.
+    constexpr tile_grid_base(tile_grid_base&&) = default;
+
+    /// @brief Defaulted move assignment operator.
+    constexpr tile_grid_base& operator=(tile_grid_base&&) = default;
+
     /// @brief Get whether the cell storage is bloated (`u16`) or not (`u8`).
     [[nodiscard]] constexpr virtual auto bloated() const -> bool = 0;
 
