@@ -1,0 +1,20 @@
+name: clang-format
+
+on:
+  push:
+    branches: ["main", "dev", "feature-*"]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout butano-ldtk
+        uses: actions/checkout@v4
+        with:
+          path: butano-ldtk
+
+      - name: Check clang-format style
+        uses: jidicula/clang-format-action@v4.15.0
+        with:
+          clang-format-version: '20'

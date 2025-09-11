@@ -7,13 +7,13 @@
 #define COMMON_INFO_H
 
 #include "bn_span.h"
-#include "bn_vector.h"
 #include "bn_sprite_ptr.h"
 #include "bn_string_view.h"
+#include "bn_vector.h"
 
 namespace bn
 {
-    class sprite_text_generator;
+class sprite_text_generator;
 }
 
 namespace common
@@ -48,6 +48,6 @@ private:
     void _update_sprites();
 };
 
-}
+} // namespace common
 
 #endif

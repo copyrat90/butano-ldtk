@@ -5,8 +5,8 @@
 
 #include "item.h"
 
-#include "ldtk_gen_project.h"
 #include "ldtk_gen_idents.h"
+#include "ldtk_gen_project.h"
 
 #include <bn_vector.h>
 
@@ -31,7 +31,8 @@ public:
     void update();
 
 private:
-    static constexpr int MAX_ITEMS_COUNT = ldtk::gen::gen_project.defs().get_entity_def(ldtk::gen::entity_ident::item).max_count();
+    static constexpr int MAX_ITEMS_COUNT =
+        ldtk::gen::gen_project.defs().get_entity_def(ldtk::gen::entity_ident::item).max_count();
 
     bn::vector<item, MAX_ITEMS_COUNT> _items;
 };

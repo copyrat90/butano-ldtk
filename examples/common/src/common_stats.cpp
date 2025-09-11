@@ -6,16 +6,15 @@
 #include "common_stats.h"
 
 #include "bn_core.h"
-#include "bn_memory.h"
-#include "bn_string.h"
 #include "bn_display.h"
+#include "bn_memory.h"
 #include "bn_sprite_text_generator.h"
+#include "bn_string.h"
 
 namespace common
 {
 
-stats::stats(bn::sprite_text_generator& text_generator) :
-    _text_generator(text_generator)
+stats::stats(bn::sprite_text_generator& text_generator) : _text_generator(text_generator)
 {
     set_mode(_mode);
 }
@@ -30,7 +29,7 @@ void stats::set_mode(mode_type mode)
     _max_cpu_usage = 0;
     _counter = 0;
 
-    switch(mode)
+    switch (mode)
     {
 
     case mode_type::DISABLED:
@@ -40,35 +39,34 @@ void stats::set_mode(mode_type mode)
         _text_position = bn::fixed_point(text_x, text_height - (bn::display::height() / 2));
         break;
 
-    case mode_type::DETAILED:
-        {
-            bn::string_view cpu_label = "CPU: ";
-            bn::fixed cpu_label_width = _text_generator.width(cpu_label);
-            _text_position = bn::fixed_point(text_x + cpu_label_width, text_height - (bn::display::height() / 2));
+    case mode_type::DETAILED: {
+        bn::string_view cpu_label = "CPU: ";
+        bn::fixed cpu_label_width = _text_generator.width(cpu_label);
+        _text_position = bn::fixed_point(text_x + cpu_label_width, text_height - (bn::display::height() / 2));
 
-            int old_bg_priority = _text_generator.bg_priority();
-            _text_generator.set_bg_priority(0);
+        int old_bg_priority = _text_generator.bg_priority();
+        _text_generator.set_bg_priority(0);
 
-            bn::string<32> text;
-            bn::ostringstream text_stream(text);
-            text_stream.append(cpu_label);
-            _text_generator.generate(text_x, _text_position.y(), text, _static_text_sprites);
+        bn::string<32> text;
+        bn::ostringstream text_stream(text);
+        text_stream.append(cpu_label);
+        _text_generator.generate(text_x, _text_position.y(), text, _static_text_sprites);
 
-            text.clear();
-            text_stream.append("IWR: ");
-            text_stream.append(bn::memory::used_static_iwram());
-            text_stream.append("B");
-            _text_generator.generate(text_x, _text_position.y() + text_height, text, _static_text_sprites);
+        text.clear();
+        text_stream.append("IWR: ");
+        text_stream.append(bn::memory::used_static_iwram());
+        text_stream.append("B");
+        _text_generator.generate(text_x, _text_position.y() + text_height, text, _static_text_sprites);
 
-            text.clear();
-            text_stream.append("EWR: ");
-            text_stream.append(bn::memory::used_static_ewram());
-            text_stream.append("B");
-            _text_generator.generate(text_x, _text_position.y() + (text_height * 2), text, _static_text_sprites);
+        text.clear();
+        text_stream.append("EWR: ");
+        text_stream.append(bn::memory::used_static_ewram());
+        text_stream.append("B");
+        _text_generator.generate(text_x, _text_position.y() + (text_height * 2), text, _static_text_sprites);
 
-            _text_generator.set_bg_priority(old_bg_priority);
-        }
-        break;
+        _text_generator.set_bg_priority(old_bg_priority);
+    }
+    break;
 
     default:
         BN_ERROR("Invalid mode: ", int(mode));
@@ -78,7 +76,7 @@ void stats::set_mode(mode_type mode)
 
 void stats::update()
 {
-    switch(_mode)
+    switch (_mode)
     {
 
     case mode_type::DISABLED:
@@ -97,13 +95,13 @@ void stats::update()
 
     _max_cpu_usage = bn::max(_max_cpu_usage, bn::core::last_cpu_usage());
 
-    if(! _counter)
+    if (!_counter)
     {
         bn::fixed max_cpu_pct = _max_cpu_usage * 100;
         bn::string<32> text;
         bn::ostringstream text_stream(text);
 
-        switch(_mode)
+        switch (_mode)
         {
 
         case mode_type::DISABLED:
@@ -137,4 +135,4 @@ void stats::update()
     --_counter;
 }
 
-}
+} // namespace common
