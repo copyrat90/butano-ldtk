@@ -403,7 +403,7 @@ public:
     /// @brief Sets the tile info that fills the out-of-bound region of a level background.
     /// @note Before calling this, you @b must make sure `has_background()` returns `true`. \n
     /// Also, you @b must use the valid tile index for the background.
-    /// @param tile_info tile info to fill the out-of-bound region of a level background.
+    /// @param oob_tile_info tile info to fill the out-of-bound region of a level background.
     /// @param layer_identifier identifier of the layer to set the tile info to.
     /// @return Reference to `this`.
     auto set_out_of_bound_tile_info(tile_grid_base::tile_info oob_tile_info, gen::layer_ident layer_identifier)
