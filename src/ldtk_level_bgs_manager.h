@@ -4,6 +4,7 @@
 #pragma once
 
 #include "ldtk_gen_idents_fwd.h"
+#include "ldtk_tile_grid_base.h"
 
 #include <bn_fixed.h>
 #include <bn_fixed_point_fwd.h>
@@ -120,6 +121,10 @@ void set_visible_in_window(id_t id, bool visible, bn::window& window, gen::layer
 void set_camera(id_t id, bn::camera_ptr&& camera);
 
 void remove_camera(id_t id);
+
+[[nodiscard]] auto out_of_bound_tile_info(id_t id, gen::layer_ident layer_identifier) -> tile_grid_base::tile_info;
+
+void set_out_of_bound_tile_info(id_t id, tile_grid_base::tile_info oob_tile_info, gen::layer_ident layer_identifier);
 
 } // namespace level_bgs_manager
 

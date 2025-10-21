@@ -5,6 +5,7 @@
 
 #include "ldtk_gen_idents_fwd.h"
 #include "ldtk_level_bgs_ptr.h"
+#include "ldtk_tile_grid_base.h"
 
 #include <bn_camera_ptr.h>
 #include <bn_config_bgs.h>
@@ -394,6 +395,20 @@ public:
     /// @brief Releases and returns the camera_ptr to attach to the level backgrounds to generate (if any).
     [[nodiscard]] auto release_camera() -> bn::optional<bn::camera_ptr>;
 
+    /// @brief Returns the tile info that fills the out-of-bound region of a level background.
+    /// @note Before calling this, you @b must make sure `has_background()` returns `true`.
+    /// @param layer_identifier identifier of the layer to get the tile info from.
+    [[nodiscard]] auto out_of_bound_tile_info(gen::layer_ident layer_identifier) const -> tile_grid_base::tile_info;
+
+    /// @brief Sets the tile info that fills the out-of-bound region of a level background.
+    /// @note Before calling this, you @b must make sure `has_background()` returns `true`. \n
+    /// Also, you @b must use the valid tile index for the background.
+    /// @param tile_info tile info to fill the out-of-bound region of a level background.
+    /// @param layer_identifier identifier of the layer to set the tile info to.
+    /// @return Reference to `this`.
+    auto set_out_of_bound_tile_info(tile_grid_base::tile_info oob_tile_info, gen::layer_ident layer_identifier)
+        -> level_bgs_builder&;
+
     /// @brief Generates and returns a `level_bgs_ptr` without releasing the acquired resources.
     [[nodiscard]] auto build() const -> level_bgs_ptr;
 
@@ -425,6 +440,8 @@ private:
         bn::green_swap_mode green_swap_mode = bn::green_swap_mode::DEFAULT;
         bool mosaic_enabled = false;
         bool blending_bottom_enabled = true;
+
+        tile_grid_base::tile_info oob_tile_info = {.index = 0, .x_flip = false, .y_flip = false};
     };
     /// @endcond
 

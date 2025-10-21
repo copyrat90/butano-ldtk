@@ -414,4 +414,15 @@ void level_bgs_ptr::remove_camera()
     level_bgs_manager::remove_camera(_handle);
 }
 
+auto level_bgs_ptr::out_of_bound_tile_info(gen::layer_ident layer_identifier) const -> tile_grid_base::tile_info
+{
+    return level_bgs_manager::out_of_bound_tile_info(_handle, layer_identifier);
+}
+
+void level_bgs_ptr::set_out_of_bound_tile_info(tile_grid_base::tile_info oob_tile_info,
+                                               gen::layer_ident layer_identifier)
+{
+    level_bgs_manager::set_out_of_bound_tile_info(_handle, oob_tile_info, layer_identifier);
+}
+
 } // namespace ldtk

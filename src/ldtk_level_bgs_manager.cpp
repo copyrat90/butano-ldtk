@@ -51,11 +51,14 @@ struct bg_t
     const layer& layer_instance;
     const tile_grid_base& grid;
 
+    tile_grid_base::tile_info oob_tile;
+
     alignas(int) bn::regular_bg_map_cell cells[ROWS * COLUMNS];
     bn::regular_bg_map_item map_item;
     bn::regular_bg_ptr bg_ptr;
     bn::regular_bg_map_ptr map_ptr;
     bool next_visible;
+    bool force_reload;
     bool grid_bloated;
 
     bg_t(const level& lv_, const layer& layer_, const bn::fixed_point& cam_applied_pos, const level_bgs_builder&);
@@ -156,8 +159,9 @@ bg_t::bg_t(const level& lv_, const layer& layer_, const bn::fixed_point& cam_app
            const level_bgs_builder& builder)
     : lv(lv_), layer_instance(layer_),
       grid(layer_.auto_layer_tiles() ? *layer_.auto_layer_tiles() : *layer_.grid_tiles()),
-      map_item(cells[0], bn::size(COLUMNS, ROWS)), bg_ptr(init_bg_ptr(layer_, cam_applied_pos, builder)),
-      map_ptr(bg_ptr.map()), next_visible(bg_ptr.visible()), grid_bloated(grid.bloated())
+      oob_tile(builder.out_of_bound_tile_info(layer_.identifier())), map_item(cells[0], bn::size(COLUMNS, ROWS)),
+      bg_ptr(init_bg_ptr(layer_, cam_applied_pos, builder)), map_ptr(bg_ptr.map()), next_visible(bg_ptr.visible()),
+      force_reload(false), grid_bloated(grid.bloated())
 {
 }
 
@@ -165,9 +169,10 @@ void bg_t::update(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_p
 {
     if (next_visible)
     {
-        if (!bg_ptr.visible())
+        if (force_reload || !bg_ptr.visible())
         {
             update_all_cells(next_cam_applied_pos);
+            force_reload = false;
         }
         // Update cells when level position changed
         else if (next_cam_applied_pos != prev_cam_applied_pos)
@@ -300,9 +305,9 @@ void bg_t::reset_rows(const int level_8x8_first_y, const int level_8x8_last_y, c
 
             if (mx < 0 || mx >= grid.c_width() || my < 0 || my >= grid.c_height())
             {
-                m_tile_info.index = 0;
-                m_tile_info.x_flip = false;
-                m_tile_info.y_flip = false;
+                m_tile_info.index = oob_tile.index;
+                m_tile_info.x_flip = oob_tile.x_flip;
+                m_tile_info.y_flip = oob_tile.y_flip;
             }
             else
             {
@@ -380,9 +385,9 @@ void bg_t::reset_columns(const int level_8x8_first_y, const int level_8x8_last_y
 
             if (mx < 0 || mx >= grid.c_width() || my < 0 || my >= grid.c_height())
             {
-                m_tile_info.index = 0;
-                m_tile_info.x_flip = false;
-                m_tile_info.y_flip = false;
+                m_tile_info.index = oob_tile.index;
+                m_tile_info.x_flip = oob_tile.x_flip;
+                m_tile_info.y_flip = oob_tile.y_flip;
             }
             else
             {
@@ -870,6 +875,20 @@ void remove_camera(id_t id)
 {
     auto lv = static_cast<lv_t*>(id);
     lv->cam.reset();
+}
+
+auto out_of_bound_tile_info(id_t id, gen::layer_ident layer_identifier) -> tile_grid_base::tile_info
+{
+    auto lv = static_cast<const lv_t*>(id);
+    return lv->get_bg(layer_identifier).oob_tile;
+}
+
+void set_out_of_bound_tile_info(id_t id, tile_grid_base::tile_info oob_tile_info, gen::layer_ident layer_identifier)
+{
+    auto lv = static_cast<lv_t*>(id);
+    auto& bg = lv->get_bg(layer_identifier);
+    bg.oob_tile = oob_tile_info;
+    bg.force_reload = true;
 }
 
 } // namespace ldtk::level_bgs_manager
