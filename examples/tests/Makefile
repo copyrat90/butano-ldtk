@@ -4,6 +4,7 @@
 # LIBBUTANO is the main directory of butano library (https://github.com/GValiente/butano).
 # BUILDLDTK is the directory where LDtk converted files will be placed.
 # LIBBUTANOLDTK is the root directory of butano-ldtk library (https://github.com/copyrat90/butano-ldtk).
+# LDTKPROJECT is the path to the LDtk project file.
 # PYTHON is the path to the python interpreter.
 # SOURCES is a list of directories containing source code.
 # INCLUDES is a list of directories containing extra header files.
@@ -38,6 +39,7 @@ BUILD       	:=  build
 LIBBUTANO   	:=  ../../../butano/butano
 BUILDLDTK   	:=  build_ldtk
 LIBBUTANOLDTK	:=  ../..
+LDTKPROJECT 	:=  levels/test.ldtk
 PYTHON      	:=  python
 SOURCES     	:=  src src/inc_test $(LIBBUTANOLDTK)/src $(BUILDLDTK)/src ../common/src
 INCLUDES    	:=  include $(LIBBUTANOLDTK)/include $(BUILDLDTK)/include ../common/include
@@ -59,7 +61,7 @@ USERLIBS    	:=
 DEFAULTLIBS 	:=  
 STACKTRACE  	:=  YES
 USERBUILD   	:=  $(BUILDLDTK)
-EXTTOOL     	:=  @$(PYTHON) -B $(LIBBUTANOLDTK)/tools/butano_ldtk.py --input=levels/test.ldtk --build=$(BUILDLDTK)
+EXTTOOL     	:=  @$(PYTHON) -B $(LIBBUTANOLDTK)/tools/butano_ldtk.py --input=$(LDTKPROJECT) --build=$(BUILDLDTK)
 
 #---------------------------------------------------------------------------------------------------------------------
 # Export absolute butano path:

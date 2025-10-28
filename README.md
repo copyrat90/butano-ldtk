@@ -36,12 +36,13 @@
    pip install -r requirements.txt
    ```
 3. Edit the `Makefile` of your own project.
-   1. Add `BUILDLDTK` and `LIBBUTANOLDTK` right below the `LIBBUTANO`.
+   1. Add `BUILDLDTK`, `LIBBUTANOLDTK` and `LDTKPROJECT` right below the `LIBBUTANO`.
    ```diff
    BUILD       	:=  build
    LIBBUTANO   	:=  /path/to/butano/butano
    + BUILDLDTK   	:=  build_ldtk
    + LIBBUTANOLDTK	:=  /path/to/butano-ldtk
+   + LDTKPROJECT 	:=  /path/to/your_project.ldtk
    ```
    2. Add butano-ldtk folders (including will-be-generated ones) to your `SOURCES`, `INCLUDES` and `GRAPHICS`.
    ```diff
@@ -56,7 +57,7 @@
    3. Add python script execution to convert your `*.ldtk` project file.
    ```diff
    - EXTTOOL     	:=
-   + EXTTOOL     	:=  @$(PYTHON) -B $(LIBBUTANOLDTK)/tools/butano_ldtk.py --input=/path/to/your_project.ldtk --build=$(BUILDLDTK)
+   + EXTTOOL     	:=  @$(PYTHON) -B $(LIBBUTANOLDTK)/tools/butano_ldtk.py --input=$(LDTKPROJECT) --build=$(BUILDLDTK)
    ```
      * This will convert `your_project.ldtk` to every time you run `make -j$(nproc)`.
    4. Add `$(BUILDLDTK)` to `USERBUILD`
