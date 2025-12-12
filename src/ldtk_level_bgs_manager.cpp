@@ -12,6 +12,7 @@
 #include "ldtk_tileset_definition.h"
 
 #include <bn_assert.h>
+#include <bn_bg_palette_ptr.h>
 #include <bn_bgs.h>
 #include <bn_common.h>
 #include <bn_config_bgs.h>
@@ -27,6 +28,7 @@
 #include <bn_regular_bg_map_item.h>
 #include <bn_regular_bg_map_ptr.h>
 #include <bn_regular_bg_ptr.h>
+#include <bn_regular_bg_tiles_ptr.h>
 #include <bn_vector.h>
 
 #include "ldtk_div_utils.h"
@@ -53,10 +55,9 @@ struct bg_t
 
     tile_grid_base::tile_info oob_tile;
 
-    alignas(int) bn::regular_bg_map_cell cells[ROWS * COLUMNS];
-    bn::regular_bg_map_item map_item;
-    bn::regular_bg_ptr bg_ptr;
+    bn::bg_palette_ptr pal_ptr;
     bn::regular_bg_map_ptr map_ptr;
+    bn::regular_bg_ptr bg_ptr;
     bool next_visible;
     bool force_reload;
     bool grid_bloated;
@@ -64,12 +65,13 @@ struct bg_t
     bg_t(const level& lv_, const layer& layer_, const bn::fixed_point& cam_applied_pos, const level_bgs_builder&);
 
     void update(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_point& prev_cam_applied_pos);
+    void commit(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_point& prev_cam_applied_pos);
 
 private:
     void update_camera_applied_position(const bn::fixed_point& cam_applied_pos);
 
-    void update_all_cells(const bn::fixed_point& cam_applied_pos);
-    void update_part_cells(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_point& prev_cam_applied_pos);
+    void commit_all_cells(const bn::fixed_point& cam_applied_pos);
+    void commit_part_cells(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_point& prev_cam_applied_pos);
 
     void reset_all_cells(const bn::fixed_point& final_pos);
     void reset_part_cells(const bn::fixed_point& next_final_pos, const bn::fixed_point& prev_final_pos);
@@ -96,6 +98,7 @@ struct lv_t
     unsigned usages = 1;
 
     const level* lv;
+    bn::fixed_point next_cam_applied_pos;
     bn::fixed_point prev_cam_applied_pos;
     bn::fixed_point cur_raw_pos; // camera not applied
     bn::optional<bn::camera_ptr> cam;
@@ -116,13 +119,15 @@ struct lv_t
 
 struct static_data
 {
-    bn::core::update_callback_type previous_callback;
+    bn::core::update_callback_type previous_update_callback;
+    bn::vblank_callback_type previous_vblank_callback;
 
     bn::pool<bg_t, BN_CFG_BGS_MAX_ITEMS> bgs_pool;
     bn::pool<lv_t, BN_CFG_BGS_MAX_ITEMS> levels_pool;
     bn::vector<lv_t*, BN_CFG_BGS_MAX_ITEMS> levels_vector;
 
-    static_data(bn::core::update_callback_type prev_callback) : previous_callback(prev_callback)
+    static_data(bn::core::update_callback_type prev_update_callback, bn::vblank_callback_type prev_vblank_callback)
+        : previous_update_callback(prev_update_callback), previous_vblank_callback(prev_vblank_callback)
     {
     }
 };
@@ -136,22 +141,38 @@ auto data_ref() -> static_data&
 
 void update_callback()
 {
-    if (auto previous_callback = data_ref().previous_callback)
+    if (auto previous_callback = data_ref().previous_update_callback)
         previous_callback();
 
     static_data& data = data_ref();
 
     for (auto* level : data.levels_vector)
     {
-        const bn::fixed_point next_cam_applied_pos =
+        level->next_cam_applied_pos =
             level->cur_raw_pos - (level->cam ? level->cam->position() : bn::fixed_point(0, 0));
 
         for (auto* bg : level->bgs)
         {
-            bg->update(next_cam_applied_pos, level->prev_cam_applied_pos);
+            bg->update(level->next_cam_applied_pos, level->prev_cam_applied_pos);
+        }
+    }
+}
+
+void vblank_callback()
+{
+    if (auto previous_callback = data_ref().previous_vblank_callback)
+        previous_callback();
+
+    static_data& data = data_ref();
+
+    for (auto* level : data.levels_vector)
+    {
+        for (auto* bg : level->bgs)
+        {
+            bg->commit(level->next_cam_applied_pos, level->prev_cam_applied_pos);
         }
 
-        level->prev_cam_applied_pos = next_cam_applied_pos;
+        level->prev_cam_applied_pos = level->next_cam_applied_pos;
     }
 }
 
@@ -159,30 +180,36 @@ bg_t::bg_t(const level& lv_, const layer& layer_, const bn::fixed_point& cam_app
            const level_bgs_builder& builder)
     : lv(lv_), layer_instance(layer_),
       grid(layer_.auto_layer_tiles() ? *layer_.auto_layer_tiles() : *layer_.grid_tiles()),
-      oob_tile(builder.out_of_bound_tile_info(layer_.identifier())), map_item(cells[0], bn::size(COLUMNS, ROWS)),
-      bg_ptr(init_bg_ptr(layer_, cam_applied_pos, builder)), map_ptr(bg_ptr.map()), next_visible(bg_ptr.visible()),
-      force_reload(false), grid_bloated(grid.bloated())
+      oob_tile(builder.out_of_bound_tile_info(layer_.identifier())),
+      pal_ptr(layer_.tileset_def()->bg_item().palette_item().create_palette()),
+      map_ptr(bn::regular_bg_map_ptr::allocate(bn::size(COLUMNS, ROWS),
+                                               layer_.tileset_def()->bg_item().tiles_item().create_tiles(), pal_ptr)),
+      bg_ptr(init_bg_ptr(layer_, cam_applied_pos, builder)), next_visible(bg_ptr.visible()), force_reload(false),
+      grid_bloated(grid.bloated())
 {
 }
 
 void bg_t::update(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_point& prev_cam_applied_pos)
 {
+    update_camera_applied_position(next_cam_applied_pos);
+}
+
+void bg_t::commit(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_point& prev_cam_applied_pos)
+{
     if (next_visible)
     {
         if (force_reload || !bg_ptr.visible())
         {
-            update_all_cells(next_cam_applied_pos);
+            commit_all_cells(next_cam_applied_pos);
             force_reload = false;
         }
         // Update cells when level position changed
         else if (next_cam_applied_pos != prev_cam_applied_pos)
         {
             // Only update cells that needs to be changed
-            update_part_cells(next_cam_applied_pos, prev_cam_applied_pos);
+            commit_part_cells(next_cam_applied_pos, prev_cam_applied_pos);
         }
     }
-
-    update_camera_applied_position(next_cam_applied_pos);
 
     bg_ptr.set_visible(next_visible);
 }
@@ -198,16 +225,14 @@ void bg_t::update_camera_applied_position(const bn::fixed_point& cam_applied_pos
     bg_ptr.set_position(apply_layer_diff(cam_applied_pos) - half_level_size + HALF_CANVAS_SIZE);
 }
 
-void bg_t::update_all_cells(const bn::fixed_point& cam_applied_pos)
+void bg_t::commit_all_cells(const bn::fixed_point& cam_applied_pos)
 {
     reset_all_cells(apply_layer_diff(cam_applied_pos));
-    map_ptr.reload_cells_ref();
 }
 
-void bg_t::update_part_cells(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_point& prev_cam_applied_pos)
+void bg_t::commit_part_cells(const bn::fixed_point& next_cam_applied_pos, const bn::fixed_point& prev_cam_applied_pos)
 {
     reset_part_cells(apply_layer_diff(next_cam_applied_pos), apply_layer_diff(prev_cam_applied_pos));
-    map_ptr.reload_cells_ref();
 }
 
 void bg_t::reset_all_cells(const bn::fixed_point& final_pos)
@@ -330,8 +355,9 @@ void bg_t::reset_rows(const int level_8x8_first_y, const int level_8x8_last_y, c
                 cell_info.set_horizontal_flip(!cell_info.horizontal_flip());
             if (m_tile_info.y_flip)
                 cell_info.set_vertical_flip(!cell_info.vertical_flip());
+            cell_info.set_palette_id(pal_ptr.id());
 
-            cells[map_item.cell_index(cx, cy)] = cell_info.cell();
+            (*map_ptr.vram())[cy * COLUMNS + cx] = cell_info.cell();
 
             if (++mx_rnd_cnt == m_tile_cnt)
             {
@@ -410,8 +436,9 @@ void bg_t::reset_columns(const int level_8x8_first_y, const int level_8x8_last_y
                 cell_info.set_horizontal_flip(!cell_info.horizontal_flip());
             if (m_tile_info.y_flip)
                 cell_info.set_vertical_flip(!cell_info.vertical_flip());
+            cell_info.set_palette_id(pal_ptr.id());
 
-            cells[map_item.cell_index(cx, cy)] = cell_info.cell();
+            (*map_ptr.vram())[cy * COLUMNS + cx] = cell_info.cell();
 
             if (++my_rnd_cnt == m_tile_cnt)
             {
@@ -446,9 +473,7 @@ auto bg_t::init_bg_ptr(const layer& layer_, const bn::fixed_point& cam_applied_p
     // Initialize the cells first, before creating bg
     reset_all_cells(final_pos);
 
-    bn::regular_bg_item bg_item(layer_.tileset_def()->bg_item().tiles_item(),
-                                layer_.tileset_def()->bg_item().palette_item(), map_item);
-    bn::regular_bg_builder builder(bg_item);
+    bn::regular_bg_builder builder(map_ptr);
 
     // Apply initial bg settings
     builder.set_position(final_pos);
@@ -495,8 +520,9 @@ void lv_t::set_level(level_bgs_builder&& builder)
     reset_bgs();
 
     lv = &builder.level();
-    prev_cam_applied_pos =
+    next_cam_applied_pos =
         builder.position() - (builder.camera() ? builder.camera()->position() : bn::fixed_point(0, 0));
+    prev_cam_applied_pos = next_cam_applied_pos;
     cur_raw_pos = builder.position();
     cam = builder.release_camera();
 
@@ -568,9 +594,10 @@ auto lv_t::get_bg_nullable(gen::layer_ident layer_identifier) const -> const bg_
 
 void init()
 {
-    ::new (static_cast<void*>(data_buffer)) static_data(bn::core::update_callback());
+    ::new (static_cast<void*>(data_buffer)) static_data(bn::core::update_callback(), bn::core::vblank_callback());
 
     bn::core::set_update_callback(update_callback);
+    bn::core::set_vblank_callback(vblank_callback);
 }
 
 auto create(level_bgs_builder&& builder) -> id_t
