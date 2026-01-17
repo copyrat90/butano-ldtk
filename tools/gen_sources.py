@@ -1168,7 +1168,7 @@ class LevelFieldInstancesHeader(GenPrivHeader):
                             field.value
                         )
                         result.append(
-                            f"entity_ref(entity_iid::_{entity_ref.entity_iid.replace("-", "_")}, layer_ident::{layer_iid_to_ident[entity_ref.layer_iid]}, level_ident::{level_iid_to_ident[entity_ref.level_iid]})"
+                            f"entity_ref(entity_iid::_{entity_ref.entity_iid.replace('-', '_')}, layer_ident::{layer_iid_to_ident[entity_ref.layer_iid]}, level_ident::{level_iid_to_ident[entity_ref.level_iid]})"
                         )
                     else:
                         result.append("bn::optional<entity_ref>()")
@@ -1344,7 +1344,7 @@ class LevelFieldArraysHeader(GenPrivHeader):
                 value = LevelFieldArraysHeader.Value(
                     elem_type,
                     [
-                        f"entity_ref(entity_iid::_{r.entity_iid.replace("-", "_")}, layer_ident::{layer_iid_to_ident[r.layer_iid]}, level_ident::{level_iid_to_ident[r.level_iid]})"
+                        f"entity_ref(entity_iid::_{r.entity_iid.replace('-', '_')}, layer_ident::{layer_iid_to_ident[r.layer_iid]}, level_ident::{level_iid_to_ident[r.level_iid]})"
                         for r in entity_ref_arr
                     ],
                 )
@@ -1423,7 +1423,7 @@ class LevelFieldArraysHeader(GenPrivHeader):
                     elem_type,
                     [
                         (
-                            f"entity_ref(entity_iid::_{r.entity_iid.replace("-", "_")}, layer_ident::{layer_iid_to_ident[r.layer_iid]}, level_ident::{level_iid_to_ident[r.level_iid]})"
+                            f"entity_ref(entity_iid::_{r.entity_iid.replace('-', '_')}, layer_ident::{layer_iid_to_ident[r.layer_iid]}, level_ident::{level_iid_to_ident[r.level_iid]})"
                             if r is not None
                             else "bn::nullopt"
                         )
@@ -1540,18 +1540,18 @@ class LevelLayerInstancesHeader(GenPrivHeader):
                     source.write("    layer(\n")
                     source.write(f"        gen_priv_layer_definitions[{layer_idx}],\n")
                     source.write(
-                        f"        {f"&gen_priv_tileset_definitions[{layer.tileset_def_idx}]" if layer.tileset_def_idx is not None else "nullptr"},\n"
+                        f"        {f'&gen_priv_tileset_definitions[{layer.tileset_def_idx}]' if layer.tileset_def_idx is not None else 'nullptr'},\n"
                     )
                     source.write(f"        {layer.c_size},\n")
                     source.write(f"        {layer.px_total_offset},\n")
                     source.write(
-                        f"        {f"&gen_priv_level_{level_ident}_layer_{layer.layer_ident}_auto_layer_tiles" if layer.has_auto_layer_tiles else "nullptr"},\n"
+                        f"        {f'&gen_priv_level_{level_ident}_layer_{layer.layer_ident}_auto_layer_tiles' if layer.has_auto_layer_tiles else 'nullptr'},\n"
                     )
                     source.write(
-                        f"        {f"&gen_priv_level_{level_ident}_layer_{layer.layer_ident}_grid_tiles" if layer.has_grid_tiles else "nullptr"},\n"
+                        f"        {f'&gen_priv_level_{level_ident}_layer_{layer.layer_ident}_grid_tiles' if layer.has_grid_tiles else 'nullptr'},\n"
                     )
                     source.write(
-                        f"        {f"&gen_priv_level_{level_ident}_layer_{layer.layer_ident}_int_grid" if layer.has_int_grid_csv else "nullptr"},\n"
+                        f"        {f'&gen_priv_level_{level_ident}_layer_{layer.layer_ident}_int_grid' if layer.has_int_grid_csv else 'nullptr'},\n"
                     )
                     source.write(
                         f"        gen_priv_level_{level_ident}_layer_{layer.layer_ident}_entities,\n"
