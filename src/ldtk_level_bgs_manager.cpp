@@ -735,8 +735,10 @@ void put_above(id_t id, gen::layer_ident layer_identifier)
 void put_below(id_t id)
 {
     auto lv = static_cast<lv_t*>(id);
-    for (auto* bg : lv->bgs)
-        bg->bg_ptr.put_below();
+    // BG generation order: Bottom -> Top
+    // So, this should be re-reversed.
+    for (auto bg_iter = lv->bgs.rbegin(); bg_iter != lv->bgs.rend(); ++bg_iter)
+        (*bg_iter)->bg_ptr.put_below();
 }
 
 void put_below(id_t id, gen::layer_ident layer_identifier)
