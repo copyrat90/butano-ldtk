@@ -150,31 +150,35 @@ public:
     [[nodiscard]] auto palette(gen::layer_ident layer_identifier) const -> const bn::bg_palette_ptr&;
 
     /// @brief Sets the color palette to use by these level backgrounds.
-    /// @param palette `bn::bg_palette_ptr` to copy.
     ///
     /// It must be compatible with the current map of these level backgrounds.
+    ///
+    /// @param palette `bn::bg_palette_ptr` to copy.
     void set_palette(const bn::bg_palette_ptr& palette);
 
     /// @brief Sets the color palette to use by a level background of the given layer.
+    ///
+    /// It must be compatible with the current map of the level background of the given layer.
+    ///
     /// @note Before calling this, you @b must make sure `has_background()` returns `true`.
     /// @param palette `bn::bg_palette_ptr` to copy.
     /// @param layer_identifier identifier of the layer to set the palette to.
-    ///
-    /// It must be compatible with the current map of the level background of the given layer.
     void set_palette(const bn::bg_palette_ptr& palette, gen::layer_ident layer_identifier);
 
     /// @brief Sets the color palette to use by these level backgrounds.
-    /// @param palette `bn::bg_palette_ptr` to move.
     ///
     /// It must be compatible with the current map of these level backgrounds.
+    ///
+    /// @param palette `bn::bg_palette_ptr` to move.
     void set_palette(bn::bg_palette_ptr&& palette);
 
     /// @brief Sets the color palette to use by a level background of the given layer.
+    ///
+    /// It must be compatible with the current map of the level background of the given layer.
+    ///
     /// @note Before calling this, you @b must make sure `has_background()` returns `true`.
     /// @param palette `bn::bg_palette_ptr` to move.
     /// @param layer_identifier identifier of the layer to set the palette to.
-    ///
-    /// It must be compatible with the current map of the level background of the given layer.
     void set_palette(bn::bg_palette_ptr&& palette, gen::layer_ident layer_identifier);
 
     /// @brief Replaces the color palette used by these level backgrounds
