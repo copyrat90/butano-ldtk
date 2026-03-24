@@ -20,6 +20,8 @@ namespace bn
 {
 
 class window;
+class bg_palette_ptr;
+class bg_palette_item;
 
 enum class green_swap_mode : std::uint8_t;
 
@@ -140,6 +142,62 @@ public:
     /// @brief Replace the level used by these level backgrounds.
     /// @param builder It creates the resources to use by this level builder.
     void set_level(level_bgs_builder&& builder);
+
+public:
+    /// @brief Returns the color palette used by a level background of the given layer.
+    /// @param layer_identifier identifier of the layer to get the palette from.
+    [[nodiscard]] auto palette(gen::layer_ident layer_identifier) const -> const bn::bg_palette_ptr&;
+
+    /// @brief Sets the color palette to use by these level backgrounds.
+    /// @param palette `bn::bg_palette_ptr` to copy.
+    ///
+    /// It must be compatible with the current map of these level backgrounds.
+    void set_palette(const bn::bg_palette_ptr& palette);
+
+    /// @brief Sets the color palette to use by a level background of the given layer.
+    /// @param palette `bn::bg_palette_ptr` to copy.
+    /// @param layer_identifier identifier of the layer to set the palette to.
+    ///
+    /// It must be compatible with the current map of the level background of the given layer.
+    void set_palette(const bn::bg_palette_ptr& palette, gen::layer_ident layer_identifier);
+
+    /// @brief Sets the color palette to use by these level backgrounds.
+    /// @param palette `bn::bg_palette_ptr` to move.
+    ///
+    /// It must be compatible with the current map of these level backgrounds.
+    void set_palette(bn::bg_palette_ptr&& palette);
+
+    /// @brief Sets the color palette to use by a level background of the given layer.
+    /// @param palette `bn::bg_palette_ptr` to move.
+    /// @param layer_identifier identifier of the layer to set the palette to.
+    ///
+    /// It must be compatible with the current map of the level background of the given layer.
+    void set_palette(bn::bg_palette_ptr&& palette, gen::layer_ident layer_identifier);
+
+    /// @brief Replaces the color palette used by these level backgrounds
+    /// with a new one created with the given `bn::bg_palette_item`.
+    ///
+    /// Before creating a new color palette,
+    /// the `bn::bg_palette_ptr` used by these level backgrounds are removed,
+    /// so VRAM usage is reduced.
+    ///
+    /// The new color palette must be compatible with the current map of these level backgrounds.
+    ///
+    /// @param palette_item It creates the color palette to use by these level backgrounds.
+    void set_palette(const bn::bg_palette_item& palette_item);
+
+    /// @brief Replaces the color palette used by a level background of the given layer
+    /// with a new one created with the given `bn::bg_palette_item`.
+    ///
+    /// Before creating a new color palette,
+    /// the `bn::bg_palette_ptr` used by the level background of the given layer is removed,
+    /// so VRAM usage is reduced.
+    ///
+    /// The new color palette must be compatible with the current map of the level background of the given layer.
+    ///
+    /// @param palette_item It creates the color palette to use by a level background of the given layer.
+    /// @param layer_identifier identifier of the layer to set the palette to.
+    void set_palette(const bn::bg_palette_item& palette_item, gen::layer_ident layer_identifier);
 
 public:
     /// @brief Returns the size in pixels of the level backgrounds.

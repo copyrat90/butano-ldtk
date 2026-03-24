@@ -20,6 +20,8 @@ enum class green_swap_mode : std::uint8_t;
 
 class camera_ptr;
 class window;
+class bg_palette_ptr;
+class bg_palette_item;
 
 } // namespace bn
 
@@ -49,6 +51,20 @@ void set_level(id_t id, const level& level);
 void set_level(id_t id, level_bgs_builder&& builder);
 
 auto has_background(id_t id, gen::layer_ident layer_identifier) -> bool;
+
+[[nodiscard]] auto palette(id_t id, gen::layer_ident layer_identifier) -> const bn::bg_palette_ptr&;
+
+void set_palette(id_t id, const bn::bg_palette_ptr& palette);
+
+void set_palette(id_t id, const bn::bg_palette_ptr& palette, gen::layer_ident layer_identifier);
+
+void set_palette(id_t id, bn::bg_palette_ptr&& palette);
+
+void set_palette(id_t id, bn::bg_palette_ptr&& palette, gen::layer_ident layer_identifier);
+
+void set_palette(id_t id, const bn::bg_palette_item& palette_item);
+
+void set_palette(id_t id, const bn::bg_palette_item& palette_item, gen::layer_ident layer_identifier);
 
 [[nodiscard]] auto dimensions(id_t id) -> const bn::size&;
 

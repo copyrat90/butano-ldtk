@@ -641,6 +641,51 @@ auto has_background(id_t id, gen::layer_ident layer_identifier) -> bool
     return lv->get_bg_nullable(layer_identifier) != nullptr;
 }
 
+auto palette(id_t id, gen::layer_ident layer_identifier) -> const bn::bg_palette_ptr&
+{
+    auto lv = static_cast<const lv_t*>(id);
+    return lv->get_bg(layer_identifier).bg_ptr.palette();
+}
+
+void set_palette(id_t id, const bn::bg_palette_ptr& palette)
+{
+    auto lv = static_cast<lv_t*>(id);
+    for (auto* bg : lv->bgs)
+        bg->bg_ptr.set_palette(palette);
+}
+
+void set_palette(id_t id, const bn::bg_palette_ptr& palette, gen::layer_ident layer_identifier)
+{
+    auto lv = static_cast<lv_t*>(id);
+    lv->get_bg(layer_identifier).bg_ptr.set_palette(palette);
+}
+
+void set_palette(id_t id, bn::bg_palette_ptr&& palette)
+{
+    auto lv = static_cast<lv_t*>(id);
+    for (auto* bg : lv->bgs)
+        bg->bg_ptr.set_palette(std::move(palette));
+}
+
+void set_palette(id_t id, bn::bg_palette_ptr&& palette, gen::layer_ident layer_identifier)
+{
+    auto lv = static_cast<lv_t*>(id);
+    lv->get_bg(layer_identifier).bg_ptr.set_palette(std::move(palette));
+}
+
+void set_palette(id_t id, const bn::bg_palette_item& palette_item)
+{
+    auto lv = static_cast<lv_t*>(id);
+    for (auto* bg : lv->bgs)
+        bg->bg_ptr.set_palette(palette_item);
+}
+
+void set_palette(id_t id, const bn::bg_palette_item& palette_item, gen::layer_ident layer_identifier)
+{
+    auto lv = static_cast<lv_t*>(id);
+    lv->get_bg(layer_identifier).bg_ptr.set_palette(palette_item);
+}
+
 auto dimensions(id_t id) -> const bn::size&
 {
     auto lv = static_cast<const lv_t*>(id);

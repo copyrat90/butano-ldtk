@@ -310,9 +310,22 @@ def generate_tilesets_bg_items(
                                     paste_x = 0
                                     paste_y += 8
 
-            # Finalize the tileset BG & save it
+            # Start finalizing the tileset BG
             tileset_bg = tileset_bg.quantize(256)
             tileset_bg = tileset_bg.crop((0, 0, TILESET_BG_WIDTH, tileset_bg_height))
+
+            # Sort the palette in RGB descending order (keeping transparent one)
+            tileset_palette = tileset_bg.palette
+            if tileset_palette:
+                palette_order = [
+                    color[-1]
+                    for color in sorted(tileset_palette.colors.items(), reverse=True)
+                ]
+                palette_order.remove(0)
+                palette_order.insert(0, 0)
+                tileset_bg = tileset_bg.remap_palette(palette_order)
+
+            # Save it
             tileset_bg.save(tileset_out_path.with_suffix(".bmp"))
 
         with tileset_out_path.with_suffix(".json").open(

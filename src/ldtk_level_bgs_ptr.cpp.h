@@ -155,6 +155,41 @@ void level_bgs_ptr::set_level(level_bgs_builder&& builder)
     level_bgs_manager::set_level(_handle, std::move(builder));
 }
 
+auto level_bgs_ptr::palette(gen::layer_ident layer_identifier) const -> const bn::bg_palette_ptr&
+{
+    return level_bgs_manager::palette(_handle, layer_identifier);
+}
+
+void level_bgs_ptr::set_palette(const bn::bg_palette_ptr& palette)
+{
+    level_bgs_manager::set_palette(_handle, palette);
+}
+
+void level_bgs_ptr::set_palette(const bn::bg_palette_ptr& palette, gen::layer_ident layer_identifier)
+{
+    level_bgs_manager::set_palette(_handle, palette, layer_identifier);
+}
+
+void level_bgs_ptr::set_palette(bn::bg_palette_ptr&& palette)
+{
+    level_bgs_manager::set_palette(_handle, std::move(palette));
+}
+
+void level_bgs_ptr::set_palette(bn::bg_palette_ptr&& palette, gen::layer_ident layer_identifier)
+{
+    level_bgs_manager::set_palette(_handle, std::move(palette), layer_identifier);
+}
+
+void level_bgs_ptr::set_palette(const bn::bg_palette_item& palette_item)
+{
+    level_bgs_manager::set_palette(_handle, palette_item);
+}
+
+void level_bgs_ptr::set_palette(const bn::bg_palette_item& palette_item, gen::layer_ident layer_identifier)
+{
+    level_bgs_manager::set_palette(_handle, palette_item, layer_identifier);
+}
+
 auto level_bgs_ptr::dimensions() const -> bn::size
 {
     return level_bgs_manager::dimensions(_handle);
