@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright 2025 Guyeon Yu <copyrat90@gmail.com>
+# SPDX-FileCopyrightText: Copyright 2025-2026 Guyeon Yu <copyrat90@gmail.com>
 # SPDX-License-Identifier: Zlib
 
 from models import *
