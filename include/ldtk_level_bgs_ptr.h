@@ -145,6 +145,7 @@ public:
 
 public:
     /// @brief Returns the color palette used by a level background of the given layer.
+    /// @note Before calling this, you @b must make sure `has_background()` returns `true`.
     /// @param layer_identifier identifier of the layer to get the palette from.
     [[nodiscard]] auto palette(gen::layer_ident layer_identifier) const -> const bn::bg_palette_ptr&;
 
@@ -155,6 +156,7 @@ public:
     void set_palette(const bn::bg_palette_ptr& palette);
 
     /// @brief Sets the color palette to use by a level background of the given layer.
+    /// @note Before calling this, you @b must make sure `has_background()` returns `true`.
     /// @param palette `bn::bg_palette_ptr` to copy.
     /// @param layer_identifier identifier of the layer to set the palette to.
     ///
@@ -168,6 +170,7 @@ public:
     void set_palette(bn::bg_palette_ptr&& palette);
 
     /// @brief Sets the color palette to use by a level background of the given layer.
+    /// @note Before calling this, you @b must make sure `has_background()` returns `true`.
     /// @param palette `bn::bg_palette_ptr` to move.
     /// @param layer_identifier identifier of the layer to set the palette to.
     ///
@@ -195,6 +198,7 @@ public:
     ///
     /// The new color palette must be compatible with the current map of the level background of the given layer.
     ///
+    /// @note Before calling this, you @b must make sure `has_background()` returns `true`.
     /// @param palette_item It creates the color palette to use by a level background of the given layer.
     /// @param layer_identifier identifier of the layer to set the palette to.
     void set_palette(const bn::bg_palette_item& palette_item, gen::layer_ident layer_identifier);
