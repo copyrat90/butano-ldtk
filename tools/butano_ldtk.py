@@ -223,6 +223,52 @@ def ensure_no_more_than_4_visible_layers(ldtk_project: LdtkJson.LdtkJSON):
             raise TooManyVisibleLayersException(visible_layers_count, level.identifier)
 
 
+def purge_ignore_tilesets(
+    ldtk_project: LdtkJson.LdtkJSON,
+    additional_ignore_tilesets: Optional[List[str]] = None,
+) -> None:
+    # Purge LDtk's `internal_icons` tileset if present
+    ignored_set = {
+        tileset_def.identifier
+        for tileset_def in ldtk_project.defs.tilesets
+        if isinstance(tileset_def.embed_atlas, LdtkJson.EmbedAtlas)
+    }
+
+    # Purge additional ignore tilesets
+    if additional_ignore_tilesets is not None:
+        for ignore_tileset_name in additional_ignore_tilesets:
+            ignore_tileset_name = ignore_tileset_name.strip()
+            if ignore_tileset_name:
+                ignored_set.add(ignore_tileset_name)
+
+    if not ignored_set:
+        return
+
+    ignored_uids = {
+        tileset.uid
+        for tileset in ldtk_project.defs.tilesets
+        if tileset.identifier in ignored_set
+    }
+
+    ldtk_project.defs.tilesets = [
+        tileset
+        for tileset in ldtk_project.defs.tilesets
+        if tileset.identifier not in ignored_set
+    ]
+
+    if not ignored_uids:
+        return
+
+    for level in ldtk_project.levels:
+        if level.layer_instances is None:
+            continue
+        for layer in level.layer_instances:
+            if layer.tileset_def_uid in ignored_uids:
+                layer.tileset_def_uid = None
+                layer.auto_layer_tiles = []
+                layer.grid_tiles = []
+
+
 def ensure_no_unsupported_features(ldtk_project: LdtkJson.LdtkJSON):
     ensure_identifier_style_lowercase(ldtk_project)
     ensure_no_tileset_without_image(ldtk_project)
@@ -239,6 +285,7 @@ def generate_tilesets_bg_items(
     ldtk_project: LdtkJson.LdtkJSON,
     ldtk_project_folder_path: Path,
     build_folder_path: Path,
+    tileset_palette_manual: bool,
 ):
     TRANSPARENT_COLOR: Final[str] = "#00FF0000"
 
@@ -277,61 +324,89 @@ def generate_tilesets_bg_items(
             (1 + tiles_count) / tiles_count_per_height_unit
         )
 
-        with Image.new(
-            "RGBA", (TEMP_LARGE_WIDTH, tileset_bg_height), color=TRANSPARENT_COLOR
-        ) as tileset_bg:
+        use_palette_manual = tileset_palette_manual and tileset_src_path is not None
+        bpp_mode = "bpp_4_manual" if use_palette_manual else "bpp_4_auto"
+
+        def paste_used_tiles_into(tileset_bg: Image.Image, tileset_src: Image.Image):
             # Start from after the first transparent tile
             paste_x, paste_y = ((tile_size >> 3) ** 2) * 8, 0
             while paste_x >= TILESET_BG_WIDTH:
                 paste_x -= TILESET_BG_WIDTH
                 paste_y += 8
 
-            # Internal icons are not copied via this check
-            if tileset_src_path is not None:
-                with Image.open(tileset_src_path) as tileset_src:
-                    for i in range(
-                        tileset_infos.get_tileset_used_tiles_count(tileset_def.uid)
-                    ):
-                        src = tileset_infos.get_tileset_used_tile_src(
-                            tileset_def.uid, i
+            for i in range(tileset_infos.get_tileset_used_tiles_count(tileset_def.uid)):
+                src = tileset_infos.get_tileset_used_tile_src(tileset_def.uid, i)
+                for y in range(tile_size >> 3):
+                    for x in range(tile_size >> 3):
+                        sub_x = src.x + x * 8
+                        sub_y = src.y + y * 8
+                        tile = tileset_src.crop((sub_x, sub_y, sub_x + 8, sub_y + 8))
+                        tileset_bg.paste(tile, (paste_x, paste_y))
+
+                        paste_x += 8
+                        if paste_x >= TILESET_BG_WIDTH:
+                            assert paste_x == TILESET_BG_WIDTH
+                            paste_x = 0
+                            paste_y += 8
+
+        if use_palette_manual:
+            assert tileset_src_path is not None
+            with Image.open(tileset_src_path) as tileset_src:
+                if tileset_src.mode != "P":
+                    raise TilesetPaletteManualRequiresIndexedImageException(
+                        tileset_def.identifier, tileset_src.mode
+                    )
+
+                palette = tileset_src.getpalette()
+                if palette is None:
+                    raise TilesetPaletteManualRequiresIndexedImageException(
+                        tileset_def.identifier, tileset_src.mode
+                    )
+
+                tileset_src.load()  # pyright: ignore[reportUnknownMemberType]
+
+                with Image.new(
+                    "P", (TILESET_BG_WIDTH, tileset_bg_height)
+                ) as tileset_bg:
+                    tileset_bg.putpalette(palette)
+                    tileset_bg.paste(0, (0, 0, TILESET_BG_WIDTH, tileset_bg_height))
+                    paste_used_tiles_into(tileset_bg, tileset_src)
+                    tileset_bg.save(tileset_out_path.with_suffix(".bmp"))
+
+        else:  # Use palette auto
+            with Image.new(
+                "RGBA", (TEMP_LARGE_WIDTH, tileset_bg_height), color=TRANSPARENT_COLOR
+            ) as tileset_bg:
+                if tileset_src_path is not None:
+                    with Image.open(tileset_src_path) as tileset_src:
+                        paste_used_tiles_into(tileset_bg, tileset_src)
+
+                # Start finalizing the tileset BG
+                tileset_bg = tileset_bg.quantize(256)
+                tileset_bg = tileset_bg.crop(
+                    (0, 0, TILESET_BG_WIDTH, tileset_bg_height)
+                )
+
+                # Sort the palette in RGB descending order (keeping transparent one)
+                tileset_palette = tileset_bg.palette
+                if tileset_palette:
+                    palette_order = [
+                        color[-1]
+                        for color in sorted(
+                            tileset_palette.colors.items(), reverse=True
                         )
-                        for y in range(tile_size >> 3):
-                            for x in range(tile_size >> 3):
-                                sub_x = src.x + x * 8
-                                sub_y = src.y + y * 8
-                                tile = tileset_src.crop(
-                                    (sub_x, sub_y, sub_x + 8, sub_y + 8)
-                                )
-                                tileset_bg.paste(tile, (paste_x, paste_y))
+                    ]
+                    palette_order.remove(0)
+                    palette_order.insert(0, 0)
+                    tileset_bg = tileset_bg.remap_palette(palette_order)
 
-                                paste_x += 8
-                                if paste_x >= TILESET_BG_WIDTH:
-                                    assert paste_x == TILESET_BG_WIDTH
-                                    paste_x = 0
-                                    paste_y += 8
-
-            # Start finalizing the tileset BG
-            tileset_bg = tileset_bg.quantize(256)
-            tileset_bg = tileset_bg.crop((0, 0, TILESET_BG_WIDTH, tileset_bg_height))
-
-            # Sort the palette in RGB descending order (keeping transparent one)
-            tileset_palette = tileset_bg.palette
-            if tileset_palette:
-                palette_order = [
-                    color[-1]
-                    for color in sorted(tileset_palette.colors.items(), reverse=True)
-                ]
-                palette_order.remove(0)
-                palette_order.insert(0, 0)
-                tileset_bg = tileset_bg.remap_palette(palette_order)
-
-            # Save it
-            tileset_bg.save(tileset_out_path.with_suffix(".bmp"))
+                # Save it
+                tileset_bg.save(tileset_out_path.with_suffix(".bmp"))
 
         with tileset_out_path.with_suffix(".json").open(
             "w", encoding="utf-8"
         ) as tileset_json:
-            tileset_json.write('{"type":"regular_bg","bpp_mode":"bpp_4_auto"}')
+            tileset_json.write(f'{{"type":"regular_bg","bpp_mode":"{bpp_mode}"}}')
 
 
 def generate_tileset_definitions(
@@ -611,7 +686,12 @@ def generate_levels_headers(
     levels_header.write(build_folder_path)
 
 
-def process_ldtk(ldtk_project_file_path: Path, build_folder_path: Path) -> bool:
+def process_ldtk(
+    ldtk_project_file_path: Path,
+    build_folder_path: Path,
+    tileset_palette_manual: bool = False,
+    additional_ignore_tilesets: Optional[List[str]] = None,
+) -> bool:
     """Returns `False` if the process is skipped, because there's no modification"""
     try:
         create_folder(build_folder_path.joinpath("include"))
@@ -626,6 +706,8 @@ def process_ldtk(ldtk_project_file_path: Path, build_folder_path: Path) -> bool:
 
         print("Start converting LDtk project...")
 
+        purge_ignore_tilesets(ldtk_project, additional_ignore_tilesets)
+
         remove_built_files(build_folder_path)
         ensure_no_unsupported_features(ldtk_project)
 
@@ -634,7 +716,11 @@ def process_ldtk(ldtk_project_file_path: Path, build_folder_path: Path) -> bool:
         enum_infos = EnumInfos(ldtk_project)
         tileset_infos = TilesetInfos(ldtk_project)
         generate_tilesets_bg_items(
-            tileset_infos, ldtk_project, ldtk_project_folder_path, build_folder_path
+            tileset_infos,
+            ldtk_project,
+            ldtk_project_folder_path,
+            build_folder_path,
+            tileset_palette_manual,
         )
         generate_definitions_headers(
             enum_infos, tileset_infos, ldtk_project, build_folder_path
@@ -662,13 +748,36 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="LDtk converter for Butano.")
     parser.add_argument("--input", required=True, help="input LDtk project file")
     parser.add_argument("--build", required=True, help="build folder path")
+    parser.add_argument(
+        "--tileset-palette-manual",
+        action="store_true",
+        help=(
+            "Keep tileset pixel indices and global palette from the source image (mode P); "
+            "no quantization. Writes bpp_4_manual in tileset JSON. "
+            "Tilesets without an image file still use the default path (bpp_4_auto)."
+        ),
+    )
+    parser.add_argument(
+        "--ignore-tilesets",
+        nargs="*",
+        default=[],
+        help=(
+            "Tileset identifiers to ignore completely (service/debug tilesets). "
+            "Example: --ignore-tilesets ldtk_only debug_tiles"
+        ),
+    )
 
     try:
         args = parser.parse_args()
         ldtk_project_file_path = Path(args.input)
         build_folder_path = Path(args.build)
 
-        if process_ldtk(ldtk_project_file_path, build_folder_path):
+        if process_ldtk(
+            ldtk_project_file_path,
+            build_folder_path,
+            tileset_palette_manual=args.tileset_palette_manual,
+            additional_ignore_tilesets=args.ignore_tilesets,
+        ):
             print(
                 f'Successfully converted LDtk project "{ldtk_project_file_path}" to "{build_folder_path}"'
             )

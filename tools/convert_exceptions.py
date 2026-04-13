@@ -102,3 +102,13 @@ class TooManyVisibleLayersException(Exception):
         )
         self.visible_layers_count = visible_layers_count
         self.level = level
+
+
+class TilesetPaletteManualRequiresIndexedImageException(Exception):
+    def __init__(self, tileset: str, mode: str):
+        super().__init__(
+            f'Tileset "{tileset}" must be a palette-indexed image (mode P), not {mode}, '
+            f"when using --tileset-palette-manual"
+        )
+        self.tileset = tileset
+        self.mode = mode
