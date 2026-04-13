@@ -51,15 +51,16 @@ struct bg_t
     const layer& layer_instance;
     const tile_grid_base& grid;
 
+    bool grid_bloated;
+    bool next_visible;
+    bool force_reload;
+
     tile_grid_base::tile_info oob_tile;
 
     alignas(int) bn::regular_bg_map_cell cells[ROWS * COLUMNS];
     bn::regular_bg_map_item map_item;
     bn::regular_bg_ptr bg_ptr;
     bn::regular_bg_map_ptr map_ptr;
-    bool next_visible;
-    bool force_reload;
-    bool grid_bloated;
 
     bg_t(const level& lv_, const layer& layer_, const bn::fixed_point& cam_applied_pos, const level_bgs_builder&);
 
@@ -158,10 +159,10 @@ void update_callback()
 bg_t::bg_t(const level& lv_, const layer& layer_, const bn::fixed_point& cam_applied_pos,
            const level_bgs_builder& builder)
     : lv(lv_), layer_instance(layer_),
-      grid(layer_.auto_layer_tiles() ? *layer_.auto_layer_tiles() : *layer_.grid_tiles()),
+      grid(layer_.auto_layer_tiles() ? *layer_.auto_layer_tiles() : *layer_.grid_tiles()), grid_bloated(grid.bloated()),
+      next_visible(builder.visible(layer_.identifier())), force_reload(false),
       oob_tile(builder.out_of_bound_tile_info(layer_.identifier())), map_item(cells[0], bn::size(COLUMNS, ROWS)),
-      bg_ptr(init_bg_ptr(layer_, cam_applied_pos, builder)), map_ptr(bg_ptr.map()), next_visible(bg_ptr.visible()),
-      force_reload(false), grid_bloated(grid.bloated())
+      bg_ptr(init_bg_ptr(layer_, cam_applied_pos, builder)), map_ptr(bg_ptr.map())
 {
 }
 
