@@ -204,6 +204,8 @@ class TilesetInfos:
                     tiles = layer.grid_tiles
                 if tiles:
                     assert layer.tileset_def_uid is not None
+                    if layer.tileset_def_uid not in tileset_uid_to_idx:
+                        continue
                     used_tiles: Set[Point] = tilesets_used_tiles[
                         tileset_uid_to_idx[layer.tileset_def_uid]
                     ]
