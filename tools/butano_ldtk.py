@@ -752,9 +752,8 @@ if __name__ == "__main__":
         "--tileset-palette-manual",
         action="store_true",
         help=(
-            "Keep tileset pixel indices and global palette from the source image (mode P); "
-            "no quantization. Writes bpp_4_manual in tileset JSON. "
-            "Tilesets without an image file still use the default path (bpp_4_auto)."
+            "Keep tileset global palette and pixels from the source image (mode P); "
+            "No quantization. Writes `bpp_4_manual` in tileset JSON."
         ),
     )
     parser.add_argument(
