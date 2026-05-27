@@ -9,9 +9,9 @@
 #include "ldtk_entity.h"
 #include "ldtk_gen_idents_fwd.h"
 #include "ldtk_gen_iids_fwd.h"
-#include "ldtk_int_grid_base.h"
+#include "ldtk_int_grid.h"
 #include "ldtk_layer_type.h"
-#include "ldtk_tile_grid_base.h"
+#include "ldtk_tile_grid.h"
 
 #include <bn_assert.h>
 #include <bn_fixed.h>
@@ -29,8 +29,8 @@ class layer
 public:
     /// @cond DO_NOT_DOCUMENT
     constexpr layer(const layer_definition& def, const tileset_definition* tileset_def, const bn::size& c_size,
-                    const bn::point& px_total_offset, const tile_grid_base* auto_layer_tiles,
-                    const tile_grid_base* grid_tiles, const int_grid_base* int_grid,
+                    const bn::point& px_total_offset, const tile_grid* auto_layer_tiles,
+                    const tile_grid* grid_tiles, const ldtk::int_grid* int_grid,
                     const bn::span<const entity>& entity_instances, gen::layer_iid iid, bool visible)
         : _def(def), _tileset_def(tileset_def), _c_size(c_size), _px_total_offset(px_total_offset),
           _auto_layer_tiles(auto_layer_tiles), _grid_tiles(grid_tiles), _int_grid(int_grid),
@@ -143,13 +143,13 @@ public:
     /// The array is already sorted in display order (ie. 1st tile is beneath 2nd, which is beneath 3rd etc.).
     /// @note if multiple tiles are stacked in the same cell as the result of different rules,
     /// all tiles behind opaque ones will be discarded.
-    [[nodiscard]] constexpr auto auto_layer_tiles() const -> const tile_grid_base*
+    [[nodiscard]] constexpr auto auto_layer_tiles() const -> const tile_grid*
     {
         return _auto_layer_tiles;
     }
 
     /// @brief (Only *Tile layers*)
-    [[nodiscard]] constexpr auto grid_tiles() const -> const tile_grid_base*
+    [[nodiscard]] constexpr auto grid_tiles() const -> const tile_grid*
     {
         return _grid_tiles;
     }
@@ -157,7 +157,7 @@ public:
     /// @brief (Only *IntGrid layers*) A list of all values in the IntGrid layer. \n
     /// 0 means "empty cell" and IntGrid values start at 1. \n
     /// The size is `c_width()` x `c_height()` cells.
-    [[nodiscard]] constexpr auto int_grid() const -> const int_grid_base*
+    [[nodiscard]] constexpr auto int_grid() const -> const ldtk::int_grid*
     {
         return _int_grid;
     }
@@ -187,9 +187,9 @@ private:
     bn::size _c_size;
     bn::point _px_total_offset;
 
-    const tile_grid_base* _auto_layer_tiles;
-    const tile_grid_base* _grid_tiles;
-    const int_grid_base* _int_grid;
+    const tile_grid* _auto_layer_tiles;
+    const tile_grid* _grid_tiles;
+    const ldtk::int_grid* _int_grid;
 
     bn::span<const entity> _entity_instances;
     gen::layer_iid _iid;

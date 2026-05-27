@@ -83,7 +83,7 @@ int main()
             // If `tiles_layer_8` doesn't have a single visible tile, it doesn't generate a BG, so it will error out.
             if (level_bgs.has_background(ldtk::gen::layer_ident::tiles_layer_8))
             {
-                ldtk::tile_grid_base::tile_info oob_tile_info =
+                ldtk::tile_grid::tile_info oob_tile_info =
                     level_bgs.out_of_bound_tile_info(ldtk::gen::layer_ident::tiles_layer_8);
 
                 // Tile index `0` is always a valid tile index, which denotes a fully transparent tile.
@@ -91,7 +91,7 @@ int main()
                 {
                     // Get the tile grid from the `tiles_layer_8` layer.
                     // If `tiles_layer_8` was an auto-tile layer, you need to use `auto_layer_tiles()` instead.
-                    const ldtk::tile_grid_base* tile_grid =
+                    const ldtk::tile_grid* tile_grid =
                         level.get_layer(ldtk::gen::layer_ident::tiles_layer_8).grid_tiles();
                     BN_ASSERT(tile_grid != nullptr, "Layer is not a tile layer");
 

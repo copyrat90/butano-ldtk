@@ -1575,8 +1575,7 @@ class LayerAutoLayerTilesHeader(GenPrivHeader):
 
     def __init__(self):
         super().__init__()
-        self.add_include("type_traits", is_system_header=True)
-        self.add_include("ldtk_tile_grid_t.h")
+        self.add_include("ldtk_tile_grid.h")
         self.add_include(f"ldtk_gen_priv_layer_{self.tiles_type()}_cells.h")
 
         self.grids: List[LayerAutoLayerTilesHeader.GridInfo] = []
@@ -1598,7 +1597,7 @@ class LayerAutoLayerTilesHeader(GenPrivHeader):
             cells_ident = grid_ident + "_cells"
 
             source.write(
-                f"inline constexpr const tile_grid_t<sizeof(std::remove_extent_t<decltype({cells_ident})>) >= 2> {grid_ident}(\n"
+                f"inline constexpr const tile_grid {grid_ident}(\n"
             )
             source.write(f"    {grid.width},\n")
             source.write(f"    {grid.height},\n")
@@ -1839,9 +1838,7 @@ class LayerIntGridsHeader(GenPrivHeader):
 
     def __init__(self):
         super().__init__()
-        self.add_include("type_traits", is_system_header=True)
-        self.add_include("ldtk_int_grid_t.h")
-        self.add_include("ldtk_int_grid_empty_t.h")
+        self.add_include("ldtk_int_grid.h")
         self.add_include("ldtk_gen_priv_layer_int_grid_cells.h")
 
         self.grids: List[LayerIntGridsHeader.GridInfo] = []
@@ -1860,19 +1857,13 @@ class LayerIntGridsHeader(GenPrivHeader):
             )
             cells_ident = grid_ident + "_cells"
 
-            if grid.is_empty:
-                source.write(f"inline constexpr const int_grid_empty_t {grid_ident}(\n")
-                source.write(f"    {grid.width},\n")
-                source.write(f"    {grid.height}\n")
-                source.write(");\n\n")
-            else:
-                source.write(
-                    f"inline constexpr const int_grid_t<std::remove_cvref_t<std::remove_extent_t<decltype({cells_ident})>>> {grid_ident}(\n"
-                )
-                source.write(f"    {grid.width},\n")
-                source.write(f"    {grid.height},\n")
-                source.write(f"    {cells_ident}\n")
-                source.write(");\n\n")
+            source.write(f"inline constexpr const int_grid {grid_ident}(\n")
+            source.write(f"    {grid.width},\n")
+            source.write(f"    {grid.height}")
+            if not grid.is_empty:
+                source.write(",\n")
+                source.write(f"    {cells_ident}")
+            source.write("\n);\n\n")
 
 
 class LayerIntGridCellsHeader(GenPrivHeader):

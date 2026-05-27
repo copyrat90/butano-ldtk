@@ -71,29 +71,7 @@ auto player_physics::detect_point_collision_with_level_walls(const bn::fixed_poi
     // Get the int grid from the "collisions" layer
     //   - "collisions" layer is an IntGrid layer, so it's safe to dereference the pointer without checking
     static_assert(COLLISION_LAYER_DEFINITION.type() == ldtk::layer_type::INT_GRID);
-    const ldtk::int_grid_base& int_grid = *collision_layer.int_grid();
-
-    // Get the concrete type of the int grid to avoid run-time virtual function call overhead
-    //
-    // You can skip this part and just call `int_grid.cell_int()` below,
-    // but that would be a run-time virtual function call, which might cause a performance issue
-    static_assert(
-        [] {
-            // Check all "collision" IntGrid layers in all levels store int values with `std::uint8_t` (1 byte)
-            //   - If all int values are [0, 256), it's stored in `std::uint8_t`.
-            //   - Actually, if there's an "empty" collision layer (all int values are strictly `0`),
-            //     it will be `ldtk::int_grid_empty_t` (0 byte!), and this check will fail.
-            //     But we don't have an empty int grid in this project, so this works.
-            for (const ldtk::level& level_inst : ldtk::gen::gen_project.levels())
-            {
-                const ldtk::layer& coll_layer = level_inst.get_layer(ldtk::gen::layer_ident::collisions);
-                if (coll_layer.int_grid()->cell_storage_size() != sizeof(std::uint8_t))
-                    return false;
-            }
-            return true;
-        }(),
-        "Size of each cell is not 1 byte as expected");
-    const auto& concrete_int_grid = static_cast<const ldtk::int_grid_t<std::uint8_t>&>(int_grid);
+    const ldtk::int_grid& int_grid = *collision_layer.int_grid();
 
     // Convert world coordinate `point` to grid coordinate point
     static constexpr int TILE_SIZE = COLLISION_LAYER_DEFINITION.grid_size();
@@ -101,9 +79,6 @@ auto player_physics::detect_point_collision_with_level_walls(const bn::fixed_poi
 
     // If this `grid_point` goes out of the grid boundary, we will consider it as an wall.
     //   - This check is REQUIRED, since calling `cell_int()` with OOB point will error out.
-    //   - `ldtk::int_grid_base::c_width()` and `c_height()` are not virtual functions,
-    //     so you don't need concrete type for this.
-    //     (it's a normal member function in the base class)
     if (grid_point.x() < 0 || grid_point.x() >= int_grid.c_width() || grid_point.y() < 0 ||
         grid_point.y() >= int_grid.c_height())
     {
@@ -112,8 +87,7 @@ auto player_physics::detect_point_collision_with_level_walls(const bn::fixed_poi
     }
 
     // Get the int grid value with the `grid_point`
-    //   - Using `concrete_int_grid` here to avoid run-time virtual function call
-    const int int_grid_value = concrete_int_grid.cell_int_no_virtual(grid_point.x(), grid_point.y());
+    const int int_grid_value = int_grid.cell_int(grid_point.x(), grid_point.y());
 
     // Get the metadata of this int grid value
     const ldtk::int_grid_value_info* int_grid_value_info =

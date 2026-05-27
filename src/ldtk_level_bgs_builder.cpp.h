@@ -217,12 +217,12 @@ auto level_bgs_builder::release_camera() -> bn::optional<bn::camera_ptr>
     return result;
 }
 
-auto level_bgs_builder::out_of_bound_tile_info(gen::layer_ident layer_identifier) const -> tile_grid_base::tile_info
+auto level_bgs_builder::out_of_bound_tile_info(gen::layer_ident layer_identifier) const -> tile_grid::tile_info
 {
     return bg_attr(layer_identifier).oob_tile_info;
 }
 
-auto level_bgs_builder::set_out_of_bound_tile_info(tile_grid_base::tile_info oob_tile_info,
+auto level_bgs_builder::set_out_of_bound_tile_info(tile_grid::tile_info oob_tile_info,
                                                    gen::layer_ident layer_identifier) -> level_bgs_builder&
 {
     bg_attr(layer_identifier).oob_tile_info = oob_tile_info;

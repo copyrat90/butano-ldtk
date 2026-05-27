@@ -8,7 +8,7 @@
 
 #include "ldtk_gen_idents_fwd.h"
 #include "ldtk_layer.h"
-#include "ldtk_tile_grid_t.h"
+#include "ldtk_tile_grid.h"
 #include "ldtk_tileset_definition.h"
 
 #include <bn_assert.h>
@@ -49,13 +49,12 @@ struct bg_t
 
     const level& lv;
     const layer& layer_instance;
-    const tile_grid_base& grid;
+    const tile_grid& grid;
 
-    bool grid_bloated;
     bool next_visible;
     bool force_reload;
 
-    tile_grid_base::tile_info oob_tile;
+    tile_grid::tile_info oob_tile;
 
     alignas(int) bn::regular_bg_map_cell cells[ROWS * COLUMNS];
     bn::regular_bg_map_item map_item;
@@ -159,7 +158,7 @@ void update_callback()
 bg_t::bg_t(const level& lv_, const layer& layer_, const bn::fixed_point& cam_applied_pos,
            const level_bgs_builder& builder)
     : lv(lv_), layer_instance(layer_),
-      grid(layer_.auto_layer_tiles() ? *layer_.auto_layer_tiles() : *layer_.grid_tiles()), grid_bloated(grid.bloated()),
+      grid(layer_.auto_layer_tiles() ? *layer_.auto_layer_tiles() : *layer_.grid_tiles()),
       next_visible(builder.visible(layer_.identifier())), force_reload(false),
       oob_tile(builder.out_of_bound_tile_info(layer_.identifier())), map_item(cells[0], bn::size(COLUMNS, ROWS)),
       bg_ptr(init_bg_ptr(layer_, cam_applied_pos, builder)), map_ptr(bg_ptr.map())
@@ -302,7 +301,7 @@ void bg_t::reset_rows(const int level_8x8_first_y, const int level_8x8_last_y, c
 
         for (int lx = level_8x8_first_x; lx <= level_8x8_last_x; ++lx)
         {
-            tile_grid_base::tile_info m_tile_info;
+            tile_grid::tile_info m_tile_info;
 
             if (mx < 0 || mx >= grid.c_width() || my < 0 || my >= grid.c_height())
             {
@@ -312,10 +311,7 @@ void bg_t::reset_rows(const int level_8x8_first_y, const int level_8x8_last_y, c
             }
             else
             {
-                // Optimization: no virtual function call
-                m_tile_info = grid_bloated
-                                  ? static_cast<const tile_grid_t<true>&>(grid).cell_tile_info_no_virtual(mx, my)
-                                  : static_cast<const tile_grid_t<false>&>(grid).cell_tile_info_no_virtual(mx, my);
+                m_tile_info = grid.cell_tile_info(mx, my);
             }
 
             const int tx = m_tile_info.x_flip ? m_tile_cnt - 1 - mx_rnd_cnt : mx_rnd_cnt;
@@ -382,7 +378,7 @@ void bg_t::reset_columns(const int level_8x8_first_y, const int level_8x8_last_y
 
         for (int ly = level_8x8_first_y; ly <= level_8x8_last_y; ++ly)
         {
-            tile_grid_base::tile_info m_tile_info;
+            tile_grid::tile_info m_tile_info;
 
             if (mx < 0 || mx >= grid.c_width() || my < 0 || my >= grid.c_height())
             {
@@ -392,10 +388,7 @@ void bg_t::reset_columns(const int level_8x8_first_y, const int level_8x8_last_y
             }
             else
             {
-                // Optimization: no virtual function call
-                m_tile_info = grid_bloated
-                                  ? static_cast<const tile_grid_t<true>&>(grid).cell_tile_info_no_virtual(mx, my)
-                                  : static_cast<const tile_grid_t<false>&>(grid).cell_tile_info_no_virtual(mx, my);
+                m_tile_info = grid.cell_tile_info(mx, my);
             }
 
             const int tx = m_tile_info.x_flip ? m_tile_cnt - 1 - mx_rnd_cnt : mx_rnd_cnt;
@@ -925,13 +918,13 @@ void remove_camera(id_t id)
     lv->cam.reset();
 }
 
-auto out_of_bound_tile_info(id_t id, gen::layer_ident layer_identifier) -> tile_grid_base::tile_info
+auto out_of_bound_tile_info(id_t id, gen::layer_ident layer_identifier) -> tile_grid::tile_info
 {
     auto lv = static_cast<const lv_t*>(id);
     return lv->get_bg(layer_identifier).oob_tile;
 }
 
-void set_out_of_bound_tile_info(id_t id, tile_grid_base::tile_info oob_tile_info, gen::layer_ident layer_identifier)
+void set_out_of_bound_tile_info(id_t id, tile_grid::tile_info oob_tile_info, gen::layer_ident layer_identifier)
 {
     auto lv = static_cast<lv_t*>(id);
     auto& bg = lv->get_bg(layer_identifier);

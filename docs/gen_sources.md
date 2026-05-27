@@ -48,7 +48,7 @@
     * ldtk_gen_priv_level_layer_instances.h
         > `layer[]   gen_priv_level_<identifier>_layer_instances;`
         * ldtk_gen_priv_layer_auto_layer_tiles.h
-            > `tile_grid_t<bool>   gen_priv_level_<identifier>_layer_<identifier>_auto_layer_tiles;`
+            > `tile_grid   gen_priv_level_<identifier>_layer_<identifier>_auto_layer_tiles;`
             * ldtk_gen_priv_layer_auto_layer_tiles_cells.h
                 > `std::uint8/16_t[]   gen_priv_level_<identifier>_layer_<identifier>_auto_layer_tiles_cells;`
         * ldtk_gen_priv_layer_entity_instances.h
@@ -58,11 +58,11 @@
                 * ldtk_gen_priv_entity_field_arrays.h
                     > `<element_type>[]   gen_priv_entity_<iid>_field_<identifier>_array;`
         * ldtk_gen_priv_layer_grid_tiles.h
-            > `tile_grid_t<bool>   gen_priv_level_<identifier>_layer_<identifier>_grid_tiles;`
+            > `tile_grid   gen_priv_level_<identifier>_layer_<identifier>_grid_tiles;`
             * ldtk_gen_priv_layer_grid_tiles_cells.h
                 > `std::uint8/16_t[]   gen_priv_level_<identifier>_layer_<identifier>_grid_tiles_cells;`
         * ldtk_gen_priv_layer_int_grids.h
-            > `int_grid_t<std::uint8/16/32_t>   gen_priv_level_<identifier>_layer_<identifier>_int_grid;`
+            > `int_grid   gen_priv_level_<identifier>_layer_<identifier>_int_grid;`
             * ldtk_gen_priv_layer_int_grid_cells.h
                 > `std::uint8/16/32_t[]   gen_priv_level_<identifier>_layer_<identifier>_int_grid_cells;`
 
